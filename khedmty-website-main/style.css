@@ -1,0 +1,198 @@
+body {
+  font-family: "Cairo", sans-serif;
+  background: linear-gradient(to bottom right, #eaf1ff, #dbe5ff);
+  color: #222;
+  margin: 0;
+  padding: 0;
+  direction: rtl;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  background-color: #233B6E;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.nav-left .church-logo {
+  height: 80px;
+}
+
+.nav-right .nav-link {
+  color: white;
+  text-decoration: none;
+  margin-left: 15px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.nav-right .nav-link:hover {
+  text-decoration: underline;
+}
+
+header {
+  background-color: #ffffff;
+  text-align: center;
+  padding: 40px 20px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-bottom: 3px solid #233B6E22;
+  border-radius: 0 0 25px 25px;
+}
+
+.logo {
+  width: 90px;
+  height: auto;
+  margin-bottom: 10px;
+  transition: transform 0.3s;
+}
+
+.logo:hover {
+  transform: scale(1.1);
+}
+
+h1 {
+  margin: 10px 0 5px;
+  font-size: 2.5em;
+  color: #233B6E;
+}
+
+.tagline {
+  font-size: 1.1em;
+  color: #555;
+}
+
+main {
+  flex: 1;
+  padding: 30px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+section {
+  margin-bottom: 40px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+h2 {
+  color: #233B6E;
+  margin-bottom: 10px;
+}
+
+p {
+  line-height: 1.8;
+  font-size: 1.05em;
+}
+
+.btn {
+  display: inline-block;
+  background: linear-gradient(to right, #233B6E, #314d9f);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 10px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-in-out;
+}
+
+.btn:hover {
+  background: #1a2d59;
+  transform: scale(1.05);
+}
+
+footer {
+  background-color: #233B6E;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9em;
+  margin-top: auto;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+}
+.back-icon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 1.8em;
+  color: #233B6E;
+  text-decoration: none;
+  z-index: 999;
+  transition: 0.3s ease;
+}
+
+.back-icon:hover {
+  color: #1a2d59;
+  transform: scale(1.2);
+}
+
+.container {
+  width: 90%;
+  max-width: 1000px;
+  margin: 50px auto;
+  padding: 50px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.container label {
+  margin: 15px 0 5px;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.container input[type="text"],
+.container input[type="email"],
+.container input[type="password"],
+.container input[type="tel"] {
+  padding: 14px;
+  font-size: 1.1em;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  width: 100%;
+}
+
+.container .role-options {
+  margin-top: 10px;
+  display: flex;
+  gap: 30px;
+  font-size: 1.05em;
+}
+
+.container .btn {
+  margin-top: 30px;
+  padding: 16px;
+  font-size: 1.2em;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  background: linear-gradient(to right, #233B6E, #314d9f);
+  color: white;
+  border: none;
+  transition: 0.3s;
+}
+
+.container .btn:hover {
+  background: #1a2d59;
+}
+
+.container h2 {
+  text-align: center;
+  color: #233B6E;
+  margin-bottom: 30px;
+  font-size: 2em;
+}
+
