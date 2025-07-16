@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الصور المرفوعة</title>
+  <link rel="stylesheet" href="listPhotos.css">
+  <script src="listPhotos.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <img src="church-logo.png" alt="Church Logo" class="church-logo">
+    </div>
+    <div class="nav-right">
+      <a href="#" class="nav-link">الصفحة الرئيسية</a>
+      <a href="#" class="nav-link">تسجيل الدخول</a>
+      <a href="#" class="nav-link">إنشاء حساب</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <main>
+      <h2 class="section-title">الصور:</h2>
+      <div class="filter-group">
+        <label for="titleFilter">تصفية حسب العنوان:</label>
+        <input type="text" id="titleFilter" placeholder="ابحث عن صورة...">
+      </div>
+      <div id="photoList" class="photo-list">
+        <div class="empty-state">
+          <p>لا توجد صور مرفوعة حاليًا</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
+  </footer>
+</body>
+</html>
