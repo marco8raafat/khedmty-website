@@ -23,6 +23,11 @@
     display: flex;
     flex-direction: column;
     direction: rtl;
+    background-image: url('knesa.jpg'); /* Change path to your image */
+    background-size: cover;        /* Make image cover the whole page */
+    background-repeat: no-repeat;  /* Prevent repeating */
+    background-attachment: fixed;  /* Keeps background fixed when scrolling */
+    background-position: center;   /* Center the image */
   }
   
   .container {
