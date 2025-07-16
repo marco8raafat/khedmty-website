@@ -1,0 +1,320 @@
+:root {
+    --primary: #233B6E;
+    --secondary: #314d9f;
+    --light: #f5f7fa;
+    --success: #388e3c;
+    --error: #d32f2f;
+    --shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(to bottom right, #eaf1ff, #dbe5ff);
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    direction: rtl;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  /* Navigation Styles */
+  .navbar {
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .nav-left .church-logo {
+    height: 80px;
+    border-radius: 8px;
+    background: white;
+    padding: 5px;
+  }
+  
+  .nav-right {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+  
+  .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Main Content */
+  main {
+    flex: 1;
+    padding: 30px 0;
+  }
+  
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    gap: 15px;
+  }
+  
+  .tab-btn {
+    background: white;
+    color: var(--primary);
+    padding: 12px 30px;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .tab-btn.active {
+    background: var(--primary);
+    color: white;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .section-title {
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+    padding-bottom: 15px;
+  }
+  
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 40%;
+    width: 20%;
+    height: 3px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+  }
+  
+  /* Upload Form */
+  #uploadForm {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  label {
+    font-weight: bold;
+    color: var(--primary);
+  }
+  
+  input[type="text"],
+  input[type="file"] {
+    padding: 12px 15px;
+    border: 1px solid #bfc9e1;
+    border-radius: 8px;
+    font-size: 1.05em;
+    background: #f7faff;
+    font-family: 'Cairo', sans-serif;
+  }
+  
+  input[type="file"] {
+    padding: 10px;
+    background: white;
+  }
+  
+  .btn {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    font-family: 'Cairo', sans-serif;
+    display: inline-block;
+    text-align: center;
+  }
+  
+  .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  #message {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    display: none;
+  }
+  
+  .success {
+    background-color: rgba(56, 142, 60, 0.15);
+    color: var(--success);
+    border: 1px solid var(--success);
+  }
+  
+  .error {
+   background-color: rgba(211, 47, 47, 0.15);
+    color: var(--error);
+    border: 1px solid var(--error);
+  }
+  
+  /* PDF List */
+  .pdf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  
+  .pdf-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f5f7fa;
+    padding: 18px 24px;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(35,59,110,0.07);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .pdf-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(35,59,110,0.1);
+  }
+  
+  .pdf-title {
+    font-size: 1.15em;
+    color: var(--primary);
+    font-weight: bold;
+    max-width: 70%;
+  }
+  
+  .pdf-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .pdf-actions a {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    padding: 8px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.98em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .pdf-actions a:hover {
+    background: #1a2d59;
+    transform: scale(1.05);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  
+  .empty-state p {
+    font-size: 1.2em;
+    color: #666;
+    margin-top: 15px;
+  }
+  
+  /* Footer */
+  footer {
+    background-color: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.95em;
+    margin-top: auto;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .pdf-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .pdf-title {
+      max-width: 100%;
+    }
+    
+    .pdf-actions {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .tabs {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .tab-btn {
+      width: 90%;
+    }
+  }
