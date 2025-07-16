@@ -22,6 +22,11 @@ body {
 
 .nav-left .church-logo {
   height: 80px;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  padding: 4px;
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .nav-right .nav-link {
@@ -29,11 +34,17 @@ body {
   text-decoration: none;
   margin-left: 15px;
   font-weight: bold;
+  padding: 8px 12px;
+  border-radius: 6px;
   transition: 0.3s;
 }
 
-.nav-right .nav-link:hover {
-  text-decoration: underline;
+.nav-right .nav-link:hover,
+.nav-right .nav-link:focus,
+.nav-right .nav-link:active {
+  background-color: #1a2d59;
+  color: #fff;
+  text-decoration: none;
 }
 
 header {
@@ -118,4 +129,55 @@ footer {
   font-size: 0.9em;
   margin-top: auto;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+}
+.container {
+  background-color: white;
+  padding: 30px;
+  max-width: 650px;
+  width: 80%; 
+  margin: 60px auto;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+
+.container h2 {
+  text-align: center;
+  color: #233B6E;
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1.05em;
+}
+
+
+label {
+  font-weight: bold;
+  color: #233B6E;
+}
+
+.back-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 1.2em;
+  color: #233B6E;
+  text-decoration: none;
+}
+
+.role-options {
+  display: flex;
+  gap: 20px;
+  margin-top: -10px;
+  font-weight: normal;
 }
