@@ -202,7 +202,6 @@ td {
   transition: color 0.3s ease;
 }
 
-/* القائمة المنسدلة */
 .dropdown-menu {
   display: none;
   position: absolute;
