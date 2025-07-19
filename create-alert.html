@@ -6,8 +6,41 @@
   <link rel="icon" type="image/png" href="logoCircle1.png">
   <title>إضافة تنبيه</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .alert-box {
+      background-color: #fefefe;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .delete-btn {
+      background-color: #ff4d4d;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      cursor: pointer;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+    }
+  </style>
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <img src="church-logo.png" alt="شعار الكنيسة" class="church-logo">
+    </div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+      <a href="login.html" class="nav-link">تسجيل الدخول</a>
+      <a href="register.html" class="nav-link">إنشاء حساب</a>
+    </div>
+  </nav>
+
   <header>
     <img src="logo.png" alt="شعار خدمتي" class="logo">
     <h1>إضافة تنبيه</h1>
@@ -22,11 +55,77 @@
       <textarea id="message" name="message" rows="4" required></textarea><br><br>
 
       <button type="submit" class="btn">إرسال التنبيه</button>
+      <a href="alerts-list.html" class="btn" style="background-color: #777;">عرض التنبيهات</a>
     </form>
+
+    <section id="alertsSection">
+      <h2>التنبيهات التي قمت بإضافتها:</h2>
+      <div id="alertsList"></div>
+    </section>
   </main>
 
   <footer>
     <p>© خدمتي 2025</p>
   </footer>
+
+  <script>
+    
+    document.querySelector('.alert-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const title = document.getElementById('title').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (title && message) {
+        const alert = {
+          title: title,
+          message: message,
+          time: new Date().toLocaleString()
+        };
+
+        let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+        alerts.push(alert);
+        localStorage.setItem('alerts', JSON.stringify(alerts));
+
+        document.getElementById('title').value = '';
+        document.getElementById('message').value = '';
+        renderAlerts();
+        window.alert("✅ تم إضافة التنبيه بنجاح!");
+      } else {
+        alert("❗يرجى ملء كل الحقول");
+      }
+    });
+
+    
+    function renderAlerts() {
+      const alertsList = document.getElementById('alertsList');
+      alertsList.innerHTML = '';
+
+      const alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+
+      alerts.forEach((alert, index) => {
+        const div = document.createElement('div');
+        div.className = 'alert-box';
+        div.innerHTML = `
+          <strong>${alert.title}</strong><br>
+          ${alert.message}<br>
+          <small>${alert.time}</small>
+          <button class="delete-btn" onclick="deleteAlert(${index})">🗑 حذف</button>
+        `;
+        alertsList.appendChild(div);
+      });
+    }
+
+  
+    function deleteAlert(index) {
+      let alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+      alerts.splice(index, 1);
+      localStorage.setItem('alerts', JSON.stringify(alerts));
+      renderAlerts();
+    }
+
+    
+    window.onload = renderAlerts;
+  </script>
 </body>
 </html>

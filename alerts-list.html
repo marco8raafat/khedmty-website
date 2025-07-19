@@ -8,6 +8,16 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <img src="church-logo.png" alt="شعار الكنيسة" class="church-logo">
+    </div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+      <a href="login.html" class="nav-link">تسجيل الدخول</a>
+      <a href="register.html" class="nav-link">إنشاء حساب</a>
+    </div>
+  </nav>
   <header>
     <img src="logo.png" alt="شعار خدمتي" class="logo">
     <h1>قائمة التنبيهات</h1>
@@ -15,16 +25,26 @@
 
   <main>
     <section class="alerts">
-      <ul>
-        <li>موعد اجتماع الخدام يوم الجمعة الساعة 12 ظهرا.</li>
-        <li>يُرجى تسليم تقرير الخدمة قبل يوم الجمعه.</li>
-        <li>لا تنسى حضور قداس الخدمة الأسبوعية.</li>
-      </ul>
+      <ul></ul>
     </section>
   </main>
 
   <footer>
     <p>© خدمتي 2025</p>
   </footer>
+  <script>
+  // اقرأ التنبيهات من Local Storage
+  const alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+
+  const ul = document.querySelector('.alerts ul');
+  ul.innerHTML = ''; 
+
+  alerts.reverse().forEach(alert => {
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${alert.title}</strong>: ${alert.message} <br><small>${alert.time}</small>`;
+    ul.appendChild(li);
+  });
+</script>
+
 </body>
 </html>
