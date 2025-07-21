@@ -1,0 +1,105 @@
+:root {
+    --primary: #233B6E;
+    --secondary: #314d9f;
+    --light: #f5f7fa;
+    --success: #388e3c;
+    --error: #d32f2f;
+    --shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Chat icon button */
+  #chat-button {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      /* background-color: #05b058; */
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+      width: 60px;
+      height: 60px;
+      font-size: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1000;
+      user-select: none;     /* For modern browsers */
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none;    /* Firefox */
+  }
+  
+  /* Chat box */
+  #chat-container {
+    position: fixed;
+    bottom: 100px;
+    right: 25px;
+    width: 300px;
+    height: 400px;
+    max-height: 400px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    display: none;
+    flex-direction: column;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999;
+    overflow: hidden;
+  }
+  
+  #chat-header {
+    /* background-color: #05b058; */
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  #chat-body {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background: #f8f8f8;
+  }
+  
+  .message {
+    margin: 8px 0;
+  }
+  
+  .user {
+    text-align: right;
+    color: rgb(0, 0, 0);
+  }
+  
+  .bot {
+    text-align: left;
+    /* color: green; */
+    color: #233B6E;
+  }
+  
+  #chat-input {
+    display: flex;
+    border-top: 1px solid #ccc;
+  }
+  
+  #chat-input input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    outline: none;
+  }
+  
+  #chat-input button {
+    /* background-color: #05b058; */
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
