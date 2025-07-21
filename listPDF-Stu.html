@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="logoCircle1.png">
+  <title>المصادر التعليمية</title>
+  <link rel="stylesheet" href="listPDF.css">
+  <script src="listPDF.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <img src="church-logo.png" alt="Church Logo" class="church-logo">
+    </div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+      <a href="login.html" class="nav-link">تسجيل الدخول</a>
+      <a href="register.html" class="nav-link">إنشاء حساب</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <main>
+      <h2 class="section-title">المصادر التعليمية المرفوعة</h2>
+      <div class="filter-group">
+        <label for="subjectFilter">تصفية حسب المادة:</label>
+        <select id="subjectFilter">
+          <option value="all">الكل</option>
+        </select>
+      </div>
+      <div id="pdfList" class="pdf-list">
+        <div class="empty-state">
+          <p>لا توجد مصادر تعليمية مرفوعة حاليًا</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
+  </footer>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const pdfList = document.getElementById('pdfList');
+    const subjectFilter = document.getElementById('subjectFilter');
+  
+    if (!pdfList || !subjectFilter) {
+      console.error('Required elements missing:', {
+        pdfList: !!pdfList,
+        subjectFilter: !!subjectFilter
+      });
+      return;
+    }
+  
+    // Retrieve PDFs from localStorage
+    let pdfs = [];
+    try {
+      pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
+      console.log('Retrieved PDFs:', pdfs.length);
+    } catch (error) {
+      console.error('Error parsing PDFs from localStorage:', error);
+      displayEmptyState();
+      return;
+    }
+  
+    // Populate subject filter dropdown
+    const subjects = [...new Set(pdfs.map(pdf => pdf.subject || 'غير محدد'))].sort();
+    subjects.forEach(subject => {
+      const option = document.createElement('option');
+      option.value = subject;
+      option.textContent = subject;
+      subjectFilter.appendChild(option);
+    });
+  
+    // Display PDFs based on filter
+    function renderPDFs(filterSubject) {
+      pdfList.innerHTML = ''; // Clear current list
+      const filteredPDFs = filterSubject === 'all' ? pdfs : pdfs.filter(pdf => (pdf.subject || 'غير محدد') === filterSubject);
+  
+      if (filteredPDFs.length === 0) {
+        displayEmptyState();
+        return;
+      }
+  
+      filteredPDFs.forEach(pdf => {
+        const pdfItem = document.createElement('div');
+        pdfItem.className = 'pdf-item';
+  
+        const pdfTitle = document.createElement('span');
+        pdfTitle.className = 'pdf-title';
+        pdfTitle.textContent = pdf.title;
+  
+        const pdfActions = document.createElement('div');
+        pdfActions.className = 'pdf-actions';
+  
+        // View button
+        const viewLink = document.createElement('a');
+        viewLink.href = pdf.data; // Base64 data URL
+        viewLink.textContent = 'عرض';
+        viewLink.setAttribute('target', '_blank'); // Open in new tab
+        viewLink.setAttribute('download', `${pdf.title}.pdf`); // Suggest download with title
+        viewLink.classList.add('firstB');
+
+  
+        
+  
+        pdfActions.appendChild(viewLink);
+        pdfItem.appendChild(pdfTitle);
+        pdfItem.appendChild(pdfActions);
+        pdfList.appendChild(pdfItem);
+      });
+    }
+  
+    // Initial render
+    renderPDFs('all');
+  
+    // Filter change event
+    subjectFilter.addEventListener('change', (e) => {
+      console.log('Filtering by subject:', e.target.value);
+      renderPDFs(e.target.value);
+    });
+  
+  
+    function updateSubjects() {
+      try {
+        pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
+        const currentSubjects = [...new Set(pdfs.map(pdf => pdf.subject || 'غير محدد'))].sort();
+        const selectedSubject = subjectFilter.value;
+  
+        // Rebuild dropdown
+        subjectFilter.innerHTML = '<option value="all">الكل</option>';
+        currentSubjects.forEach(subject => {
+          const option = document.createElement('option');
+          option.value = subject;
+          option.textContent = subject;
+          subjectFilter.appendChild(option);
+        });
+  
+        // Restore selection or default to 'all' if selected subject is gone
+        subjectFilter.value = currentSubjects.includes(selectedSubject) ? selectedSubject : 'all';
+        renderPDFs(subjectFilter.value);
+      } catch (error) {
+        console.error('Error updating subjects:', error);
+        displayEmptyState();
+      }
+    }
+  
+    function displayEmptyState() {
+      pdfList.innerHTML = `
+        <div class="empty-state">
+          <p>لا توجد مصادر تعليمية مرفوعة حاليًا</p>
+        </div>
+      `;
+      console.log('Displayed empty state');
+    }
+  
+    function checkEmptyState() {
+      try {
+        const filteredPDFs = subjectFilter.value === 'all' ? pdfs : pdfs.filter(pdf => (pdf.subject || 'غير محدد') === subjectFilter.value);
+        if (filteredPDFs.length === 0) {
+          displayEmptyState();
+        }
+      } catch (error) {
+        console.error('Error checking empty state:', error);
+        displayEmptyState();
+      }
+    }
+  });
+  </script>
+</body>
+</html>
