@@ -16,8 +16,8 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
   }
 
   users[email] = {
-  username,
-  email,
+  username: username,
+  email: email,
   phone: phone,
   group: group,
   password: password,
