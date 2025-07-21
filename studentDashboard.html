@@ -453,7 +453,7 @@ label {
 
   <div class="dashboard-container">
     <div class="welcome-section">
-      <h1>مرحباً بك عزيزي الطالب</h1>
+      <h1>مرحباً بك   <span id="username">الطالب</span></h1>
       <p>منصتك التعليمية الشاملة للنمو الروحي والعلمي</p>
     </div>
 
@@ -546,6 +546,16 @@ label {
   </footer>
 <script src="botScript.js"></script>
   <script>
+const users = JSON.parse(localStorage.getItem("users")) || {};
+const currentEmail = localStorage.getItem("currentUser");
+
+if (!currentEmail || !users[currentEmail]) {
+  window.location.href = "login.html";
+}
+
+const userData = users[currentEmail];
+
+document.getElementById("username").textContent = userData.username.split(" ").slice(0, 2).join(" ");
     document.addEventListener('DOMContentLoaded', function() {
       loadLatestNotifications();
     });

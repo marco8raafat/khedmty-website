@@ -378,7 +378,7 @@ footer {
 
   <div class="dashboard-container">
     <div class="welcome-section">
-      <h1>مرحباً بك في لوحة تحكم الخادم</h1>
+      <h1>مرحباً بك مستر <span id="username"></span> <br>في لوحة تحكم الخادم</h1>
       <p>إدارة شاملة لخدمتك التعليمية والروحية</p>
     </div>
 
@@ -465,6 +465,19 @@ footer {
   </footer>
   <script src="botScript.js"></script>
   <script>
+  const users = JSON.parse(localStorage.getItem("users")) || {};
+const currentEmail = localStorage.getItem("currentUser");
+
+if (!currentEmail || !users[currentEmail]) {
+  window.location.href = "login.html";
+}
+
+const userData = users[currentEmail];
+
+document.getElementById("username").textContent = userData.username.split(" ").slice(0, 1).join(" ");
+    document.addEventListener('DOMContentLoaded', function() {
+      loadLatestNotifications();
+    });
     // تحديث الإحصائيات من البيانات المحفوظة
     document.addEventListener('DOMContentLoaded', function() {
       updateStats();
