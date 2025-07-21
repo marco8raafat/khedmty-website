@@ -15,40 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     header: !!header
   });
 
-  // Navigation link handling
-  if (navLinks.length) {
-    navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const href = link.getAttribute('href');
-        // Define navigation paths (update as needed)
-        const paths = {
-          '#': './index.html', // Home
-          '#login': './login.html', // Login
-          '#signup': './signup.html' // Signup
-        };
-        if (paths[href]) {
-          window.location.href = paths[href];
-          console.log(`Navigating to: ${paths[href]}`);
-        } else {
-          console.warn(`No path defined for link: ${href}`);
-          alert('الصفحة غير متاحة حاليًا');
-        }
-        // Set active state
-        navLinks.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-      });
-    });
-    // Set active state for current page
-    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-    navLinks.forEach(link => {
-      if (link.getAttribute('href').includes(currentPath)) {
-        link.classList.add('active');
-      }
-    });
-  } else {
-    console.error('Navigation links not found');
-  }
 
   // Button handling for alerts
   if (addAlertBtn) {
