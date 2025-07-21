@@ -7,25 +7,63 @@
   <title>إضافة تنبيه</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .alert-box {
-      background-color: #fefefe;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-      position: relative;
+    textarea#message {
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1.1em;
+      border: 1px solid #ccc;
+      width: 100%;
+      background-color: #f9f9f9;
+      transition: 0.3s;
     }
+
+    textarea#message:focus {
+      outline: none;
+      border-color: #233B6E;
+      background-color: #fff;
+      box-shadow: 0 0 8px rgba(35, 59, 110, 0.2);
+    }
+
+    .alert-box {
+      background-color: #fdfdfd;
+      padding: 15px 20px;
+      margin: 15px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .alert-box strong {
+      font-size: 1.1em;
+      display: block;
+      color: #233B6E;
+      margin-bottom: 5px;
+    }
+
+    .alert-box small {
+      display: block;
+      margin-top: 8px;
+      color: #777;
+      font-size: 0.85em;
+    }
+
     .delete-btn {
       background-color: #ff4d4d;
       border: none;
       color: white;
       padding: 5px 10px;
       border-radius: 6px;
-      font-size: 0.9em;
+      font-size: 0.85em;
       cursor: pointer;
       position: absolute;
       left: 10px;
       top: 10px;
+      transition: 0.3s;
+    }
+
+    .delete-btn:hover {
+      background-color: #e60000;
     }
   </style>
 </head>

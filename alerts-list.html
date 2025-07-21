@@ -6,6 +6,28 @@
   <link rel="icon" type="image/png" href="logoCircle1.png">
   <title>كل التنبيهات</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .alert-item {
+      background-color: #ffffffa8;
+      margin-bottom: 15px;
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      line-height: 1.6;
+    }
+    .alert-item strong {
+      font-size: 1.2em;
+      color: #233B6E;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .alert-item small {
+      display: block;
+      color: #555;
+      margin-top: 6px;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -25,26 +47,30 @@
 
   <main>
     <section class="alerts">
-      <ul></ul>
+      <div id="alertsList"></div>
     </section>
   </main>
 
   <footer>
     <p>© خدمتي 2025</p>
   </footer>
+
   <script>
-  // اقرأ التنبيهات من Local Storage
-  const alerts = JSON.parse(localStorage.getItem('alerts')) || [];
+    const alerts = JSON.parse(localStorage.getItem('alerts')) || [];
 
-  const ul = document.querySelector('.alerts ul');
-  ul.innerHTML = ''; 
+    const container = document.getElementById('alertsList');
+    container.innerHTML = '';
 
-  alerts.reverse().forEach(alert => {
-    const li = document.createElement('li');
-    li.innerHTML = `<strong>${alert.title}</strong>: ${alert.message} <br><small>${alert.time}</small>`;
-    ul.appendChild(li);
-  });
-</script>
-
+    alerts.reverse().forEach(alert => {
+      const div = document.createElement('div');
+      div.className = 'alert-item';
+      div.innerHTML = `
+        <strong>${alert.title}</strong>
+        <div>${alert.message}</div>
+        <small>${alert.time}</small>
+      `;
+      container.appendChild(div);
+    });
+  </script>
 </body>
 </html>
