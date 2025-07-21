@@ -6,7 +6,7 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
   const password = document.getElementById("password").value;
   const phone = document.getElementById("phone").value;
   const group = document.getElementById("group").value;
-  const role = document.querySelector('input[name="role"]:checked').value;
+  const selectedRole = document.querySelector('input[name="role"]:checked').value;
 
   const users = JSON.parse(localStorage.getItem("users")) || {};
 
@@ -16,13 +16,12 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
   }
 
   users[email] = {
-    username,
-    email,
-    password, 
-    phone,
-    group,
-    role
-  };
+  name: name,
+  phone: phone,
+  group: group,
+  password: password,
+  role: selectedRole, 
+};
 
   localStorage.setItem("users", JSON.stringify(users));
   localStorage.setItem("currentUser", email);

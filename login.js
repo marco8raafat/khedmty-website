@@ -9,7 +9,16 @@ document.getElementById("loginForm").addEventListener("submit", function(e) {
   if (users[email]) {
     if (users[email].password === password) {
       localStorage.setItem("currentUser", email); 
-      window.location.href = "profilepage.html";
+
+      const role = users[email].role;
+      if (role === "student") {
+        window.location.href = "studentDashboard.html";
+      } else if (role === "servant") {
+        window.location.href = "teacherDashboard.html";
+      } else {
+        window.location.href = "register.html";
+      }
+
     } else {
       alert("كلمة المرور غير صحيحة.");
     }

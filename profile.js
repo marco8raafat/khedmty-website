@@ -21,3 +21,13 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 document.getElementById("editBtn").addEventListener("click", () => {
   window.location.href = "editprofile.html";
 });
+
+const backBtn = document.getElementById("backBtn");
+
+if (userData.role === "student") {
+  backBtn.href = "studentDashboard.html"; 
+} else if (userData.role === "servant") {
+  backBtn.href = "teacherDashboard.html"; 
+} else {
+  backBtn.href = "index.html";
+}
