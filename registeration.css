@@ -88,3 +88,53 @@
   margin-bottom: 30px;
   font-size: 2em;
 }
+.phone-frame {
+  width: 90%;
+  max-width: 450px;
+  background-color: #ffffffdd; 
+  border-radius: 16px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
+  text-align: center;
+}
+
+.phone-frame h2 {
+  margin-bottom: 25px;
+  color: #233B6E;
+  font-size: 1.8em;
+}
+
+#editForm input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  font-size: 1em;
+}
+
+#editForm input:disabled {
+  background-color: #eee;
+  color: #888;
+}
+
+#editForm button[type="submit"],
+.phone-frame button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  font-size: 1.1em;
+  background: linear-gradient(to right, #233B6E, #314d9f);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#editForm button[type="submit"]:hover,
+.phone-frame button:hover {
+  background-color: #1a2d59;
+}

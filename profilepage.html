@@ -2,27 +2,26 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="logoCircle1.png">
   <title>صفحة البروفايل</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="profileStyle.css">
+  <link rel="icon" type="image/png" href="logoCircle1.png">
+  <link rel="stylesheet" href="profileStyle.css">
 </head>
 <body>
-
   <div class="phone-frame">
     <img class="avatar-image" src="profileicon.png" alt="User Icon">
 
-    <h2> يوليانا عادل اسحق سعيد</h2>
-    <div class="info-line">📧 البريد الإلكتروني: example@gmail.com</div>
-    <div class="info-line">📞 رقم التليفون: 01012345678</div>
-    <div class="info-line">👥 اسم المجموعة: مجموعة مارمينا</div>
-    <div class="info-line">🎓 السنة الدراسية: الأولى</div>
+    <h2 id="username"></h2>
+    <div class="info-line" id="email"></div>
+    <div class="info-line" id="phone"></div>
+    <div class="info-line" id="group"></div>
+    <div class="info-line" id="role"></div>
 
     <div class="profile-buttons">
-      <button>تعديل البيانات</button>
-      <button>تسجيل الخروج</button>
+      <button id="editBtn">تعديل البيانات</button>
+      <button id="logoutBtn">تسجيل الخروج</button>
     </div>
   </div>
 
+  <script src="profile.js"></script>
 </body>
 </html>
