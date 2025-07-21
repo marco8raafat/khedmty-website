@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>سجل الحضور</title>
+  <link rel="stylesheet" href="styleAttendance.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">
+      <img src="church-logo.png" alt="شعار الموقع">
+    </div>
+    <ul class="nav-links">
+      
+      <li><a href="index.html">الرئيسية</a></li>
+      <li class="dropdown">
+        <a href="#">النظام الدراسي ▾</a>
+        <ul class="dropdown-menu">
+          <li><a href="Attendance registration.html">تسجيل الحضور</a></li>
+          <li><a href="term date.html">إدارة بيانات الترم والطلاب</a></li>
+          <li><a href="Attendance data.html">سجل الحضور</a></li>
+        </ul>
+      </li>
+      
+    </ul>
+  </nav>
+  <h2>سجل الحضور</h2>
+    <button onclick="printAttendance()">🖨️ طباعة / تحميل PDF</button>
+  <input type="text" id="searchInput" placeholder="ابحث بالاسم أو التاريخ" oninput="filterAttendanceHistory()">
+
+  <table id="historyTable">
+    <tr><th>التاريخ</th><th>الاسم</th><th>الحالة</th></tr>
+  </table>
+  <script src="attendance.js"></script>
+  <script>
+    loadAttendanceHistory();
+  </script>
+
+</body>
+</html>
