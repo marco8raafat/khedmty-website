@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="logoCircle1.png">
+  <link rel="stylesheet" href="botStyle.css">
   <title>لوحة تحكم الطالب - خدمتي</title>
   <style>
   body {
@@ -409,29 +410,7 @@ label {
       margin-top: 10px;
     }
 
-    .profile-section {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1000;
-    }
-
-    .profile-btn {
-      background: white;
-      border: 2px solid #233B6E;
-      border-radius: 50px;
-      padding: 10px 20px;
-      color: #233B6E;
-      text-decoration: none;
-      font-weight: bold;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-    }
-
-    .profile-btn:hover {
-      background: #233B6E;
-      color: white;
-    }
+    
 
     .empty-notifications {
       text-align: center;
@@ -466,13 +445,11 @@ label {
     <div class="nav-right">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
-      <a href="login.html" class="nav-link">تسجيل الخروج</a>
+      <a href="index.html" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
 
-  <div class="profile-section">
-    <a href="profilepage.html" class="profile-btn">👤 الملف الشخصي</a>
-  </div>
+  
 
   <div class="dashboard-container">
     <div class="welcome-section">
@@ -550,11 +527,24 @@ label {
       </p>
     </div>
   </div>
+  <!-- Chat Button -->
+<div id="chat-button" onclick="toggleChat()">
+  🤖
+</div>
 
+<!-- Chat Container -->
+<div id="chat-container">
+  <div id="chat-header">المساعد الذكي</div>
+  <div id="chat-body"></div>
+  <div id="chat-input">
+    <input type="text" style="font-size: 20px;" id="user-input" placeholder="أسالني اي سؤال..." onkeydown="if(event.key === 'Enter') sendMessage()">
+    <button onclick="sendMessage()">📤</button>
+  </div>
+</div>
   <footer>
     <p>© كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025</p>
   </footer>
-
+<script src="botScript.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       loadLatestNotifications();
