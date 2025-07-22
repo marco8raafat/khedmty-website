@@ -2,57 +2,125 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="logoCircle1.png">
-  <title>خدمتي - الصفحة الرئيسية</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="botStyle.css">
+  <title>تسليم البحث</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #e8f0fe;
+      font-family: 'Arial', sans-serif;
+  background-image: url('knesa.jpg'); /* Change path to your image */
+    background-size: cover;        /* Make image cover the whole page */
+    background-repeat: no-repeat;  /* Prevent repeating */
+    background-attachment: fixed;  /* Keeps background fixed when scrolling */
+    background-position: center;   /* Center the image */
+    }
+
+    .navbar {
+      background-color: #1c2f5c;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 40px;
+      align-items: center;
+    }
+
+    .navbar .links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar .links a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .navbar img {
+      height: 40px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+    }
+
+    .form-box {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
+    }
+
+    .form-box h2 {
+      margin-bottom: 20px;
+      color: #1c2f5c;
+    }
+
+    .form-box input[type="text"],
+    .form-box input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    .form-box button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(to right, #4059b4, #23326f);
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .footer {
+      background-color: #1c2f5c;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-left">
-      <img src="church-logo.png" alt="شعار الكنيسة" class="church-logo">
+
+  <div class="navbar">
+ <img src="logo.png" alt="Logo">
+    
+   <div class="links">
+      <a href="#">الصفحة الرئيسية</a>
+      <a href="#">تسجيل الدخول</a>
+      <a href="#">إنشاء حساب</a>
+</div>
+  </div>
+
+  <div class="container">
+    <div class="form-box">
+      <h2>تسليم البحث</h2>
+      <form>
+        <label>اسم البحث:</label>
+        <input type="text" name="title" required>
+
+        <label>البحث PDF:</label>
+        <input type="file" accept=".pdf" required>
+
+        <button type="submit">رفع البحث</button>
+      </form>
     </div>
-    <div class="nav-right">
-      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="login.html" class="nav-link">تسجيل الدخول</a>
-      <a href="register.html" class="nav-link">إنشاء حساب</a>
-    </div>
-  </nav>
+  </div>
 
-  <header>
-    <img src="logo.png" alt="شعار خدمتي" class="logo">
-    <h1>خدمتي</h1>
-    <p class="tagline">معًا نخدم المسيح في كنيسته</p>
-  </header>
+  <div class="footer">
+    © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
+  </div>
 
-  <main>
-    <section class="intro">
-      <h2>عن البرنامج</h2>
-      <p>
-        "خدمتي"  هو تطبيق من إعداد أسرة البابا أثناسيوس الرسولي لإعداد الخدام بكنيسة السيدة العذراء مريم - عزبة النخل
- يهدف إلى مساعدة الخادم في تنظيم خدمته مع تسهيل التواصل والتفاعل بين الخدام و المخدومين.
-      </p>
-    </section>
-
-    <section class="about-church">
-      <h2>عن الكنيسة</h2>
-      <p>
-       كنيسة السيدة العذراء مريم - عزبة النخل .. هي كنيسة أرثوذكسية عريقة تخدم آلاف الأسر في منطقة عزبة النخل على مدار أكثر من 75 عاما ً حيث تقدم خدمات روحية واجتماعية وتعليمية لكل الأعمار و تركز الكنيسة على تربية أجيال قوية في الإيمان  مع الإستعانة بالتكنولوجيا كوسيلة لتسهيل الخدمة وتقويتها
-      </p>
-    </section>
-
-    <section class="actions">
-      <a href="create-alert.html" class="btn">إضافة تنبيه (لخدام)</a>
-      <a href="alerts-list.html" class="btn">عرض كل التنبيهات</a>
-    </section>
-  </main>
-
-
-  <footer>
-    <p>© كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025</p>
-  </footer>
-  
-  <script src="index.js"></script>
 </body>
 </html>
+
