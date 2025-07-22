@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تسليم البحث</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #e8f0fe;
+      font-family: 'Arial', sans-serif;
+  background-image: url('knesa.jpg'); /* Change path to your image */
+    background-size: cover;        /* Make image cover the whole page */
+    background-repeat: no-repeat;  /* Prevent repeating */
+    background-attachment: fixed;  /* Keeps background fixed when scrolling */
+    background-position: center;   /* Center the image */
+    }
+
+    .navbar {
+      background-color: #1c2f5c;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 40px;
+      align-items: center;
+    }
+
+    .navbar .links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar .links a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .navbar img {
+      height: 40px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+    }
+
+    .form-box {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
+    }
+
+    .form-box h2 {
+      margin-bottom: 20px;
+      color: #1c2f5c;
+    }
+
+    .form-box input[type="text"],
+    .form-box input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    .form-box button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(to right, #4059b4, #23326f);
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .footer {
+      background-color: #1c2f5c;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+ <img src="logo.png" alt="Logo">
+    
+   <div class="links">
+      <a href="#">الصفحة الرئيسية</a>
+      <a href="#">تسجيل الدخول</a>
+      <a href="#">إنشاء حساب</a>
+</div>
+  </div>
+
+  <div class="container">
+    <div class="form-box">
+      <h2>تسليم البحث</h2>
+      <form>
+        <label>اسم البحث:</label>
+        <input type="text" name="title" required>
+
+        <label>البحث PDF:</label>
+        <input type="file" accept=".pdf" required>
+
+        <button type="submit">رفع البحث</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer">
+    © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
+  </div>
+
+</body>
+</html>
+
