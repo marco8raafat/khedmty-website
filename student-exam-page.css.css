@@ -1,0 +1,128 @@
+body {
+    font-family: sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .exam-box {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  .exam-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #bfc9e1;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+  }
+  
+  
+  #timer {
+    font-weight: bold;
+    color: white;
+    background-color: #d32f2f; 
+    padding: 6px 12px;
+    border-radius: 50PX;
+    font-size: 16px;
+    min-width: 70px;
+    text-align: center;
+  }
+  
+  
+  .question {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+  }
+  
+  .question h5 {
+    margin-bottom: 10px;
+  }
+  
+  label {
+    display: block;
+    margin: 5px 0;
+  }
+  
+  textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    display: block;
+    margin-top: 10px;
+  }
+  
+  
+  button#submitBtn {
+    background-color: #233B6E;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* .question-indicator {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .indicator-buttons button {
+    margin: 0 5px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+  }*/
+  
+  .indicator-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .indicator-buttons .answered {
+    background-color: #233B6E;
+    color: white;
+    border-color: #233B6E;
+  } 
+  .question-num {
+    width: 35px;
+    height: 35px;
+    background-color: #e0e0e0;
+    color: black;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: default;
+    transition: background-color 0.3s;
+  }
+  
+  .question-num.answered {
+    background-color: #233B6E; 
+    color: white;
+  }
+  
+  
