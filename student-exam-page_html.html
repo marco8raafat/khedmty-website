@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Exam</title>
+  <link rel="stylesheet" href="student-exam-PageCss.css" />
+  <script defer src="student-exam-PageJs.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="exam-box">
+
+      <div class="exam-header">
+        <h2>خدمتي :)</h2>
+        <div id="timer" data-minutes="10">10:00</div>
+      </div>
+
+      <h6>لن يتم ارسال الاختبار اذا كان احد الاسئلة من دون اجابة</h6>
+
+      <form id="examForm">
+
+        <div class="question" data-qname="q1">
+          <h3>بسم الاب</h3>
+          <label><input type="radio" name="q1" value="1"> 1</label>
+          <label><input type="radio" name="q1" value="2"> 2</label>
+          <label><input type="radio" name="q1" value="3"> 3</label>
+        </div>
+
+        <div class="question" data-qname="q2">
+          <h3>والابن</h3>
+          <label><input type="radio" name="q2" value="True"> صح</label>
+          <label><input type="radio" name="q2" value="False"> مش صح</label>
+        </div>
+
+        <div class="question" data-qname="q3">
+          <h3>والروح القدس</h3>
+          <textarea name="q3" rows="5" placeholder="اكتب إجابتك هنا..."></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn">ارسال الاختبار</button>
+      </form>
+
+      <center>
+      <div class="question-indicator">
+        <p>الأسئلة</p>
+        <div class="indicator-buttons">
+          <div class="question-num" data-qname="q1">1</div>
+          <div class="question-num" data-qname="q2">2</div>
+          <div class="question-num" data-qname="q3">3</div>
+        </div>
+      </div>
+    </center>
+
+    </div>
+  </div>
+</body>
+</html>
