@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>الدرجات</title>
+  <style>
+    :root {
+    --primary: #233B6E;
+    --secondary: #314d9f;
+    --light: #f5f7fa;
+    --success: #388e3c;
+    --error: #d32f2f;
+    --shadow: 0 2px 10px rgba(0,0,0,0.08);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+    body {
+     font-family: 'Cairo', sans-serif;
+    background: linear-gradient(to bottom right, #eaf1ff, #dbe5ff);
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    direction: rtl;
+    background-image: url('knesa.jpg'); /* Change path to your image */
+    background-size: cover;        /* Make image cover the whole page */
+    background-repeat: no-repeat;  /* Prevent repeating */
+    background-attachment: fixed;  /* Keeps background fixed when scrolling */
+    background-position: center;   /* Center the image */
+    }
+
+    .navbar {
+    background-color: var(--primary);
+    color: white ;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .nav-left .church-logo {
+    height: 80px;
+    border-radius: 8px;
+    background: white;
+    padding: 5px;
+  }
+  
+  .nav-right {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+  
+  .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  
+
+   .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    h2.title {
+      text-align: center;
+      color: #0b2e59;
+      border-bottom: 2px solid #0b2e59;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background-color: #0b2e59;
+      color: white;
+      padding: 12px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+    }
+
+    table, th, td {
+     border: 2px solid gray; /* أو ممكن رمادي فاتح لو تحبي */
+    }
+
+    th, td {
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+    }
+
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+
+    .fail {
+      color: red;
+      font-weight: bold;
+    }
+
+    footer {
+    background-color: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.95em;
+    margin-top: auto;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  }
+  @media (max-width: 768px) {
+    .pdf-list {
+      padding: 0 12px;
+    }
+  }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-left">
+      <img src="church-logo.png" alt="Church Logo" class="church-logo">
+    </div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+      <a href="login.html" class="nav-link">تسجيل الدخول</a>
+      <a href="register.html" class="nav-link">إنشاء حساب</a>
+    </div>
+  </nav>
+ <div class="container">
+    <h2 class="title">الدرجات</h2>
+
+  <table id="gradesTable">
+    <thead>
+      <tr>
+        <th>المادة</th>
+        <th>الدرجة</th>
+        <th>الحالة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>العهد القديم</td>
+        <td class="mark">43</td>
+        <td class="status"></td>
+      </tr>
+      <tr>
+        <td>العهد الجديد</td>
+        <td class="mark">30</td>
+        <td class="status"></td>
+      </tr>
+    <tr>
+  <td>اللاهوت العقيدي</td>
+  <td class="mark">28</td>
+  <td class="status"></td>
+</tr>
+    </tbody>
+  </table>
+   </div>
+
+  <script>
+    const rows = document.querySelectorAll("tbody tr");
+    rows.forEach(row => {
+      const mark = parseFloat(row.querySelector(".mark").textContent);
+      const statusCell = row.querySelector(".status");
+
+      if (!isNaN(mark)) {
+        if (mark >= 30) {
+          statusCell.textContent = "ناجح";
+          statusCell.className = "status success";
+        } else {
+          statusCell.textContent = "راسب";
+          statusCell.className = "status fail";
+        }
+      }
+    });
+  </script>
+
+     <footer>
+    © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
+  </footer>
+  
+</body>
+</html>
