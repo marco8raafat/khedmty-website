@@ -8,24 +8,29 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
   const group = document.getElementById("group").value;
   const selectedRole = document.querySelector('input[name="role"]:checked').value;
 
-  const users = JSON.parse(localStorage.getItem("users")) || {};
+  const data = {
+    username,
+    email,
+    password,
+    phone,
+    group,
+    role: selectedRole
+  };
 
-  if (users[email]) {
-    alert("هذا البريد مسجل بالفعل.");
-    return;
-  }
-
-  users[email] = {
-  username: username,
-  email: email,
-  phone: phone,
-  group: group,
-  password: password,
-  role: selectedRole, 
-};
-
-  localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("currentUser", email);
-
-  window.location.href = "login.html";
+  fetch("https://script.google.com/macros/s/AKfycbxHDaSFGPM8PV9qyZxpo94AVYsvSf6C24bg3I3mHJEUe-k9XYz91ppz61cSJdYN0PmOaA/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(response => response.text())
+  .then(result => {
+    alert(result || "تم التسجيل بنجاح!");
+    window.location.href = "login.html";
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    alert("حدث خطأ أثناء التسجيل. حاول مرة أخرى.");
+  });
 });
