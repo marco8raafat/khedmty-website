@@ -127,13 +127,18 @@ function saveAttendance() {
     renderStudents();
     renderAttendanceTable();
   
-    const termName = localStorage.getItem("termName");
-    const sessionsCount = parseInt(localStorage.getItem("sessionsCount"));
-  
-    if (!termName || !sessionsCount) {
-      alert("⚠️ لم يتم إعداد بيانات الترم. الرجاء إدخالها أولًا.");
-      return;
-    }
+const currentPage = window.location.pathname;
+
+if (currentPage.includes("AttendanceRegistration.html")) {
+  const termName = localStorage.getItem("termName");
+  const sessionsCount = parseInt(localStorage.getItem("sessionsCount"));
+
+  if (!termName || !sessionsCount) {
+    alert("⚠️ لم يتم إعداد بيانات الترم. الرجاء إدخالها أولًا.");
+    return;
+  }
+}
+
   
     const termDisplay = document.getElementById("termDisplay");
     if (termDisplay) termDisplay.value = termName;
