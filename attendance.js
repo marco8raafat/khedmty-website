@@ -53,7 +53,6 @@ function saveAttendance() {
     document.getElementById("output").innerHTML = "✅ تم حفظ بيانات الترم.";
   }
   
-  let students = JSON.parse(localStorage.getItem("students") || "[]");
   
   function renderStudents() {
     const users = JSON.parse(localStorage.getItem("users") || "{}");
@@ -125,26 +124,31 @@ function saveAttendance() {
     }
   }
   
-  function renderAttendanceTable() {
-    const students = JSON.parse(localStorage.getItem("students") || "[]");
-    const table = document.getElementById("attendanceTable");
-    if (!table) return;
-  
-    students.forEach((name) => {
-      const row = table.insertRow();
-      const cellName = row.insertCell();
-      const cellSelect = row.insertCell();
-  
-      cellName.innerText = name;
-  
-      const select = document.createElement("select");
-      select.innerHTML = `
-        <option value="present">حاضر</option>
-        <option value="absent">غائب</option>
-      `;
-      cellSelect.appendChild(select);
-    });
-  }
+function renderAttendanceTable() {
+  const users = JSON.parse(localStorage.getItem("users") || "{}");
+  const table = document.getElementById("attendanceTable");
+  if (!table) return;
+
+  table.innerHTML = ""; 
+
+  const studentList = Object.values(users).filter(user => user.role === "student");
+
+  studentList.forEach((student) => {
+    const row = table.insertRow();
+    const cellName = row.insertCell();
+    const cellSelect = row.insertCell();
+
+    cellName.innerText = student.username;
+
+    const select = document.createElement("select");
+    select.innerHTML = `
+      <option value="present">حاضر</option>
+      <option value="absent">غائب</option>
+    `;
+    cellSelect.appendChild(select);
+  });
+}
+
   
   window.onload = function () {
     renderStudents();
