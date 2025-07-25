@@ -150,26 +150,25 @@ function saveAttendance() {
   });
 }
 
-  window.onload = function () {
-    renderStudents();
-    renderAttendanceTable();
-  
-const currentPage = window.location.pathname;
+window.onload = function () {
+  const currentPage = window.location.pathname;
 
-if (currentPage.includes("AttendanceRegistration.html")) {
+  renderStudents();
+  renderAttendanceTable();
+
   const termName = localStorage.getItem("termName");
   const sessionsCount = parseInt(localStorage.getItem("sessionsCount"));
+  const startDate = localStorage.getItem("startDate");
 
-  if (!termName || !sessionsCount) {
-    alert("⚠️ لم يتم إعداد بيانات الترم. الرجاء إدخالها أولًا.");
-    return;
-  }
-}
+  if (currentPage.includes("AttendanceRegistration.html")) {
+    if (!termName || !sessionsCount || !startDate) {
+      alert("⚠️ لم يتم إعداد بيانات الترم. الرجاء إدخالها أولًا.");
+      return;
+    }
 
-  
     const termDisplay = document.getElementById("termDisplay");
     if (termDisplay) termDisplay.value = termName;
-  
+
     const weekSelect = document.getElementById("week");
     if (weekSelect) {
       weekSelect.innerHTML = "";
@@ -180,7 +179,11 @@ if (currentPage.includes("AttendanceRegistration.html")) {
         weekSelect.appendChild(opt);
       }
     }
-  };
+
+    const startDateDisplay = document.getElementById("startDateDisplay");
+    if (startDateDisplay) startDateDisplay.textContent = `تاريخ أول جمعة: ${startDate}`;
+  }
+};
 function loadAttendanceHistory() {
     const table = document.getElementById("historyTable");
     const data = JSON.parse(localStorage.getItem("attendance") || "[]");
