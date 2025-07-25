@@ -149,7 +149,6 @@ function saveAttendance() {
     cellSelect.appendChild(select);
   });
 }
-
 window.onload = function () {
   const currentPage = window.location.pathname;
 
@@ -184,6 +183,7 @@ window.onload = function () {
     if (startDateDisplay) startDateDisplay.textContent = `تاريخ أول جمعة: ${startDate}`;
   }
 };
+
 function loadAttendanceHistory() {
     const table = document.getElementById("historyTable");
     const data = JSON.parse(localStorage.getItem("attendance") || "[]");
@@ -239,3 +239,4 @@ function loadAttendanceHistory() {
     printWindow.print();
   }
   
+
