@@ -31,15 +31,12 @@ function loadAttendanceHistory() {
 
   const data = JSON.parse(localStorage.getItem("attendance") || "[]");
 
-  // ترتيب تنازلي حسب التاريخ
   const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // حذف الصفوف القديمة ما عدا الهيدر
   while (table.rows.length > 1) {
     table.deleteRow(1);
   }
 
-  // عرض البيانات في الجدول
   sortedData.forEach(entry => {
     const row = table.insertRow();
     row.insertCell(0).innerText = entry.date;
@@ -149,7 +146,9 @@ function printAttendance() {
 window.onload = function () {
   const currentPage = window.location.pathname;
 
-  if (currentPage.includes("AttendanceRegistration.html")) {
+  if (
+    currentPage.includes("AttendanceRegistration.html")
+  ) {
     renderStudents();
     renderAttendanceTable();
 
@@ -182,5 +181,9 @@ window.onload = function () {
 
   if (currentPage.includes("AttendanceData.html")) {
     loadAttendanceHistory();
+  }
+
+  if (currentPage.includes("StudentManagement.html") || currentPage.includes("termData.html")) {
+    renderStudents();
   }
 };
