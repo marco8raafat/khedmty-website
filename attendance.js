@@ -53,7 +53,8 @@ function saveAttendance() {
     document.getElementById("output").innerHTML = "✅ تم حفظ بيانات الترم.";
   }
   
-  
+  let students = JSON.parse(localStorage.getItem("students") || "[]");
+
   function renderStudents() {
     const users = JSON.parse(localStorage.getItem("users") || "{}");
     const table = document.getElementById("studentTable");
@@ -124,7 +125,7 @@ function saveAttendance() {
     }
   }
   
-function renderAttendanceTable() {
+  function renderAttendanceTable() {
   const users = JSON.parse(localStorage.getItem("users") || "{}");
   const table = document.getElementById("attendanceTable");
   if (!table) return;
@@ -149,7 +150,6 @@ function renderAttendanceTable() {
   });
 }
 
-  
   window.onload = function () {
     renderStudents();
     renderAttendanceTable();
@@ -236,4 +236,3 @@ function loadAttendanceHistory() {
     printWindow.print();
   }
   
-
