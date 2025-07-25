@@ -56,27 +56,50 @@ function saveAttendance() {
   let students = JSON.parse(localStorage.getItem("students") || "[]");
   
   function renderStudents() {
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
     const table = document.getElementById("studentTable");
     if (!table) return;
+  
     table.innerHTML = '<tr><th>الاسم</th><th>تعديل</th><th>حذف</th></tr>';
   
-    students.forEach((name, index) => {
+    let studentList = Object.values(users).filter(user => user.role === "student");
+  
+    studentList.forEach((student, index) => {
       const row = table.insertRow();
-      row.insertCell().innerText = name;
+      row.insertCell().innerText = student.username;
   
       const editBtn = document.createElement("button");
       editBtn.innerText = "✏️";
-      editBtn.onclick = () => editStudent(index);
+      editBtn.onclick = () => editStudent(student.email); 
       row.insertCell().appendChild(editBtn);
   
       const delBtn = document.createElement("button");
       delBtn.innerText = "🗑️";
-      delBtn.onclick = () => deleteStudent(index);
+      delBtn.onclick = () => deleteStudent(student.email);
       row.insertCell().appendChild(delBtn);
     });
-  
-    localStorage.setItem("students", JSON.stringify(students));
   }
+  
+  function deleteStudent(email) {
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
+    delete users[email];
+    localStorage.setItem("users", JSON.stringify(users));
+    renderStudents();
+  }
+  
+  function editStudent(email) {
+    const newName = prompt("اكتب الاسم الجديد:");
+    if (newName) {
+      const users = JSON.parse(localStorage.getItem("users") || "{}");
+      if (users[email]) {
+        users[email].username = newName;
+        localStorage.setItem("users", JSON.stringify(users));
+        renderStudents();
+      }
+    }
+  }
+  
+  window.onload = renderStudents;
   
   function addStudent() {
     const name = document.getElementById("studentName").value.trim();
