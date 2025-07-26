@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>رفع امتحان</title>
+  <link rel="stylesheet" href="upload-exam.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <img src="church-logo.png" alt="Church Logo" class="church-logo">
+    </div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+      <a href="login.html" class="nav-link">تسجيل الدخول</a>
+      <a href="register.html" class="nav-link">إنشاء حساب</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="form-box">
+  <h2>رفع امتحان جديد</h2>
+  <form id="examForm">
+    <div class="form-row">
+      <label for="examName">اسم الامتحان:</label>
+      <input type="text" id="examName" required>
+    </div>
+
+    <div class="form-row">
+      <label for="examLink">لينك الامتحان:</label>
+      <input type="text" id="examLink" placeholder="https://..." required>
+    </div>
+
+    <button type="submit">رفع الامتحان</button>
+  </form>
+</div>
+
+  </main>
+
+  <footer>
+    © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
+  </footer>
+
+  <script src="upload-exam.js"></script>
+</body>
+</html>

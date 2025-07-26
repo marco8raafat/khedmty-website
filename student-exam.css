@@ -1,0 +1,119 @@
+     * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background-color: #fff;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav.navbar {
+            background-color: #233B6E;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-left .church-logo {
+            height: 80px;
+            border-radius: 8px;
+            background: white;
+            padding: 5px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #233B6E;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #examContainer {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .exam-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 250px;
+            text-align: center;
+        }
+
+        .exam-card h3 {
+            margin-bottom: 15px;
+            color: #233b6e;
+        }
+
+        .exam-card button {
+            background: #233b6e;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .exam-card button:hover {
+            background: #1c2f5a;
+        }
+
+        footer {
+            background-color: #233B6E;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.95em;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+        }
+/* دعم العرض على الشاشات الصغيرة */
+@media (max-width: 768px) {
+  .nav-right {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-box {
+    width: 90%;
+  }
+}

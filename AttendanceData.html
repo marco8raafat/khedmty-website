@@ -18,7 +18,7 @@
         <a href="#">النظام الدراسي ▾</a>
         <ul class="dropdown-menu">
           <li><a href="AttendanceRegistration.html">تسجيل الحضور</a></li>
-          <li><a href="termDate.html">إدارة بيانات الترم والطلاب</a></li>
+          <li><a href="termData.html">إدارة بيانات الترم والطلاب</a></li>
           <li><a href="AttendanceData.html">سجل الحضور</a></li>
         </ul>
       </li>
@@ -33,9 +33,9 @@
     <tr><th>التاريخ</th><th>الاسم</th><th>الحالة</th></tr>
   </table>
   <script src="attendance.js"></script>
-  <script>
-    loadAttendanceHistory();
-  </script>
+<script>
+  window.onload = loadAttendanceHistory;
+</script>
 
 </body>
 </html>
