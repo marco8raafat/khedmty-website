@@ -146,10 +146,6 @@ footer {
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
 }
 
-
-
-
-
 .container {
    background-color: white;
   padding: 30px;
@@ -162,7 +158,6 @@ footer {
   flex-direction: column;
   gap: 15px;
 }
-
 
 .container h2 {
   text-align: center;
@@ -179,7 +174,6 @@ input[type="tel"] {
   border: 1px solid #ccc;
   font-size: 1.05em;
 }
-
 
 label {
   font-weight: bold;
@@ -398,7 +392,7 @@ label {
     }
 
     .progress-fill {
-      background: linear-gradient(45deg, #1a2d59, #233B6E)
+      background: linear-gradient(45deg, #1a2d59, #233B6E);
       height: 100%;
       width: 75%;
       border-radius: 20px;
@@ -409,8 +403,6 @@ label {
       color: #666;
       margin-top: 10px;
     }
-
-    
 
     .empty-notifications {
       text-align: center;
@@ -449,8 +441,6 @@ label {
     </div>
   </nav>
 
-  
-
   <div class="dashboard-container">
     <div class="welcome-section">
       <h1>مرحباً بك   <span id="username">الطالب</span></h1>
@@ -478,6 +468,12 @@ label {
       </a>
       <a href="listPhotos-stu.html" class="quick-link">
         🖼️<br>معرض الصور
+      </a>
+      <a href="student-exam.html" class="quick-link">
+        📝<br>الامتحانات
+      </a>
+      <a href="uploadResearch.html" class="quick-link">
+        📋<br>تسليم البحوث
       </a>
       <a href="index.html" class="quick-link">
         🏠<br>الصفحة الرئيسية
@@ -507,6 +503,20 @@ label {
       </div>
 
       <div class="dashboard-card">
+        <div class="card-icon">📝</div>
+        <div class="card-title">الامتحانات الإلكترونية</div>
+        <div class="card-description">أدخل الامتحانات الإلكترونية وتابع نتائجك</div>
+        <a href="student-exam.html" class="card-btn">دخول الامتحان</a>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="card-icon">📋</div>
+        <div class="card-title">تسليم البحوث</div>
+        <div class="card-description">ارفع وسلم البحوث والمشاريع المطلوبة منك</div>
+        <a href="uploadResearch.html" class="card-btn">تسليم بحث</a>
+      </div>
+
+      <div class="dashboard-card">
         <div class="card-icon">👤</div>
         <div class="card-title">الملف الشخصي</div>
         <div class="card-description">إدارة بياناتك الشخصية ومعلومات الحساب</div>
@@ -527,35 +537,39 @@ label {
       </p>
     </div>
   </div>
-  <!-- Chat Button -->
-<div id="chat-button" onclick="toggleChat()">
-  🤖
-</div>
 
-<!-- Chat Container -->
-<div id="chat-container">
-  <div id="chat-header">المساعد الذكي</div>
-  <div id="chat-body"></div>
-  <div id="chat-input">
-    <input type="text" style="font-size: 20px;" id="user-input" placeholder="أسالني اي سؤال..." onkeydown="if(event.key === 'Enter') sendMessage()">
-    <button onclick="sendMessage()">📤</button>
+  <!-- Chat Button -->
+  <div id="chat-button" onclick="toggleChat()">
+    🤖
   </div>
-</div>
+
+  <!-- Chat Container -->
+  <div id="chat-container">
+    <div id="chat-header">المساعد الذكي</div>
+    <div id="chat-body"></div>
+    <div id="chat-input">
+      <input type="text" style="font-size: 20px;" id="user-input" placeholder="أسالني اي سؤال..." onkeydown="if(event.key === 'Enter') sendMessage()">
+      <button onclick="sendMessage()">📤</button>
+    </div>
+  </div>
+
   <footer>
     <p>© كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025</p>
   </footer>
-<script src="botScript.js"></script>
+
+  <script src="botScript.js"></script>
   <script>
-const users = JSON.parse(localStorage.getItem("users")) || {};
-const currentEmail = localStorage.getItem("currentUser");
+    const users = JSON.parse(localStorage.getItem("users")) || {};
+    const currentEmail = localStorage.getItem("currentUser");
 
-if (!currentEmail || !users[currentEmail]) {
-  window.location.href = "login.html";
-}
+    if (!currentEmail || !users[currentEmail]) {
+      window.location.href = "login.html";
+    }
 
-const userData = users[currentEmail];
+    const userData = users[currentEmail];
 
-document.getElementById("username").textContent = userData.username.split(" ").slice(0, 2).join(" ");
+    document.getElementById("username").textContent = userData.username.split(" ").slice(0, 2).join(" ");
+    
     document.addEventListener('DOMContentLoaded', function() {
       loadLatestNotifications();
     });
