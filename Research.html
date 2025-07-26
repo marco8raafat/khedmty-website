@@ -150,21 +150,7 @@
   max-height: 100%;
 }
 
-  </style>
-  <script>
-    window.onload = function () {
-      const table = document.querySelector("table");
-      const rows = Array.from(table.rows).slice(1); 
-
-      rows.sort((a, b) => {
-        const dateA = new Date(`${a.cells[3].innerText} ${a.cells[4].innerText}`);
-        const dateB = new Date(`${b.cells[3].innerText} ${b.cells[4].innerText}`);
-        return dateB - dateA;
-      });
-
-      rows.forEach(row => table.appendChild(row));
-    };
-  </script>
+</style>
 </head>
 <body>
 <nav class="navbar">
@@ -191,7 +177,7 @@
         <th>المجموعة</th>
         <th>اسم البحث</th>
         <th>تاريخ التسليم</th>
-        <th>الساعة</th>
+        <th>الوقت</th>
         <th>البحث (PDF)</th>
         <th>تاريخ ووقت المناقشة</th>
         <th>درجة البحث </th>
@@ -200,71 +186,75 @@
       </tr>
      </thead>
       
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>ماريا سامح</td>
-        <td>العدرا و الملاك ميخائيل</td>
-        <td>الكهنوت في اسفار موسي الخمسة</td>
-        <td>2025-07-22</td>
-        <td>15:45</td>
-        <td><a href="#">تحميل</a></td>
-        <td><input type="datetime-local" class="discussion-time"></td>
-        <td><input type="number" class="research" min="0" max="50" value="0"></td>
-        <td><input type="number" class="discussion" min="0" max="50" value="0"></td>
-        <td><span class="total">0</span></td>
-
-      </tr>
-
-      <tr>
-        <td>2</td>
-        <td>ماركو رأفت</td>
-        <td>الانبا انطونيوس</td>
-        <td>القطمارس</td>
-        <td>2025-07-21</td>
-        <td>18:10</td>
-        <td><a href="#">تحميل</a></td>
-        <td><input type="datetime-local" class="discussion-time"></td>
-        <td><input type="number" class="research" min="0" max="50" value="0"></td>
-        <td><input type="number" class="discussion" min="0" max="50" value="0"></td>
-        <td><span class="total">0</span></td>
-      </tr>
-    </tbody>
+      <tbody id="researchBody">
+</tbody>
     </table>
-    
-      </form>
+    </form>
     </div>
   </div>
 
-     <footer>
+  <footer>
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
 
 <script>
- document.addEventListener('DOMContentLoaded', function () {
-    const table = document.querySelector('table tbody');
-    const rows = table.querySelectorAll('tr');
+  function loadResearches() {
+  const data = JSON.parse(localStorage.getItem("researches") || "[]");
 
-    rows.forEach((row, index) => {
-      const cells = row.querySelectorAll('td');
-
-      if (cells.length >= 11) {
-        cells[0].textContent = index + 1;
-        const researchInput = cells[8].querySelector('input');
-        const discussionInput = cells[9].querySelector('input');
-        const totalSpan = cells[10].querySelector('span');
-
-        function updateTotal() {
-          const research = parseFloat(researchInput.value) || 0;
-          const discussion = parseFloat(discussionInput.value) || 0;
-          totalSpan.textContent = Math.round(research + discussion);
-        }
-        researchInput.addEventListener('input', updateTotal);
-        discussionInput.addEventListener('input', updateTotal);
-        updateTotal();
-      }
-    });
+  data.sort((a, b) => {
+    const dateA = new Date(`${a.submissionDate} ${a.submissionTime}`);
+    const dateB = new Date(`${b.submissionDate} ${b.submissionTime}`);
+    return dateA - dateB;
   });
+  const tbody = document.getElementById("researchBody");
+  tbody.innerHTML = "";
+
+  for (let i = data.length - 1; i >= 0; i--) {
+    const item = data[i];
+    const row = document.createElement("tr");
+    const researchNumber = i + 1; 
+    const discussionValue = item.discussionDateTime || "";
+    const researchGrade = parseFloat(item.researchGrade) || 0;
+    const discussionGrade = parseFloat(item.discussionGrade) || 0;
+    const totalGrade = researchGrade + discussionGrade;
+
+    row.innerHTML = `
+      <td>${researchNumber}</td>
+      <td>${item.studentName || ""}</td>
+      <td>${item.group || ""}</td>
+      <td>${item.researchTitle || ""}</td>
+      <td>${item.submissionDate || ""}</td>
+      <td>${item.submissionTime || ""}</td>
+      <td><a href="${item.researchFile}" target="_blank">عرض</a></td>
+      <td><input type="datetime-local" value="${discussionValue}" class="discussion-time"></td>
+      <td><input type="number" value="${researchGrade}" class="research-grade"></td>
+      <td><input type="number" value="${discussionGrade}" class="discussion-grade"></td>
+      <td class="total-grade">${totalGrade}</td>
+    `;
+    const discussionInput = row.querySelector(".discussion-time");
+    const researchInput = row.querySelector(".research-grade");
+    const discussionGradeInput = row.querySelector(".discussion-grade");
+    const totalGradeCell = row.querySelector(".total-grade");
+
+    [discussionInput, researchInput, discussionGradeInput].forEach(input => {
+      input.addEventListener("input", () => {
+        const updatedResearchGrade = parseFloat(researchInput.value) || 0;
+        const updatedDiscussionGrade = parseFloat(discussionGradeInput.value) || 0;
+        const updatedTotal = updatedResearchGrade + updatedDiscussionGrade;
+
+        data[i].discussionDateTime = discussionInput.value;
+        data[i].researchGrade = updatedResearchGrade;
+        data[i].discussionGrade = updatedDiscussionGrade;
+        data[i].totalGrade = updatedTotal;
+
+        totalGradeCell.textContent = updatedTotal;
+        localStorage.setItem("researches", JSON.stringify(data));
+      });
+    });
+    tbody.appendChild(row); 
+  }
+}
+document.addEventListener("DOMContentLoaded", loadResearches);
 </script>
 </body>
 </html>
