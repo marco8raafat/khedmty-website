@@ -514,7 +514,7 @@ footer {
     }
 
     async function getUserData() {
-      const currentEmail = localStorage.getItem("currentUser");
+      const currentEmail = sessionStorage.getItem("currentUser");
       if (!currentEmail) return null;
 
       const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
@@ -545,21 +545,29 @@ footer {
     }
 
     async function checkAuthentication() {
-      const currentEmail = localStorage.getItem("currentUser");
+      const currentEmail = sessionStorage.getItem("currentUser");
+      console.log("Current email from session:", currentEmail);
+      
       if (!currentEmail) {
         window.location.href = "login.html";
         return false;
       }
 
       const userData = await getUserData();
+      console.log("User data from Firebase:", userData);
+      
       if (!userData) {
+        console.log("No user data found, redirecting to login");
         window.location.href = "login.html";
         return false;
       }
 
       const usernameSpan = document.getElementById("username");
       if (usernameSpan && userData.username) {
+        console.log("Setting username to:", userData.username.split(" ")[0]);
         usernameSpan.textContent = userData.username.split(" ")[0] || "";
+      } else {
+        console.log("Username span not found or no username in data");
       }
 
       return true;
