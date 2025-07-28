@@ -1,3 +1,19 @@
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+  authDomain: "edad-5odam.firebaseapp.com",
+  databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "edad-5odam",
+  storageBucket: "edad-5odam.appspot.com", // ✅ corrected from .firebasestorage.app
+  messagingSenderId: "679576633778",
+  appId: "1:679576633778:web:566e6aaef9b72f71a824ab",
+  measurementId: "G-7WB1WPDLRH"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 document.addEventListener('DOMContentLoaded', () => {
     // Verify elements exist
     const uploadForm = document.getElementById('uploadForm');
@@ -28,35 +44,47 @@ document.addEventListener('DOMContentLoaded', () => {
     if (photoList) {
       photoList.style.display = 'none';
       console.log('Photo list hidden');
-    } else {
-      console.warn('photoList element not found, cannot hide photo list');
     }
   
-    if (uploadForm && titleInput && fileInput && messageDiv) {
+    // Utility function to show messages
+    function showMessage(text, type = 'info') {
+      if (messageDiv) {
+        messageDiv.textContent = text;
+        messageDiv.className = type;
+        messageDiv.style.display = 'block';
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 3000);
+      }
+    }
+  
+    if (uploadForm) {
       uploadForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Prevent form from submitting to a server
-        console.log('Form submission intercepted');
-  
-        const title = titleInput.value.trim();
-        const file = fileInput.files[0];
-  
-        // Validate inputs
-        if (!title || !file) {
-          showMessage('يرجى إدخال عنوان واختيار ملف صورة', 'error');
-          console.log('Validation failed: Missing title or file');
+        e.preventDefault();
+        
+        const file = fileInput ? fileInput.files[0] : null;
+        const title = titleInput ? titleInput.value.trim() : '';
+        
+        if (!title) {
+          showMessage('يرجى إدخال عنوان للصورة', 'error');
           return;
         }
-  
+        
+        if (!file) {
+          showMessage('يرجى اختيار صورة', 'error');
+          return;
+        }
+        
         // Validate file type
         if (!file.type.startsWith('image/')) {
-          showMessage('يرجى اختيار ملف صورة فقط (مثل JPEG أو PNG)', 'error');
-          console.log('Validation failed: File is not an image');
+          showMessage('يرجى اختيار ملف صورة صحيح', 'error');
           return;
         }
-  
-        // Validate file size (limit to 5MB to avoid localStorage issues)
-        const maxSizeMB = 5;
-        if (file.size > maxSizeMB * 1024 * 1024) {
+        
+        // Validate file size (limit to 2MB to avoid Firebase issues)
+        const maxSizeMB = 2;
+        const maxSizeBytes = maxSizeMB * 1024 * 1024;
+        if (file.size > maxSizeBytes) {
           showMessage(`حجم الملف كبير جدًا. الحد الأقصى ${maxSizeMB} ميغابايت`, 'error');
           console.log(`Validation failed: File size ${file.size} bytes exceeds ${maxSizeMB}MB`);
           return;
@@ -66,58 +94,86 @@ document.addEventListener('DOMContentLoaded', () => {
         const reader = new FileReader();
         reader.onload = () => {
           try {
-            // Get existing photos from localStorage
-            let photos = JSON.parse(localStorage.getItem('photos')) || [];
-            console.log('Current photos in localStorage:', photos.length);
-  
             // Add new photo data
             const newPhoto = {
               id: Date.now(),
               title: title,
-              data: reader.result
+              data: reader.result,
+              uploadDate: new Date().toISOString(),
+              timestamp: Date.now()
             };
-            photos.push(newPhoto);
   
-            // Save to localStorage
-            try {
-              localStorage.setItem('photos', JSON.stringify(photos));
+            // Save to Firebase
+            database.ref("photos").push(newPhoto).then(() => {
               showMessage('تم رفع الصورة بنجاح', 'success');
-              console.log('Photo saved to localStorage:', newPhoto);
-              uploadForm.reset(); // Reset form after successful save
-            } catch (error) {
-              showMessage('خطأ في حفظ الصورة: مساحة التخزين ممتلئة أو خطأ آخر', 'error');
-              console.error('LocalStorage error:', error);
-            }
+              console.log('Photo saved to Firebase:', newPhoto.title);
+              
+              // Reset form
+              if (uploadForm) {
+                uploadForm.reset();
+              }
+            }).catch((error) => {
+              console.error('Firebase error:', error);
+              showMessage('حدث خطأ أثناء رفع الصورة إلى Firebase', 'error');
+            });
+  
           } catch (error) {
-            showMessage('حدث خطأ أثناء معالجة الصورة', 'error');
-            console.error('Error processing file:', error);
+            console.error('File processing error:', error);
+            showMessage('حدث خطأ أثناء معالجة الملف', 'error');
           }
         };
-  
+        
         reader.onerror = () => {
           showMessage('حدث خطأ أثناء قراءة الملف', 'error');
-          console.error('FileReader error:', reader.error);
         };
-  
-        console.log('Reading file:', file.name);
+        
         reader.readAsDataURL(file);
       });
-    } else {
-      console.error('Form functionality disabled due to missing elements');
-      showMessage('خطأ: النموذج غير متاح بسبب عناصر مفقودة', 'error');
-    }
-  
-    function showMessage(text, type) {
-      if (messageDiv) {
-        messageDiv.textContent = text;
-        messageDiv.className = `message ${type}`; // Preserve 'message' class
-        messageDiv.style.display = 'block';
-        console.log(`Message displayed: ${text} (${type})`);
-        setTimeout(() => {
-          messageDiv.style.display = 'none';
-        }, 3000);
-      } else {
-        console.error('Cannot display message: messageDiv not found');
-      }
     }
   });
+  
+  // If photos exist on this page, load them from Firebase
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('photoList')) {
+      loadPhotos();
+    }
+  });
+  
+  function loadPhotos() {
+    const photoList = document.getElementById('photoList');
+    if (!photoList) return;
+  
+    database.ref("photos").on("value", (snapshot) => {
+      photoList.innerHTML = '';
+      
+      if (!snapshot.exists()) {
+        photoList.innerHTML = '<p>لا توجد صور حالياً</p>';
+        return;
+      }
+  
+      snapshot.forEach((childSnapshot) => {
+        const photo = childSnapshot.val();
+        const photoKey = childSnapshot.key;
+        
+        const photoElement = document.createElement('div');
+        photoElement.className = 'photo-item';
+        photoElement.innerHTML = `
+          <h3>${photo.title}</h3>
+          <img src="${photo.data}" alt="${photo.title}" style="max-width: 200px; max-height: 200px;">
+          <button onclick="deletePhoto('${photoKey}')">حذف</button>
+        `;
+        photoList.appendChild(photoElement);
+      });
+    });
+  }
+  
+  function deletePhoto(photoKey) {
+    if (confirm('هل أنت متأكد من حذف هذه الصورة؟')) {
+      database.ref("photos/" + photoKey).remove().then(() => {
+        console.log('Photo deleted successfully');
+      }).catch((error) => {
+        console.error('Error deleting photo from Firebase:', error);
+        alert('حدث خطأ أثناء حذف الصورة');
+      });
+    }
+  }

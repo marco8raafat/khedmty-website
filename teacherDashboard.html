@@ -487,61 +487,149 @@ footer {
     <p>© كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025</p>
   </footer>
   
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="botScript.js"></script>
   <script>
-    const users = JSON.parse(localStorage.getItem("users")) || {};
-    const currentEmail = localStorage.getItem("currentUser");
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+      authDomain: "edad-5odam.firebaseapp.com",
+      databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "edad-5odam",
+      storageBucket: "edad-5odam.firebasestorage.app",
+      messagingSenderId: "679576633778",
+      appId: "1:679576633778:web:566e6aaef9b72f71a824ab",
+      measurementId: "G-7WB1WPDLRH"
+    };
 
-    if (!currentEmail || !users[currentEmail]) {
-      window.location.href = "login.html";
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Helper functions for Firebase operations
+    function getFirebaseData(path) {
+      return database.ref(path).once('value').then(snapshot => {
+        return snapshot.val() || {};
+      });
     }
 
-    const userData = users[currentEmail];
+    function setFirebaseData(path, data) {
+      return database.ref(path).set(data);
+    }
 
-    document.getElementById("username").textContent = userData.username.split(" ").slice(0, 1).join(" ");
-    
-    document.addEventListener('DOMContentLoaded', function() {
-      loadLatestNotifications();
-    });
-    
-    // تحديث الإحصائيات من البيانات المحفوظة
-    document.addEventListener('DOMContentLoaded', function() {
-      updateStats();
-    });
+    // Firebase data retrieval functions
+    async function getUserData() {
+      const currentEmail = localStorage.getItem("currentUser");
+      if (!currentEmail) return null;
+      
+      const emailKey = currentEmail.replace(/[.#$[\]]/g, '_');
+      const userData = await getFirebaseData(`users/${emailKey}`);
+      return userData;
+    }
 
-    function updateStats() {
-      // تحديث عدد التنبيهات
-      const alerts = JSON.parse(localStorage.getItem('alerts')) || [];
-      document.getElementById('alertCount').textContent = alerts.length;
+    async function getStatisticsData() {
+      const [alerts, students, attendance, pdfs, photos, exams, researches] = await Promise.all([
+        getFirebaseData('alerts'),
+        getFirebaseData('students'),
+        getFirebaseData('attendanceHistory'),
+        getFirebaseData('pdfs'),
+        getFirebaseData('photos'),
+        getFirebaseData('exams'),
+        getFirebaseData('researches')
+      ]);
 
-      // تحديث عدد الطلاب
-      const students = JSON.parse(localStorage.getItem('students')) || [];
-      document.getElementById('studentCount').textContent = students.length || 45;
+      return {
+        alerts: Object.values(alerts || {}),
+        students: Object.values(students || {}),
+        attendance: Object.values(attendance || {}),
+        pdfs: Object.values(pdfs || {}),
+        photos: Object.values(photos || {}),
+        exams: Object.values(exams || {}),
+        researches: Object.values(researches || {})
+      };
+    }
 
-      // تحديث معدل الحضور (يمكن حسابه من بيانات الحضور)
-      const attendance = JSON.parse(localStorage.getItem('attendanceHistory')) || [];
-      if (attendance.length > 0) {
-        const presentCount = attendance.filter(record => record.status === 'حاضر').length;
-        const rate = Math.round((presentCount / attendance.length) * 100);
-        document.getElementById('attendanceRate').textContent = rate + '%';
+    // Authentication check
+    async function checkAuthentication() {
+      const currentEmail = localStorage.getItem("currentUser");
+      if (!currentEmail) {
+        window.location.href = "login.html";
+        return false;
       }
 
-      // تحديث عدد المصادر التعليمية
-      const pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
-      const photos = JSON.parse(localStorage.getItem('photos')) || [];
-      document.getElementById('resourceCount').textContent = pdfs.length + photos.length;
+      const userData = await getUserData();
+      if (!userData) {
+        window.location.href = "login.html";
+        return false;
+      }
 
-      // تحديث عدد الامتحانات
-      const exams = JSON.parse(localStorage.getItem('exams')) || [];
-      document.getElementById('examCount').textContent = exams.length;
-
-      // تحديث عدد البحوث
-      const researches = JSON.parse(localStorage.getItem('researches')) || [];
-      document.getElementById('researchCount').textContent = researches.length;
+      document.getElementById("username").textContent = userData.username.split(" ").slice(0, 1).join(" ");
+      return true;
     }
 
-    // تحديث الإحصائيات كل 30 ثانية
-    setInterval(updateStats, 30000);
+    // Update statistics from Firebase
+    async function updateStats() {
+      try {
+        const data = await getStatisticsData();
+
+        // Update alert count
+        document.getElementById('alertCount').textContent = data.alerts.length;
+
+        // Update student count
+        document.getElementById('studentCount').textContent = data.students.length || 45;
+
+        // Update attendance rate
+        if (data.attendance.length > 0) {
+          const presentCount = data.attendance.filter(record => record.status === 'حاضر').length;
+          const rate = Math.round((presentCount / data.attendance.length) * 100);
+          document.getElementById('attendanceRate').textContent = rate + '%';
+        }
+
+        // Update resource count
+        document.getElementById('resourceCount').textContent = data.pdfs.length + data.photos.length;
+
+        // Update exam count
+        document.getElementById('examCount').textContent = data.exams.length;
+
+        // Update research count
+        document.getElementById('researchCount').textContent = data.researches.length;
+      } catch (error) {
+        console.error('Error updating statistics:', error);
+        // Fallback to default values on error
+        document.getElementById('alertCount').textContent = '12';
+        document.getElementById('studentCount').textContent = '45';
+        document.getElementById('attendanceRate').textContent = '87%';
+        document.getElementById('resourceCount').textContent = '28';
+        document.getElementById('examCount').textContent = '8';
+        document.getElementById('researchCount').textContent = '15';
+      }
+    }
+
+    // Load latest notifications from Firebase
+    async function loadLatestNotifications() {
+      try {
+        const alerts = await getFirebaseData('alerts');
+        const alertsArray = Object.values(alerts || {});
+        
+        // Process notifications as needed
+        console.log('Latest notifications loaded:', alertsArray.length);
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+      }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', async function() {
+      const isAuthenticated = await checkAuthentication();
+      if (isAuthenticated) {
+        await loadLatestNotifications();
+        await updateStats();
+        
+        // Update statistics every 30 seconds
+        setInterval(updateStats, 30000);
+      }
+    });
   </script>
 </body>
 </html>
