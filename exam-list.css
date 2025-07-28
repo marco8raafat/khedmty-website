@@ -7,6 +7,11 @@ html, body {
   display: flex;
   flex-direction: column;
   font-family: Arial, sans-serif;
+  background-image: url('knesa.jpg'); 
+  background-size: cover;        
+  background-repeat: no-repeat;  
+  background-attachment: fixed;  
+  background-position: center; 
 }
 
 main {
@@ -136,7 +141,12 @@ footer {
 }
 
 @media (max-width: 768px) {
-  .pdf-list {
-    padding: 0 12px;
+  .nav-right {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-box {
+    width: 90%;
   }
 }
