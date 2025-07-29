@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const exams = JSON.parse(localStorage.getItem("exams") || "[]");
     const container = document.getElementById("examContainer");
 
     if (!container) {
@@ -7,28 +6,42 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    if (exams.length === 0) {
-        container.innerHTML = "<p>لا يوجد امتحانات حالياً.</p>";
-    } else {
-        // نفرغ المحتوى أولاً (احتياطي)
-        container.innerHTML = "";
+    // Show loading text while fetching
+    container.innerHTML = "<p>جاري تحميل الامتحانات...</p>";
 
-        exams.forEach((exam) => {
-            const card = document.createElement("div");
-            card.className = "exam-card";
+    // Fetch exams from Firebase
+    firebase.database().ref("exams").once("value")
+        .then(snapshot => {
+            const data = snapshot.val();
+            container.innerHTML = ""; // Clear loading text
 
-            const title = document.createElement("h3");
-            title.textContent = exam.name;
+            if (!data) {
+                container.innerHTML = "<p>لا يوجد امتحانات حالياً.</p>";
+                return;
+            }
 
-            const button = document.createElement("button");
-            button.textContent = "ابدأ الامتحان";
-            button.onclick = () => {
-                window.open(exam.link, "_blank");
-            };
+            const exams = Object.values(data); // Convert {key: value} to array
 
-            card.appendChild(title);
-            card.appendChild(button);
-            container.appendChild(card);
+            exams.forEach((exam) => {
+                const card = document.createElement("div");
+                card.className = "exam-card";
+
+                const title = document.createElement("h3");
+                title.textContent = exam.name;
+
+                const button = document.createElement("button");
+                button.textContent = "ابدأ الامتحان";
+                button.onclick = () => {
+                    window.open(exam.link, "_blank");
+                };
+
+                card.appendChild(title);
+                card.appendChild(button);
+                container.appendChild(card);
+            });
+        })
+        .catch(error => {
+            console.error("خطأ أثناء تحميل الامتحانات:", error);
+            container.innerHTML = "<p>حدث خطأ أثناء تحميل الامتحانات.</p>";
         });
-    }
 });

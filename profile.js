@@ -49,3 +49,19 @@ database.ref("users/" + emailKey).once("value").then((snapshot) => {
   console.error("Firebase error:", error);
   window.location.href = "login.html";
 });
+
+// Add event listeners for edit and logout buttons
+document.getElementById("editBtn").addEventListener("click", function() {
+  window.location.href = "editprofile.html";
+});
+
+document.getElementById("logoutBtn").addEventListener("click", function() {
+  // Clear session storage
+  sessionStorage.removeItem("currentUser");
+  
+  // Show confirmation message
+  alert("تم تسجيل الخروج بنجاح!");
+  
+  // Redirect to login page
+  window.location.href = "login.html";
+});

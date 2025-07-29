@@ -22,6 +22,72 @@
   background-position: center;   /* Center the image */
   font-family: 'Arial', sans-serif;
 }
+/* Mobile menu toggle button */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .nav-left {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .nav-left .church-logo {
+    height: 60px;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-right {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .nav-right.active {
+    max-height: 300px;
+  }
+
+  .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+}
 
 .navbar {
   background-color: #233B6E;
@@ -433,11 +499,12 @@ label {
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="شعار الكنيسة" class="church-logo">
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-    <div class="nav-right">
+    <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
-      <a href="#" class="nav-link" onclick="logout()">تسجيل الخروج</a>
+      <a href="javascript:void(0)" class="nav-link" onclick="logout()">تسجيل الخروج</a>
     </div>
   </nav>
 
@@ -636,11 +703,29 @@ label {
     });
   }
 
+  // Mobile menu toggle function
+  function toggleMobileMenu() {
+    const navMenu = document.getElementById('navMenu');
+    navMenu.classList.toggle('active');
+  }
+
   // 🔓 Logout
   function logout() {
     sessionStorage.removeItem("currentUser");
     window.location.href = "login.html";
   }
+
+  // Close mobile menu when clicking on a link
+  document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        const navMenu = document.getElementById('navMenu');
+        navMenu.classList.remove('active');
+      });
+    });
+  });
+
 </script>
 
 </body>

@@ -41,6 +41,7 @@ body {
   align-items: center;
   padding: 10px 20px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: relative;
 }
 
 .nav-left .church-logo {
@@ -68,6 +69,23 @@ body {
   background-color: #1a2d59;
   color: #fff;
   text-decoration: none;
+}
+
+/* Mobile menu toggle button */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 header {
@@ -154,6 +172,56 @@ footer {
   font-size: 0.9em;
   margin-top: auto;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .nav-left {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .nav-left .church-logo {
+    height: 60px;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-right {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .nav-right.active {
+    max-height: 300px;
+  }
+
+  .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
+  }
 }
 
   /* end*/
@@ -363,11 +431,12 @@ footer {
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="شعار الكنيسة" class="church-logo">
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-    <div class="nav-right">
+    <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
-      <a href="index.html" class="nav-link">تسجيل الخروج</a>
+      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
 
@@ -410,9 +479,8 @@ footer {
         <div class="card-title">إدارة الحضور</div>
         <div class="card-description">تسجيل ومتابعة حضور الطلاب، وإنشاء التقارير الدورية</div>
         <div class="card-actions">
-          <a href="AttendanceRegistration.html" class="card-btn">تسجيل الحضور</a>
-          <a href="AttendanceData.html" class="card-btn secondary">عرض سجل الحضور</a>
-          <a href="termData.html" class="card-btn secondary">إعداد بيانات الترم</a>
+          <a href="AttendanceData.html" class="card-btn">تسجيل الحضور</a>
+          <a href="AttendanceRegistration.html" class="card-btn secondary">عرض سجل الحضور</a>
         </div>
       </div>
 
@@ -615,6 +683,20 @@ footer {
       }
     }
 
+    // Mobile menu toggle function
+    function toggleMobileMenu() {
+      const navMenu = document.getElementById('navMenu');
+      navMenu.classList.toggle('active');
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        sessionStorage.removeItem("currentUser");
+        window.location.href = "index.html";
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
       const isAuthenticated = await checkAuthentication();
       if (isAuthenticated) {
@@ -622,6 +704,15 @@ footer {
         await updateStats();
         setInterval(updateStats, 30000);
       }
+
+      // Close mobile menu when clicking on a link
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          const navMenu = document.getElementById('navMenu');
+          navMenu.classList.remove('active');
+        });
+      });
     });
   </script>
 </body>

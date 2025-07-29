@@ -60,14 +60,242 @@
     .delete-btn:hover {
       background-color: #e60000;
     }
+
+    /* Mobile menu toggle button */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      padding: 12px;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .menu-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        padding: 10px;
+      }
+
+      .nav-left {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .nav-left .church-logo {
+        height: 60px;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .nav-right {
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-in-out;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 0 0 8px 8px;
+      }
+
+      .nav-right.active {
+        max-height: 350px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 16px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0;
+        font-size: 1.1rem;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link:active {
+        background-color: rgba(255, 255, 255, 0.15);
+        transform: scale(0.98);
+      }
+
+      .nav-link:last-child {
+        border-bottom: none;
+      }
+
+      /* Form responsiveness */
+      .alert-form {
+        padding: 15px;
+        margin: 0 10px;
+      }
+
+      .alert-form input,
+      .alert-form textarea {
+        font-size: 1rem;
+        padding: 12px;
+      }
+
+      .alert-form .btn {
+        padding: 14px 20px;
+        font-size: 1.1rem;
+        margin: 5px 0;
+        width: 100%;
+        display: block;
+        text-align: center;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* Alert boxes responsive */
+      .alert-box {
+        margin: 10px 5px;
+        padding: 15px;
+        padding-top: 45px; /* Make room for delete button */
+      }
+
+      .delete-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        min-width: 44px;
+        min-height: 44px;
+        top: 8px;
+        left: 8px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      header {
+        padding: 15px 10px;
+        text-align: center;
+      }
+
+      header .logo {
+        max-width: 80px;
+        height: auto;
+      }
+
+      header h1 {
+        font-size: 1.8rem;
+        margin-top: 10px;
+      }
+
+      main {
+        padding: 10px;
+      }
+
+      #alertsSection h2 {
+        font-size: 1.5rem;
+        text-align: center;
+        margin: 20px 0;
+      }
+    }
+
+    /* Extra small phones */
+    @media (max-width: 480px) {
+      .navbar {
+        padding: 8px;
+      }
+
+      .nav-left .church-logo {
+        height: 50px;
+      }
+
+      .menu-toggle {
+        font-size: 1.6rem;
+        padding: 10px;
+        min-width: 40px;
+        min-height: 40px;
+      }
+
+      .alert-form {
+        padding: 10px;
+        margin: 0 5px;
+      }
+
+      .alert-form input,
+      .alert-form textarea {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+
+      .alert-form .btn {
+        padding: 12px 16px;
+        font-size: 1rem;
+      }
+
+      header h1 {
+        font-size: 1.6rem;
+      }
+
+      .alert-box {
+        padding: 12px;
+        padding-top: 40px;
+      }
+
+      .delete-btn {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 40px;
+        min-height: 40px;
+      }
+    }
+
+    /* Very small phones */
+    @media (max-width: 360px) {
+      .nav-left .church-logo {
+        height: 45px;
+      }
+
+      .menu-toggle {
+        font-size: 1.5rem;
+        padding: 8px;
+        min-width: 36px;
+        min-height: 36px;
+      }
+
+      .alert-form {
+        padding: 8px;
+        margin: 0 2px;
+      }
+
+      header h1 {
+        font-size: 1.4rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <nav class="navbar">
+   <nav class="navbar">
     <div class="nav-left">
-      <img src="church-logo.png" alt="شعار الكنيسة" class="church-logo">
+      <img src="church-logo.png" alt="Church Logo" class="church-logo">
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-    <div class="nav-right">
+    <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
       <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
@@ -262,6 +490,22 @@
         window.location.href = "index.html";
       }
     }
+    // Mobile menu toggle function
+    function toggleMobileMenu() {
+      const navMenu = document.getElementById('navMenu');
+      navMenu.classList.toggle('active');
+    }
+
+    // Close mobile menu when clicking on a link
+    document.addEventListener('DOMContentLoaded', function() {
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          const navMenu = document.getElementById('navMenu');
+          navMenu.classList.remove('active');
+        });
+      });
+    });
 
     // Initialize the page when DOM is loaded
     window.onload = initializePage;

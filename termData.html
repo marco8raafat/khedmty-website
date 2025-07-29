@@ -12,17 +12,17 @@
       <img src="church-logo.png" alt="شعار الموقع">
     </div>
     <ul class="nav-links">
-      
       <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="teacherDashboard.html">لوحة التحكم</a></li>
       <li class="dropdown">
         <a href="#">النظام الدراسي ▾</a>
         <ul class="dropdown-menu">
-   <li><a href="AttendanceRegistration.html">تسجيل الحضور</a></li>
+          <li><a href="AttendanceRegistration.html">تسجيل الحضور</a></li>
           <li><a href="termData.html">إدارة بيانات الترم والطلاب</a></li>
           <li><a href="AttendanceData.html">سجل الحضور</a></li>
         </ul>
       </li>
-      
+      <li><a href="javascript:void(0)" onclick="logout()">تسجيل الخروج</a></li>
     </ul>
   </nav>
   <div class="container">
@@ -50,6 +50,89 @@
     <tr><th>الاسم</th><th>تعديل</th><th>حذف</th></tr>
   </table>
 </div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+    authDomain: "edad-5odam.firebaseapp.com",
+    databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "edad-5odam",
+    storageBucket: "edad-5odam.appspot.com",
+    messagingSenderId: "679576633778",
+    appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Authentication check function
+  async function checkAuthentication() {
+    const currentUser = sessionStorage.getItem("currentUser");
+    
+    if (!currentUser) {
+      alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    // Verify user exists in Firebase
+    const emailKey = currentUser.replace(/\./g, '_');
+    try {
+      const snapshot = await db.ref('users/' + emailKey).once('value');
+      if (!snapshot.exists()) {
+        alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
+        sessionStorage.removeItem("currentUser");
+        window.location.href = "login.html";
+        return false;
+      }
+      
+      const userData = snapshot.val();
+      // Check if user is a servant (only servants can manage term data)
+      if (userData.role !== "servant") {
+        alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للخدام فقط");
+        window.location.href = userData.role === "student" ? "studentDashboard.html" : "index.html";
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error verifying user:", error);
+      alert("حدث خطأ في التحقق من المستخدم. يرجى تسجيل الدخول مرة أخرى");
+      window.location.href = "login.html";
+      return false;
+    }
+  }
+
+  function logout() {
+    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+      sessionStorage.removeItem("currentUser");
+      window.location.href = "index.html";
+    }
+  }
+
+  // Initialize page
+  async function initializePage() {
+    const isAuthenticated = await checkAuthentication();
+    if (isAuthenticated) {
+      // Initialize term data functionality
+      initializeTermData();
+    }
+  }
+
+  function initializeTermData() {
+    // Initialize term data functions here
+    if (typeof renderStudents === 'function') {
+      renderStudents();
+    }
+  }
+
+  // Load page when authenticated
+  window.addEventListener('DOMContentLoaded', initializePage);
+</script>
 
 <script src="attendance.js"></script>
 </body>

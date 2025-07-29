@@ -9,11 +9,13 @@
     <nav class="navbar">
         <div class="nav-left">
             <img src="church-logo.png" alt="Church Logo" class="church-logo">
+            <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
         </div>
-        <div class="nav-right">
+        <div class="nav-right" id="navMenu">
             <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-            <a href="login.html" class="nav-link">تسجيل الدخول</a>
-            <a href="register.html" class="nav-link">إنشاء حساب</a>
+            <a href="studentDashboard.html" class="nav-link">لوحة التحكم</a>
+            <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+            <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
         </div>
     </nav>
     <br><br>
@@ -26,6 +28,131 @@
     <footer>
         © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
     </footer>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+        authDomain: "edad-5odam.firebaseapp.com",
+        databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "edad-5odam",
+        storageBucket: "edad-5odam.appspot.com",
+        messagingSenderId: "679576633778",
+        appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+
+      // Authentication check function
+      async function checkAuthentication() {
+        const currentUser = sessionStorage.getItem("currentUser");
+        
+        if (!currentUser) {
+          alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+          window.location.href = "login.html";
+          return false;
+        }
+
+        // Verify user exists in Firebase
+        const emailKey = currentUser.replace(/\./g, '_');
+        try {
+          const snapshot = await db.ref('users/' + emailKey).once('value');
+          if (!snapshot.exists()) {
+            alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
+            sessionStorage.removeItem("currentUser");
+            window.location.href = "login.html";
+            return false;
+          }
+          
+          const userData = snapshot.val();
+          // Check if user is a student (only students can take exams)
+          if (userData.role !== "student") {
+            alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للطلاب فقط");
+            window.location.href = userData.role === "servant" ? "teacherDashboard.html" : "index.html";
+            return false;
+          }
+          
+          return true;
+        } catch (error) {
+          console.error("Error verifying user:", error);
+          alert("حدث خطأ في التحقق من المستخدم. يرجى تسجيل الدخول مرة أخرى");
+          window.location.href = "login.html";
+          return false;
+        }
+      }
+
+      function logout() {
+        if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+          sessionStorage.removeItem("currentUser");
+          window.location.href = "index.html";
+        }
+      }
+
+      // Initialize page
+      async function initializePage() {
+        const isAuthenticated = await checkAuthentication();
+        if (isAuthenticated) {
+          // Initialize student exam functionality
+          initializeStudentExams();
+        }
+      }
+
+      function initializeStudentExams() {
+        // Load student exam functionality here
+        if (typeof loadExamsForStudent === 'function') {
+          loadExamsForStudent();
+        }
+      }
+
+      // Load page when authenticated
+      window.addEventListener('DOMContentLoaded', initializePage);
+
+      // Mobile menu toggle function
+      function toggleMobileMenu() {
+        const navMenu = document.getElementById('navMenu');
+        navMenu.classList.toggle('active');
+        
+        // Add aria-expanded for accessibility
+        const menuToggle = document.querySelector('.menu-toggle');
+        const isExpanded = navMenu.classList.contains('active');
+        menuToggle.setAttribute('aria-expanded', isExpanded);
+      }
+
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', function(event) {
+        const navMenu = document.getElementById('navMenu');
+        const menuToggle = document.querySelector('.menu-toggle');
+        
+        if (!navMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+          navMenu.classList.remove('active');
+          menuToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Close mobile menu when clicking on a link
+      document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            const navMenu = document.getElementById('navMenu');
+            const menuToggle = document.querySelector('.menu-toggle');
+            navMenu.classList.remove('active');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          });
+        });
+
+        // Add accessibility attributes
+        const menuToggle = document.querySelector('.menu-toggle');
+        if (menuToggle) {
+          menuToggle.setAttribute('aria-label', 'فتح/إغلاق القائمة');
+          menuToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    </script>
 
     <script src="student-exam.js"></script>
 </body>

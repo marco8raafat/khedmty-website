@@ -1,35 +1,68 @@
-const examList = document.getElementById("examList");
-let exams = JSON.parse(localStorage.getItem("exams") || "[]");
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+    authDomain: "edad-5odam.firebaseapp.com",
+    databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "edad-5odam",
+    storageBucket: "edad-5odam.appspot.com",
+    messagingSenderId: "679576633778",
+    appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+  };
 
-function renderExams() {
-    examList.innerHTML = "";
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    if (exams.length === 0) {
-    examList.innerHTML = "<li>لا يوجد امتحانات حالياً.</li>";
-    return;
-}
+  const examList = document.getElementById("examList");
 
-exams.forEach((exam, index) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-    <strong>${exam.name}</strong><br>
-    <button onclick="openExam('${exam.link}')">فتح الامتحان</button>
-    <button class="delete" onclick="deleteExam(${index})">حذف</button>
-    `;
-    examList.appendChild(li);
-});
-}
+  function renderExamsFromFirebase() {
+    examList.innerHTML = "<li>جاري تحميل الامتحانات...</li>";
 
-function openExam(link) {
+    db.ref("exams").once("value")
+      .then(snapshot => {
+        const examsData = snapshot.val();
+        examList.innerHTML = "";
+
+        if (!examsData) {
+          examList.innerHTML = "<li>لا يوجد امتحانات حالياً.</li>";
+          return;
+        }
+
+        const exams = Object.entries(examsData); // [ [key, data], ... ]
+
+        exams.forEach(([key, exam]) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <strong>${exam.name}</strong><br>
+            <button onclick="openExam('${exam.link}')">فتح الامتحان</button>
+            <button class="delete" onclick="deleteExam('${key}')">حذف</button>
+          `;
+          examList.appendChild(li);
+        });
+      })
+      .catch(error => {
+        console.error("حدث خطأ أثناء تحميل الامتحانات:", error);
+        examList.innerHTML = "<li>فشل تحميل الامتحانات.</li>";
+      });
+  }
+
+  function openExam(link) {
     window.open(link, "_blank");
-}
+  }
 
-function deleteExam(index) {
-if (confirm("هل أنت متأكد من حذف الامتحان؟")) {
-    exams.splice(index, 1);
-    localStorage.setItem("exams", JSON.stringify(exams));
-    renderExams();
-}
-}
+  function deleteExam(examKey) {
+    if (confirm("هل أنت متأكد من حذف الامتحان؟")) {
+      db.ref("exams/" + examKey).remove()
+        .then(() => {
+          alert("تم حذف الامتحان.");
+          renderExamsFromFirebase(); // Reload after delete
+        })
+        .catch(error => {
+          console.error("خطأ أثناء حذف الامتحان:", error);
+          alert("حدث خطأ أثناء حذف الامتحان.");
+        });
+    }
+  }
 
-renderExams();
+  // Start rendering
+  renderExamsFromFirebase();

@@ -80,7 +80,24 @@
   .nav-link.active {
     background-color: rgba(255, 255, 255, 0.3);
   }
-  
+
+  /* Mobile menu toggle button */
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+
+  .menu-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
   /* Main Content */
   main {
     flex: 1;
@@ -267,6 +284,52 @@
   
   /* Responsive Design for Phones */
   @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    .nav-left {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .nav-left .church-logo {
+      height: 60px;
+    }
+
+    .menu-toggle {
+      display: block;
+    }
+
+    .nav-right {
+      width: 100%;
+      flex-direction: column;
+      gap: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .nav-right.active {
+      max-height: 300px;
+    }
+
+    .nav-link {
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0;
+    }
+
+    .nav-link:last-child {
+      border-bottom: none;
+    }
+
     .container {
       padding: 0 12px;
     }

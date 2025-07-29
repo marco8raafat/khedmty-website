@@ -12,8 +12,9 @@
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-    <div class="nav-right">
+    <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="login.html" class="nav-link">تسجيل الدخول</a>
       <a href="register.html" class="nav-link">إنشاء حساب</a>
@@ -40,5 +41,24 @@
   <footer>
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
+
+  <script>
+    // Mobile menu toggle function
+    function toggleMobileMenu() {
+      const navMenu = document.getElementById('navMenu');
+      navMenu.classList.toggle('active');
+    }
+
+    // Close mobile menu when clicking on a link
+    document.addEventListener('DOMContentLoaded', function() {
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          const navMenu = document.getElementById('navMenu');
+          navMenu.classList.remove('active');
+        });
+      });
+    });
+  </script>
 </body>
 </html>

@@ -9,11 +9,13 @@
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-    <div class="nav-right">
+    <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="login.html" class="nav-link">تسجيل الدخول</a>
-      <a href="register.html" class="nav-link">إنشاء حساب</a>
+      <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+      <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
 
@@ -26,6 +28,29 @@
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
 
-  <script src="exam-list.js"></script>
+<!-- Make sure these scripts are included before your custom script -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+  // Mobile menu toggle function
+  function toggleMobileMenu() {
+    const navMenu = document.getElementById('navMenu');
+    navMenu.classList.toggle('active');
+  }
+
+  // Close mobile menu when clicking on a link
+  document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        const navMenu = document.getElementById('navMenu');
+        navMenu.classList.remove('active');
+      });
+    });
+  });
+</script>
+
+<script src="exam-list.js"></script>
 </body>
 </html>
