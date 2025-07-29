@@ -6,6 +6,11 @@ html, body {
   flex-direction: column;
   font-family: Arial, sans-serif;
   background: #f8f9fa;
+  background-image: url('knesa.jpg'); 
+  background-size: cover;        
+  background-repeat: no-repeat;  
+  background-attachment: fixed;  
+  background-position: center;
 }
 
 :root {
@@ -150,7 +155,6 @@ footer {
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* دعم العرض على الشاشات الصغيرة */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;

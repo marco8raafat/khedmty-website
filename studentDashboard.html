@@ -625,60 +625,27 @@ label {
   </footer>
 
   <script src="botScript.js"></script>
-  <!-- Place this at the bottom of your studentDashboard.html file before </body> -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script>
-  // Firebase configuration (replace only if different)
-  const firebaseConfig = {
-    apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
-    authDomain: "edad-5odam.firebaseapp.com",
-    databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "edad-5odam",
-    storageBucket: "edad-5odam.appspot.com",
-    messagingSenderId: "679576633778",
-    appId: "1:679576633778:web:566e6aaef9b72f71a824ab",
-    measurementId: "G-7WB1WPDLRH"
-  };
+  <script>
+    const users = JSON.parse(localStorage.getItem("users")) || {};
+    const currentEmail = localStorage.getItem("currentUser");
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-
-  // 🔐 Get current user
-  const currentEmail = sessionStorage.getItem("currentUser");
-  if (!currentEmail) {
-    window.location.href = "login.html";
-  }
-
-  const emailKey = currentEmail.replace(/\./g, '_');
-
-  // Fetch user data from Firebase
-  database.ref("users/" + emailKey).once("value").then((snapshot) => {
-    if (!snapshot.exists()) {
+    if (!currentEmail || !users[currentEmail]) {
       window.location.href = "login.html";
-      return;
     }
 
-    const userData = snapshot.val();
+    const userData = users[currentEmail];
+
     document.getElementById("username").textContent = userData.username.split(" ").slice(0, 2).join(" ");
-  }).catch((error) => {
-    console.error("Error fetching user data:", error);
-    window.location.href = "login.html";
-  });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      loadLatestNotifications();
+    });
 
-  // 🔔 Load latest notifications
-  document.addEventListener('DOMContentLoaded', function() {
-    loadLatestNotifications();
-    setInterval(loadLatestNotifications, 60000); // every minute
-  });
-
-  function loadLatestNotifications() {
-    // Fetch alerts from Firebase instead of localStorage
-    database.ref('alerts').limitToLast(5).on('value', (snapshot) => {
+    function loadLatestNotifications() {
+      const alerts = JSON.parse(localStorage.getItem('alerts')) || [];
       const notificationsContainer = document.getElementById('latestNotifications');
       
-      if (!snapshot.exists()) {
+      if (alerts.length === 0) {
         notificationsContainer.innerHTML = `
           <div class="empty-notifications">
             <p>لا توجد تنبيهات جديدة حالياً</p>
@@ -687,12 +654,9 @@ label {
         return;
       }
 
-      const alerts = [];
-      snapshot.forEach((childSnapshot) => {
-        alerts.push(childSnapshot.val());
-      });
-      
+      // عرض آخر 3 تنبيهات
       const latestAlerts = alerts.slice(-3).reverse();
+      
       notificationsContainer.innerHTML = latestAlerts.map(alert => `
         <div class="notification-item">
           <div class="notification-title">${alert.title}</div>

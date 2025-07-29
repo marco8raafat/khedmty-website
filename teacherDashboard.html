@@ -555,8 +555,6 @@ footer {
     <p>© كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025</p>
   </footer>
   
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="botScript.js"></script>
   <script>
     const firebaseConfig = {
@@ -683,20 +681,6 @@ footer {
       }
     }
 
-    // Mobile menu toggle function
-    function toggleMobileMenu() {
-      const navMenu = document.getElementById('navMenu');
-      navMenu.classList.toggle('active');
-    }
-
-    // Logout function
-    function logout() {
-      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
-        window.location.href = "index.html";
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', async function () {
       const isAuthenticated = await checkAuthentication();
       if (isAuthenticated) {
@@ -704,15 +688,6 @@ footer {
         await updateStats();
         setInterval(updateStats, 30000);
       }
-
-      // Close mobile menu when clicking on a link
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-          const navMenu = document.getElementById('navMenu');
-          navMenu.classList.remove('active');
-        });
-      });
     });
   </script>
 </body>
