@@ -1,33 +1,33 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const hamburger = document.querySelector(".hamburger");
-  const nav = document.getElementById("navLinks");
+document.getElementById("examForm").addEventListener("submit", function(e) {
+  e.preventDefault();
 
-  if (hamburger && nav) {
-    hamburger.addEventListener("click", function () {
-      nav.classList.toggle("show");
-    });
+  const examName = document.getElementById("examName").value.trim();
+  const examLink = document.getElementById("examLink").value.trim();
+  const currentUser = sessionStorage.getItem("currentUser");
+
+  if (examName === "" || examLink === "") {
+    alert("يرجى ملء جميع الحقول.");
+    return;
   }
 
-  const examForm = document.getElementById("examForm");
-
-  if (examForm) {
-    examForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const examName = document.getElementById("examName").value.trim();
-      const examLink = document.getElementById("examLink").value.trim();
-
-      if (examName === "" || examLink === "") {
-        alert("يرجى ملء جميع الحقول.");
-        return;
-      }
-
-      let exams = JSON.parse(localStorage.getItem("exams") || "[]");
-      exams.push({ name: examName, link: examLink });
-
-      localStorage.setItem("exams", JSON.stringify(exams));
-      alert("تم رفع الامتحان بنجاح!");
-      window.location.href = "exam-list.html";
-    });
+  if (!currentUser) {
+    alert("يجب تسجيل الدخول أولاً.");
+    return;
   }
+
+  const emailKey = currentUser.replace(/\./g, '_'); // Firebase-safe key
+
+  const newExamRef = firebase.database().ref("exams").push(); // generate new key
+  newExamRef.set({
+    name: examName,
+    link: examLink,
+    uploadedBy: emailKey,
+    timestamp: Date.now()
+  }).then(() => {
+    alert("تم رفع الامتحان بنجاح!");
+    window.location.href = "exam-list.html";
+  }).catch((error) => {
+    console.error("خطأ أثناء رفع الامتحان:", error);
+    alert("حدث خطأ أثناء رفع الامتحان. حاول مرة أخرى.");
+  });
 });
