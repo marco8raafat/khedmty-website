@@ -4,138 +4,46 @@
   <meta charset="UTF-8">
   <title>رفع امتحان</title>
   <link rel="stylesheet" href="upload-exam.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
-      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-    <div class="nav-right" id="navMenu">
+
+    <div class="hamburger">☰</div>
+
+    <div class="nav-right" id="navLinks">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
-      <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
-      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
+      <a href="login.html" class="nav-link">تسجيل الدخول</a>
+      <a href="register.html" class="nav-link">إنشاء حساب</a>
     </div>
   </nav>
 
   <main>
     <div class="form-box">
-  <h2>رفع امتحان جديد</h2>
-  <form id="examForm">
-    <div class="form-row">
-      <label for="examName">اسم الامتحان:</label>
-      <input type="text" id="examName" required>
+      <h2>رفع امتحان جديد</h2>
+      <form id="examForm">
+        <div class="form-row">
+          <label for="examName">اسم الامتحان:</label>
+          <input type="text" id="examName" required>
+        </div>
+
+        <div class="form-row">
+          <label for="examLink">لينك الامتحان:</label>
+          <input type="text" id="examLink" placeholder="https://..." required>
+        </div>
+
+        <button type="submit">رفع الامتحان</button>
+      </form>
     </div>
-
-    <div class="form-row">
-      <label for="examLink">لينك الامتحان:</label>
-      <input type="text" id="examLink" placeholder="https://..." required>
-    </div>
-
-    <button type="submit">رفع الامتحان</button>
-  </form>
-</div>
-
   </main>
 
   <footer>
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
-      authDomain: "edad-5odam.firebaseapp.com",
-      databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "edad-5odam",
-      storageBucket: "edad-5odam.appspot.com",
-      messagingSenderId: "679576633778",
-      appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // Authentication check function
-    async function checkAuthentication() {
-      const currentUser = sessionStorage.getItem("currentUser");
-      
-      if (!currentUser) {
-        alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
-        window.location.href = "login.html";
-        return false;
-      }
-
-      // Verify user exists in Firebase
-      const emailKey = currentUser.replace(/\./g, '_');
-      try {
-        const snapshot = await db.ref('users/' + emailKey).once('value');
-        if (!snapshot.exists()) {
-          alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
-          sessionStorage.removeItem("currentUser");
-          window.location.href = "login.html";
-          return false;
-        }
-        
-        const userData = snapshot.val();
-        // Check if user is a servant (only servants can upload exams)
-        if (userData.role !== "servant") {
-          alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للخدام فقط");
-          window.location.href = userData.role === "student" ? "studentDashboard.html" : "index.html";
-          return false;
-        }
-        
-        return true;
-      } catch (error) {
-        console.error("Error verifying user:", error);
-        alert("حدث خطأ في التحقق من المستخدم. يرجى تسجيل الدخول مرة أخرى");
-        window.location.href = "login.html";
-        return false;
-      }
-    }
-
-    function logout() {
-      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
-        window.location.href = "index.html";
-      }
-    }
-
-    // Initialize page
-    async function initializePage() {
-      const isAuthenticated = await checkAuthentication();
-      if (isAuthenticated) {
-        // Initialize upload exam functionality
-        console.log("User authenticated, ready to upload exams");
-      }
-    }
-
-    // Load page when authenticated
-    window.addEventListener('DOMContentLoaded', initializePage);
-
-    // Mobile menu toggle function
-    function toggleMobileMenu() {
-      const navMenu = document.getElementById('navMenu');
-      navMenu.classList.toggle('active');
-    }
-
-    // Close mobile menu when clicking on a link
-    document.addEventListener('DOMContentLoaded', function() {
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-          const navMenu = document.getElementById('navMenu');
-          navMenu.classList.remove('active');
-        });
-      });
-    });
-  </script>
 
   <script src="upload-exam.js"></script>
 </body>
