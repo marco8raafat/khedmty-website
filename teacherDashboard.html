@@ -345,6 +345,7 @@ footer {
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
       margin-bottom: 40px;
+      transition: opacity 0.3s ease;
     }
 
     .stat-card {
@@ -735,6 +736,78 @@ footer {
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    // Cache management system
+    class DataCache {
+      constructor() {
+        this.cache = new Map();
+        this.listeners = new Map();
+        this.lastUpdated = new Map();
+        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache expiry
+      }
+
+      // Check if cached data is still valid
+      isCacheValid(path) {
+        const lastUpdate = this.lastUpdated.get(path);
+        if (!lastUpdate) return false;
+        return (Date.now() - lastUpdate) < this.cacheExpiry;
+      }
+
+      // Get data from cache or Firebase with real-time listener
+      async getData(path, callback) {
+        // If we have valid cached data, use it immediately
+        if (this.isCacheValid(path) && this.cache.has(path)) {
+          console.log(`Using cached data for ${path}`);
+          if (callback) callback(this.cache.get(path));
+          return this.cache.get(path);
+        }
+
+        // Set up real-time listener if not already exists
+        if (!this.listeners.has(path)) {
+          console.log(`Setting up real-time listener for ${path}`);
+          const listener = database.ref(path).on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            this.cache.set(path, data);
+            this.lastUpdated.set(path, Date.now());
+            console.log(`Data updated for ${path}:`, Object.keys(data).length, 'items');
+            if (callback) callback(data);
+          });
+          this.listeners.set(path, listener);
+        }
+
+        // Return cached data if available, otherwise return empty object
+        return this.cache.get(path) || {};
+      }
+
+      // Clean up listeners when not needed
+      cleanup() {
+        this.listeners.forEach((listener, path) => {
+          database.ref(path).off('value', listener);
+        });
+        this.listeners.clear();
+        this.cache.clear();
+        this.lastUpdated.clear();
+      }
+    }
+
+    // Initialize cache instance
+    const dataCache = new DataCache();
+
+    // Debounce function to prevent rapid successive updates
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Debounced version of updateStats
+    const debouncedUpdateStats = debounce(updateStats, 300);
+
     function getFirebaseData(path) {
       return database.ref(path).once('value').then(snapshot => snapshot.val() || {});
     }
@@ -748,19 +821,21 @@ footer {
       if (!currentEmail) return null;
 
       const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
-      const userData = await getFirebaseData(`users/${emailKey}`);
-      return userData;
+      return await dataCache.getData(`users/${emailKey}`);
     }
 
     async function getStatisticsData() {
+      console.log('Getting statistics data...');
+      
+      // Use cached data with real-time listeners
       const [alerts, students, attendance, pdfs, photos, exams, researches] = await Promise.all([
-        getFirebaseData('alerts'),
-        getFirebaseData('users'),
-        getFirebaseData('attendance'),
-        getFirebaseData('educational-resources'),
-        getFirebaseData('photos'),
-        getFirebaseData('exams'),
-        getFirebaseData('researches')
+        dataCache.getData('alerts'),
+        dataCache.getData('users'),
+        dataCache.getData('attendance'),
+        dataCache.getData('educational-resources'),
+        dataCache.getData('photos'),
+        dataCache.getData('exams'),
+        dataCache.getData('researches')
       ]);
 
       return {
@@ -783,10 +858,17 @@ footer {
         return false;
       }
 
-      const userData = await getUserData();
-      console.log("User data from Firebase:", userData);
+      const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
       
-      if (!userData) {
+      // Wait for user data to be loaded from cache/Firebase
+      const userData = await new Promise((resolve) => {
+        dataCache.getData(`users/${emailKey}`, (data) => {
+          console.log("User data loaded:", data);
+          resolve(data);
+        });
+      });
+      
+      if (!userData || Object.keys(userData).length === 0) {
         console.log("No user data found, redirecting to login");
         window.location.href = "login.html";
         return false;
@@ -805,7 +887,17 @@ footer {
 
     async function updateStats() {
       try {
+        console.log('Updating statistics...');
         const data = await getStatisticsData();
+
+        // Add a subtle indicator when using cached data
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+          statsSection.style.opacity = '0.8';
+          setTimeout(() => {
+            statsSection.style.opacity = '1';
+          }, 100);
+        }
 
         document.getElementById('alertCount').textContent = (data.alerts || []).length;
         document.getElementById('studentCount').textContent = (data.students || []).length;
@@ -863,6 +955,8 @@ footer {
         document.getElementById('examCount').textContent = (data.exams || []).length;
         document.getElementById('researchCount').textContent = (data.researches || []).length;
 
+        console.log('Statistics updated successfully');
+
       } catch (error) {
         console.error('Error updating statistics:', error);
         document.getElementById('alertCount').textContent = '0';
@@ -874,11 +968,25 @@ footer {
       }
     }
 
+    async function setupRealTimeUpdates() {
+      console.log('Setting up real-time updates...');
+      
+      // Set up real-time listeners for each data type that will auto-update stats
+      const dataPaths = ['alerts', 'users', 'attendance', 'educational-resources', 'photos', 'exams', 'researches'];
+      
+      dataPaths.forEach(path => {
+        dataCache.getData(path, () => {
+          console.log(`Data changed in ${path}, scheduling stats update...`);
+          debouncedUpdateStats(); // Use debounced version
+        });
+      });
+    }
+
     async function loadLatestNotifications() {
       try {
-        const alerts = await getFirebaseData('alerts');
+        const alerts = await dataCache.getData('alerts');
         const alertsArray = Object.values(alerts || {});
-        console.log('Latest notifications loaded:', alertsArray.length);
+        console.log('Latest notifications loaded from cache:', alertsArray.length);
       } catch (error) {
         console.error('Error loading notifications:', error);
       }
@@ -901,9 +1009,16 @@ footer {
     document.addEventListener('DOMContentLoaded', async function () {
       const isAuthenticated = await checkAuthentication();
       if (isAuthenticated) {
+        console.log('User authenticated, setting up dashboard...');
+        
+        // Setup real-time listeners and initial data load
+        await setupRealTimeUpdates();
         await loadLatestNotifications();
+        
+        // Initial stats update
         await updateStats();
-        setInterval(updateStats, 30000);
+        
+        console.log('Dashboard setup complete with real-time caching');
       }
 
       // Close mobile menu when clicking on a link
@@ -914,6 +1029,12 @@ footer {
           navMenu.classList.remove('active');
         });
       });
+    });
+
+    // Clean up listeners when page is unloaded
+    window.addEventListener('beforeunload', function() {
+      console.log('Cleaning up Firebase listeners...');
+      dataCache.cleanup();
     });
   </script>
 </body>

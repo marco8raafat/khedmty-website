@@ -14,6 +14,75 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// Smart Cache Management System
+class PhotoCache {
+  constructor() {
+    this.cache = new Map();
+    this.listeners = new Map();
+    this.lastUpdated = new Map();
+    this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache expiry
+  }
+
+  // Check if cached data is still valid
+  isCacheValid(path) {
+    const lastUpdate = this.lastUpdated.get(path);
+    if (!lastUpdate) return false;
+    return (Date.now() - lastUpdate) < this.cacheExpiry;
+  }
+
+  // Get data from cache or Firebase with real-time listener
+  async getData(path, callback) {
+    // If we have valid cached data, use it immediately
+    if (this.isCacheValid(path) && this.cache.has(path)) {
+      console.log(`[Photo System] Using cached data for ${path}`);
+      if (callback) callback(this.cache.get(path));
+      return this.cache.get(path);
+    }
+
+    // Set up real-time listener if not already exists
+    if (!this.listeners.has(path)) {
+      console.log(`[Photo System] Setting up real-time listener for ${path}`);
+      const listener = database.ref(path).on('value', (snapshot) => {
+        const data = snapshot.val() || {};
+        this.cache.set(path, data);
+        this.lastUpdated.set(path, Date.now());
+        console.log(`[Photo System] Data updated for ${path}:`, Object.keys(data).length, 'photos');
+        if (callback) callback(data);
+      });
+      this.listeners.set(path, listener);
+    }
+
+    // Return cached data if available, otherwise return empty object
+    return this.cache.get(path) || {};
+  }
+
+  // Clean up listeners when not needed
+  cleanup() {
+    this.listeners.forEach((listener, path) => {
+      database.ref(path).off('value', listener);
+    });
+    this.listeners.clear();
+    this.cache.clear();
+    this.lastUpdated.clear();
+  }
+}
+
+// Initialize cache instance
+const photoCache = new PhotoCache();
+
+// Debounce function to prevent rapid successive updates
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Verify elements exist
     const uploadForm = document.getElementById('uploadForm');
@@ -163,14 +232,16 @@ document.addEventListener('DOMContentLoaded', () => {
           // Save to Firebase
           database.ref("photos").push(newPhoto).then(() => {
             showMessage('✅ تم إضافة الصورة بنجاح! يمكنك الآن عرضها في قائمة الصور', 'success', 5000);
-            console.log('Photo saved to Firebase:', newPhoto.title);
+            console.log('[Photo System] Photo saved to Firebase:', newPhoto.title);
             
             // Reset form
             if (uploadForm) {
               uploadForm.reset();
             }
+
+            // The real-time listener will automatically update any photo lists
           }).catch((error) => {
-            console.error('Firebase error:', error);
+            console.error('[Photo System] Firebase error:', error);
             showMessage('❌ حدث خطأ أثناء حفظ الصورة في قاعدة البيانات. حاول مرة أخرى', 'error', 6000);
           });
 
@@ -182,29 +253,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // If photos exist on this page, load them from Firebase
+  // If photos exist on this page, load them from Firebase with caching
   document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('photoList')) {
-      loadPhotos();
+      loadPhotosWithCache();
     }
   });
   
-  function loadPhotos() {
+  function loadPhotosWithCache() {
     const photoList = document.getElementById('photoList');
     if (!photoList) return;
-  
-    database.ref("photos").on("value", (snapshot) => {
+
+    console.log('[Photo System] Loading photos with smart caching...');
+    
+    // Use cached data with real-time listener
+    photoCache.getData('photos', (photosData) => {
       photoList.innerHTML = '';
       
-      if (!snapshot.exists()) {
+      if (!photosData || Object.keys(photosData).length === 0) {
         photoList.innerHTML = '<p>لا توجد صور حالياً</p>';
         return;
       }
-  
-      snapshot.forEach((childSnapshot) => {
-        const photo = childSnapshot.val();
-        const photoKey = childSnapshot.key;
-        
+
+      const photos = Object.entries(photosData);
+      console.log('[Photo System] Displaying', photos.length, 'photos');
+      
+      photos.forEach(([photoKey, photo]) => {
         const photoElement = document.createElement('div');
         photoElement.className = 'photo-item';
         
@@ -218,20 +292,43 @@ document.addEventListener('DOMContentLoaded', () => {
           <div style="display: none; padding: 10px; background: #f0f0f0; color: #666;">
             صورة غير متاحة
           </div>
-          <button onclick="deletePhoto('${photoKey}')">حذف</button>
+          <button onclick="deletePhotoFromCache('${photoKey}')">حذف</button>
         `;
         photoList.appendChild(photoElement);
       });
+
+      // Add subtle animation to show data refresh
+      photoList.style.opacity = '0.8';
+      setTimeout(() => {
+        photoList.style.opacity = '1';
+      }, 100);
     });
   }
-  
-  function deletePhoto(photoKey) {
+
+  // Enhanced delete function with cache integration
+  function deletePhotoFromCache(photoKey) {
     if (confirm('هل أنت متأكد من حذف هذه الصورة؟')) {
+      console.log('[Photo System] Deleting photo:', photoKey);
       database.ref("photos/" + photoKey).remove().then(() => {
-        console.log('Photo deleted successfully');
+        console.log('[Photo System] Photo deleted successfully');
+        // The real-time listener will automatically update the UI and cache
       }).catch((error) => {
-        console.error('Error deleting photo from Firebase:', error);
+        console.error('[Photo System] Error deleting photo:', error);
         alert('حدث خطأ أثناء حذف الصورة');
       });
     }
   }
+
+  // Make delete function global for onclick handlers
+  window.deletePhotoFromCache = deletePhotoFromCache;
+
+  // Clean up listeners when page is unloaded
+  window.addEventListener('beforeunload', function() {
+    console.log('[Photo System] Cleaning up Firebase listeners...');
+    photoCache.cleanup();
+  });
+
+  // Performance monitoring
+  window.addEventListener('load', function() {
+    console.log('[Photo System] Page loaded, photo cache system active');
+  });

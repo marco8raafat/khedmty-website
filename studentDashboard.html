@@ -386,6 +386,10 @@ label {
       gap: 10px;
     }
 
+    #latestNotifications {
+      transition: opacity 0.3s ease;
+    }
+
     .notification-item {
       background: #f8fff8;
       border: 1px solid #e8f5e8;
@@ -393,6 +397,12 @@ label {
       padding: 15px;
       margin-bottom: 15px;
       border-left: 4px solid #233B6E;
+      transition: all 0.3s ease;
+    }
+
+    .notification-item:hover {
+      transform: translateX(-3px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     }
 
     .notification-title {
@@ -645,6 +655,75 @@ label {
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
 
+  // Cache management system
+  class DataCache {
+    constructor() {
+      this.cache = new Map();
+      this.listeners = new Map();
+      this.lastUpdated = new Map();
+      this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache expiry
+    }
+
+    // Check if cached data is still valid
+    isCacheValid(path) {
+      const lastUpdate = this.lastUpdated.get(path);
+      if (!lastUpdate) return false;
+      return (Date.now() - lastUpdate) < this.cacheExpiry;
+    }
+
+    // Get data from cache or Firebase with real-time listener
+    async getData(path, callback) {
+      // If we have valid cached data, use it immediately
+      if (this.isCacheValid(path) && this.cache.has(path)) {
+        console.log(`[Student Dashboard] Using cached data for ${path}`);
+        if (callback) callback(this.cache.get(path));
+        return this.cache.get(path);
+      }
+
+      // Set up real-time listener if not already exists
+      if (!this.listeners.has(path)) {
+        console.log(`[Student Dashboard] Setting up real-time listener for ${path}`);
+        const listener = database.ref(path).on('value', (snapshot) => {
+          const data = snapshot.val() || {};
+          this.cache.set(path, data);
+          this.lastUpdated.set(path, Date.now());
+          console.log(`[Student Dashboard] Data updated for ${path}:`, Object.keys(data).length, 'items');
+          if (callback) callback(data);
+        });
+        this.listeners.set(path, listener);
+      }
+
+      // Return cached data if available, otherwise return empty object
+      return this.cache.get(path) || {};
+    }
+
+    // Clean up listeners when not needed
+    cleanup() {
+      this.listeners.forEach((listener, path) => {
+        database.ref(path).off('value', listener);
+      });
+      this.listeners.clear();
+      this.cache.clear();
+      this.lastUpdated.clear();
+    }
+  }
+
+  // Initialize cache instance
+  const dataCache = new DataCache();
+
+  // Debounce function to prevent rapid successive updates
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
   // 🔐 Get current user
   const currentEmail = sessionStorage.getItem("currentUser");
   if (!currentEmail) {
@@ -653,32 +732,72 @@ label {
 
   const emailKey = currentEmail.replace(/\./g, '_');
 
-  // Fetch user data from Firebase
-  database.ref("users/" + emailKey).once("value").then((snapshot) => {
-    if (!snapshot.exists()) {
+  // Enhanced user authentication with caching
+  async function checkAuthentication() {
+    console.log("[Student Dashboard] Checking authentication for:", currentEmail);
+    
+    if (!currentEmail) {
       window.location.href = "login.html";
-      return;
+      return false;
     }
 
-    const userData = snapshot.val();
-    document.getElementById("username").textContent = userData.username.split(" ").slice(0, 2).join(" ");
-  }).catch((error) => {
-    console.error("Error fetching user data:", error);
-    window.location.href = "login.html";
-  });
+    // Wait for user data to be loaded from cache/Firebase
+    const userData = await new Promise((resolve) => {
+      dataCache.getData(`users/${emailKey}`, (data) => {
+        console.log("[Student Dashboard] User data loaded:", data);
+        resolve(data);
+      });
+    });
+    
+    if (!userData || Object.keys(userData).length === 0) {
+      console.log("[Student Dashboard] No user data found, redirecting to login");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    const usernameElement = document.getElementById("username");
+    if (usernameElement && userData.username) {
+      const displayName = userData.username.split(" ").slice(0, 2).join(" ");
+      console.log("[Student Dashboard] Setting username to:", displayName);
+      usernameElement.textContent = displayName;
+    }
+
+    return true;
+  }
 
   // 🔔 Load latest notifications
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', async function() {
+    console.log("[Student Dashboard] Initializing dashboard...");
+    
+    // Check authentication first
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) {
+      return; // Exit if not authenticated
+    }
+
+    console.log("[Student Dashboard] User authenticated, setting up real-time updates...");
+    
+    // Setup real-time notifications listener
     loadLatestNotifications();
-    setInterval(loadLatestNotifications, 60000); // every minute
+    
+    // Set up real-time listener for alerts that will auto-update notifications
+    dataCache.getData('alerts', () => {
+      console.log("[Student Dashboard] Alerts updated, refreshing notifications...");
+      debouncedLoadNotifications();
+    });
+
+    console.log("[Student Dashboard] Dashboard setup complete with smart caching");
   });
 
+  // 🔔 Enhanced notifications with smart caching
   function loadLatestNotifications() {
-    // Fetch alerts from Firebase instead of localStorage
-    database.ref('alerts').limitToLast(5).on('value', (snapshot) => {
+    console.log("[Student Dashboard] Loading notifications from cache...");
+    
+    // Use cached data with real-time listener
+    dataCache.getData('alerts', (alertsData) => {
       const notificationsContainer = document.getElementById('latestNotifications');
       
-      if (!snapshot.exists()) {
+      if (!alertsData || Object.keys(alertsData).length === 0) {
         notificationsContainer.innerHTML = `
           <div class="empty-notifications">
             <p>لا توجد تنبيهات جديدة حالياً</p>
@@ -687,21 +806,30 @@ label {
         return;
       }
 
-      const alerts = [];
-      snapshot.forEach((childSnapshot) => {
-        alerts.push(childSnapshot.val());
-      });
+      // Convert to array and sort by timestamp or order
+      const alerts = Object.values(alertsData);
+      const latestAlerts = alerts.slice(-3).reverse(); // Get last 3 alerts
       
-      const latestAlerts = alerts.slice(-3).reverse();
+      console.log("[Student Dashboard] Displaying", latestAlerts.length, "notifications");
+      
       notificationsContainer.innerHTML = latestAlerts.map(alert => `
         <div class="notification-item">
-          <div class="notification-title">${alert.title}</div>
-          <div class="notification-message">${alert.message}</div>
-          <div class="notification-time">${alert.time}</div>
+          <div class="notification-title">${alert.title || 'تنبيه'}</div>
+          <div class="notification-message">${alert.message || ''}</div>
+          <div class="notification-time">${alert.time || alert.timestamp || 'منذ قليل'}</div>
         </div>
       `).join('');
+
+      // Add subtle animation to show data refresh
+      notificationsContainer.style.opacity = '0.7';
+      setTimeout(() => {
+        notificationsContainer.style.opacity = '1';
+      }, 100);
     });
   }
+
+  // Debounced version to prevent rapid updates
+  const debouncedLoadNotifications = debounce(loadLatestNotifications, 200);
 
   // Mobile menu toggle function
   function toggleMobileMenu() {
@@ -724,6 +852,17 @@ label {
         navMenu.classList.remove('active');
       });
     });
+  });
+
+  // Clean up listeners when page is unloaded
+  window.addEventListener('beforeunload', function() {
+    console.log('[Student Dashboard] Cleaning up Firebase listeners...');
+    dataCache.cleanup();
+  });
+
+  // Performance monitoring
+  window.addEventListener('load', function() {
+    console.log('[Student Dashboard] Page loaded, cache system active');
   });
 
 </script>

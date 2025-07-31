@@ -60,6 +60,75 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // Smart Cache Management System for Student PDFs
+    class StudentPDFCache {
+      constructor() {
+        this.cache = new Map();
+        this.listeners = new Map();
+        this.lastUpdated = new Map();
+        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache expiry
+      }
+
+      // Check if cached data is still valid
+      isCacheValid(path) {
+        const lastUpdate = this.lastUpdated.get(path);
+        if (!lastUpdate) return false;
+        return (Date.now() - lastUpdate) < this.cacheExpiry;
+      }
+
+      // Get data from cache or Firebase with real-time listener
+      async getData(path, callback) {
+        // If we have valid cached data, use it immediately
+        if (this.isCacheValid(path) && this.cache.has(path)) {
+          console.log(`[Student PDFs] Using cached data for ${path}`);
+          if (callback) callback(this.cache.get(path));
+          return this.cache.get(path);
+        }
+
+        // Set up real-time listener if not already exists
+        if (!this.listeners.has(path)) {
+          console.log(`[Student PDFs] Setting up real-time listener for ${path}`);
+          const listener = db.ref(path).on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            this.cache.set(path, data);
+            this.lastUpdated.set(path, Date.now());
+            console.log(`[Student PDFs] Data updated for ${path}:`, Object.keys(data).length, 'PDFs');
+            if (callback) callback(data);
+          });
+          this.listeners.set(path, listener);
+        }
+
+        // Return cached data if available, otherwise return empty object
+        return this.cache.get(path) || {};
+      }
+
+      // Clean up listeners when not needed
+      cleanup() {
+        this.listeners.forEach((listener, path) => {
+          db.ref(path).off('value', listener);
+        });
+        this.listeners.clear();
+        this.cache.clear();
+        this.lastUpdated.clear();
+      }
+    }
+
+    // Initialize cache instance
+    const studentPDFCache = new StudentPDFCache();
+
+    // Debounce function to prevent rapid successive updates
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
     // Mobile menu toggle function
     function toggleMobileMenu() {
       const navMenu = document.getElementById('navMenu');
@@ -89,32 +158,36 @@
 
     let allPdfs = [];
   
-    // Fetch PDFs from Firebase
+    // Fetch PDFs from Firebase with smart caching
+    const debouncedProcessPDFs = debounce(processPDFData, 200);
+    
     function fetchPDFs() {
       displayLoading();
       
-      db.ref('educational-resources').once('value')
-        .then((snapshot) => {
-          allPdfs = [];
-          
-          if (snapshot.exists()) {
-            snapshot.forEach((childSnapshot) => {
-              const pdf = childSnapshot.val();
-              allPdfs.push(pdf);
-            });
-            
-            console.log('Retrieved PDFs from Firebase:', allPdfs.length);
-            populateSubjectFilter();
-            renderPDFs('all');
-          } else {
-            console.log('No educational resources found in Firebase');
-            displayEmptyState();
+      // Use smart caching for educational resources
+      studentPDFCache.getData('educational-resources', (data) => {
+        debouncedProcessPDFs(data);
+      });
+    }
+
+    // Process PDF data from cache or Firebase
+    function processPDFData(data) {
+      allPdfs = [];
+      
+      if (data && Object.keys(data).length > 0) {
+        Object.values(data).forEach((pdf) => {
+          if (pdf) {
+            allPdfs.push(pdf);
           }
-        })
-        .catch((error) => {
-          console.error('Error fetching PDFs from Firebase:', error);
-          displayEmptyState();
         });
+        
+        console.log('[Student PDFs] Processed PDFs:', allPdfs.length);
+        populateSubjectFilter();
+        renderPDFs('all');
+      } else {
+        console.log('[Student PDFs] No educational resources found');
+        displayEmptyState();
+      }
     }
 
     // Populate subject filter dropdown
@@ -131,6 +204,11 @@
         subjectFilter.appendChild(option);
       });
     }
+
+    // Debounced render function for smooth filtering
+    const debouncedRender = debounce((filterSubject) => {
+      renderPDFs(filterSubject);
+    }, 200);
   
     // Display PDFs based on filter (students can only view, not delete)
     function renderPDFs(filterSubject) {
@@ -175,10 +253,15 @@
     // Initial load
     fetchPDFs();
   
-    // Filter change event
+    // Filter change event with debouncing
     subjectFilter.addEventListener('change', (e) => {
-      console.log('Filtering by subject:', e.target.value);
-      renderPDFs(e.target.value);
+      console.log('[Student PDFs] Filtering by subject:', e.target.value);
+      debouncedRender(e.target.value);
+    });
+
+    // Clean up cache and listeners when page is about to unload
+    window.addEventListener('beforeunload', () => {
+      studentPDFCache.cleanup();
     });
 
     // Close mobile menu when clicking on a link
