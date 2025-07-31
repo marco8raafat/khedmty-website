@@ -236,7 +236,23 @@ function printAttendance() {
     printWindow.document.close();
     printWindow.print();
   }
-  
+  function filterAttendanceHistory() {
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const rows = document.querySelectorAll("#attendanceBody tr");
+
+  rows.forEach(row => {
+    const name = row.cells[0]?.textContent.toLowerCase() || "";
+    const team = row.cells[1]?.textContent.toLowerCase() || "";
+    const status = row.cells[2]?.textContent.toLowerCase() || "";
+
+    if (name.includes(input) || team.includes(input) || status.includes(input)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+
 
   </script>
   <script>
