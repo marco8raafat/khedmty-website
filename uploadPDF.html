@@ -6,7 +6,6 @@
   <link rel="icon" type="image/png" href="logoCircle1.png">
   <title>رفع المصادر التعليمية</title>
   <link rel="stylesheet" href="uploadPDF.css">
-  <script src="uploadPDF.js"></script>
 </head>
 <body>
   <nav class="navbar">
@@ -27,6 +26,14 @@
 
       <div id="upload" class="tab-content active">
         <h2 class="section-title">رفع مصدر تعليمي جديد</h2>
+        <div style="background-color: #e8f4fd; border: 1px solid #0066cc; border-radius: 5px; padding: 15px; margin-bottom: 20px; text-align: center;">
+          <p style="margin: 0; color: #0066cc; font-weight: bold;">
+            📌 يجب رفع الصورة أولاً على هذا الموقع: 
+            <a href="https://gofile.io/" target="_blank" style="color: #0066cc; text-decoration: underline;">https://gofile.io/</a>
+            <br>
+            ثم نسخ الرابط المباشر للصورة ولصقه هنا
+          </p>
+        </div>
         <form id="uploadForm">
           <div class="form-group">
             <label for="title">اسم الملف:</label>
@@ -37,8 +44,8 @@
             <input type="text" id="subject" required>
           </div>
           <div class="form-group">
-            <label for="pdfFile">ملف PDF:</label>
-            <input type="file" id="pdfFile" accept="application/pdf" required>
+            <label for="pdfLink">رابط الملف:</label>
+            <input type="url" id="pdfLink" placeholder="https://gofile.io/d/0ZKlPi" required>
           </div>
           <button type="submit" class="btn">رفع المصدر التعليمي</button>
         </form>

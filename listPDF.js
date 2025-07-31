@@ -9,31 +9,65 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       return;
     }
-  
-    // Retrieve PDFs from localStorage
-    let pdfs = [];
-    try {
-      pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
-      console.log('Retrieved PDFs:', pdfs.length);
-    } catch (error) {
-      console.error('Error parsing PDFs from localStorage:', error);
+
+    // Check if Firebase is available
+    if (typeof firebase === 'undefined' || !firebase.database) {
+      console.error('Firebase not available');
       displayEmptyState();
       return;
     }
+
+    const db = firebase.database();
+    let allPdfs = [];
   
+    // Fetch PDFs from Firebase
+    function fetchPDFs() {
+      displayLoading();
+      
+      db.ref('educational-resources').once('value')
+        .then((snapshot) => {
+          allPdfs = [];
+          
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              const pdf = childSnapshot.val();
+              pdf.firebaseKey = childSnapshot.key; // Store Firebase key for deletion
+              allPdfs.push(pdf);
+            });
+            
+            console.log('Retrieved PDFs from Firebase:', allPdfs.length);
+            populateSubjectFilter();
+            renderPDFs('all');
+          } else {
+            console.log('No educational resources found in Firebase');
+            displayEmptyState();
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching PDFs from Firebase:', error);
+          displayEmptyState();
+        });
+    }
+
     // Populate subject filter dropdown
-    const subjects = [...new Set(pdfs.map(pdf => pdf.subject || 'غير محدد'))].sort();
-    subjects.forEach(subject => {
-      const option = document.createElement('option');
-      option.value = subject;
-      option.textContent = subject;
-      subjectFilter.appendChild(option);
-    });
+    function populateSubjectFilter() {
+      const subjects = [...new Set(allPdfs.map(pdf => pdf.subject || 'غير محدد'))].sort();
+      
+      // Clear existing options except "All"
+      subjectFilter.innerHTML = '<option value="all">الكل</option>';
+      
+      subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectFilter.appendChild(option);
+      });
+    }
   
     // Display PDFs based on filter
     function renderPDFs(filterSubject) {
       pdfList.innerHTML = ''; // Clear current list
-      const filteredPDFs = filterSubject === 'all' ? pdfs : pdfs.filter(pdf => (pdf.subject || 'غير محدد') === filterSubject);
+      const filteredPDFs = filterSubject === 'all' ? allPdfs : allPdfs.filter(pdf => (pdf.subject || 'غير محدد') === filterSubject);
   
       if (filteredPDFs.length === 0) {
         displayEmptyState();
@@ -48,40 +82,43 @@ document.addEventListener('DOMContentLoaded', () => {
         pdfTitle.className = 'pdf-title';
         pdfTitle.textContent = pdf.title;
   
+        const pdfSubject = document.createElement('span');
+        pdfSubject.className = 'pdf-subject';
+        pdfSubject.textContent = `المادة: ${pdf.subject || 'غير محدد'}`;
+  
         const pdfActions = document.createElement('div');
         pdfActions.className = 'pdf-actions';
   
         // View button
         const viewLink = document.createElement('a');
-        viewLink.href = pdf.data; // Base64 data URL
+        viewLink.href = pdf.link; // Use the link from Firebase
         viewLink.textContent = 'عرض';
         viewLink.setAttribute('target', '_blank'); // Open in new tab
-        viewLink.setAttribute('download', `${pdf.title}.pdf`); // Suggest download with title
         viewLink.classList.add('firstB');
-
   
-        // Delete button
+        // Delete button (only show if user has permission)
         const deleteLink = document.createElement('a');
         deleteLink.href = '#';
         deleteLink.textContent = 'حذف';
         deleteLink.addEventListener('click', (e) => {
           e.preventDefault();
-          deletePDF(pdf.id);
-          pdfItem.remove(); // Remove item from DOM
-          updateSubjects(); // Update dropdown if subject is no longer used
-          checkEmptyState(); // Check if list is now empty
+          if (confirm('هل أنت متأكد من حذف هذا المصدر التعليمي؟')) {
+            deletePDF(pdf.firebaseKey, pdfItem);
+          }
         });
   
         pdfActions.appendChild(viewLink);
         pdfActions.appendChild(deleteLink);
+        
         pdfItem.appendChild(pdfTitle);
+        pdfItem.appendChild(pdfSubject);
         pdfItem.appendChild(pdfActions);
         pdfList.appendChild(pdfItem);
       });
     }
   
-    // Initial render
-    renderPDFs('all');
+    // Initial load
+    fetchPDFs();
   
     // Filter change event
     subjectFilter.addEventListener('change', (e) => {
@@ -89,39 +126,44 @@ document.addEventListener('DOMContentLoaded', () => {
       renderPDFs(e.target.value);
     });
   
-    function deletePDF(id) {
-      try {
-        let pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
-        pdfs = pdfs.filter(pdf => pdf.id !== id);
-        localStorage.setItem('pdfs', JSON.stringify(pdfs));
-        console.log(`Deleted PDF with id ${id}`);
-      } catch (error) {
-        console.error('Error deleting PDF from localStorage:', error);
+    function deletePDF(firebaseKey, pdfItem) {
+      if (!firebaseKey) {
+        console.error('No Firebase key provided for deletion');
+        return;
       }
-    }
-  
-    function updateSubjects() {
-      try {
-        pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
-        const currentSubjects = [...new Set(pdfs.map(pdf => pdf.subject || 'غير محدد'))].sort();
-        const selectedSubject = subjectFilter.value;
-  
-        // Rebuild dropdown
-        subjectFilter.innerHTML = '<option value="all">الكل</option>';
-        currentSubjects.forEach(subject => {
-          const option = document.createElement('option');
-          option.value = subject;
-          option.textContent = subject;
-          subjectFilter.appendChild(option);
+
+      db.ref('educational-resources/' + firebaseKey).remove()
+        .then(() => {
+          console.log(`Deleted PDF with Firebase key: ${firebaseKey}`);
+          pdfItem.remove(); // Remove item from DOM
+          
+          // Update local array
+          allPdfs = allPdfs.filter(pdf => pdf.firebaseKey !== firebaseKey);
+          
+          // Update subject filter and re-render if needed
+          populateSubjectFilter();
+          
+          // Check if current filter still has items
+          const currentFilter = subjectFilter.value;
+          const filteredPDFs = currentFilter === 'all' ? allPdfs : allPdfs.filter(pdf => (pdf.subject || 'غير محدد') === currentFilter);
+          
+          if (filteredPDFs.length === 0) {
+            displayEmptyState();
+          }
+        })
+        .catch((error) => {
+          console.error('Error deleting PDF from Firebase:', error);
+          alert('حدث خطأ أثناء حذف المصدر التعليمي');
         });
-  
-        // Restore selection or default to 'all' if selected subject is gone
-        subjectFilter.value = currentSubjects.includes(selectedSubject) ? selectedSubject : 'all';
-        renderPDFs(subjectFilter.value);
-      } catch (error) {
-        console.error('Error updating subjects:', error);
-        displayEmptyState();
-      }
+    }
+
+    function displayLoading() {
+      pdfList.innerHTML = `
+        <div class="empty-state">
+          <p>جاري تحميل المصادر التعليمية...</p>
+        </div>
+      `;
+      console.log('Displayed loading state');
     }
   
     function displayEmptyState() {
@@ -131,17 +173,5 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
       console.log('Displayed empty state');
-    }
-  
-    function checkEmptyState() {
-      try {
-        const filteredPDFs = subjectFilter.value === 'all' ? pdfs : pdfs.filter(pdf => (pdf.subject || 'غير محدد') === subjectFilter.value);
-        if (filteredPDFs.length === 0) {
-          displayEmptyState();
-        }
-      } catch (error) {
-        console.error('Error checking empty state:', error);
-        displayEmptyState();
-      }
     }
   });

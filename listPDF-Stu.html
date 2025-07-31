@@ -6,17 +6,18 @@
     <link rel="icon" type="image/png" href="logoCircle1.png">
   <title>المصادر التعليمية</title>
   <link rel="stylesheet" href="listPDF.css">
-  <script src="listPDF.js"></script>
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-    <div class="nav-right">
+ <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="login.html" class="nav-link">تسجيل الدخول</a>
-      <a href="register.html" class="nav-link">إنشاء حساب</a>
+      <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+      <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
 
@@ -40,6 +41,32 @@
   <footer>
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+      authDomain: "edad-5odam.firebaseapp.com",
+      databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "edad-5odam",
+      storageBucket: "edad-5odam.appspot.com",
+      messagingSenderId: "679576633778",
+      appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Mobile menu toggle function
+    function toggleMobileMenu() {
+      const navMenu = document.getElementById('navMenu');
+      navMenu.classList.toggle('active');
+    }
+  </script>
+
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     const pdfList = document.getElementById('pdfList');
@@ -52,31 +79,63 @@
       });
       return;
     }
-  
-    // Retrieve PDFs from localStorage
-    let pdfs = [];
-    try {
-      pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
-      console.log('Retrieved PDFs:', pdfs.length);
-    } catch (error) {
-      console.error('Error parsing PDFs from localStorage:', error);
+
+    // Check if Firebase is available
+    if (typeof firebase === 'undefined' || !firebase.database) {
+      console.error('Firebase not available');
       displayEmptyState();
       return;
     }
+
+    let allPdfs = [];
   
+    // Fetch PDFs from Firebase
+    function fetchPDFs() {
+      displayLoading();
+      
+      db.ref('educational-resources').once('value')
+        .then((snapshot) => {
+          allPdfs = [];
+          
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              const pdf = childSnapshot.val();
+              allPdfs.push(pdf);
+            });
+            
+            console.log('Retrieved PDFs from Firebase:', allPdfs.length);
+            populateSubjectFilter();
+            renderPDFs('all');
+          } else {
+            console.log('No educational resources found in Firebase');
+            displayEmptyState();
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching PDFs from Firebase:', error);
+          displayEmptyState();
+        });
+    }
+
     // Populate subject filter dropdown
-    const subjects = [...new Set(pdfs.map(pdf => pdf.subject || 'غير محدد'))].sort();
-    subjects.forEach(subject => {
-      const option = document.createElement('option');
-      option.value = subject;
-      option.textContent = subject;
-      subjectFilter.appendChild(option);
-    });
+    function populateSubjectFilter() {
+      const subjects = [...new Set(allPdfs.map(pdf => pdf.subject || 'غير محدد'))].sort();
+      
+      // Clear existing options except "All"
+      subjectFilter.innerHTML = '<option value="all">الكل</option>';
+      
+      subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectFilter.appendChild(option);
+      });
+    }
   
-    // Display PDFs based on filter
+    // Display PDFs based on filter (students can only view, not delete)
     function renderPDFs(filterSubject) {
       pdfList.innerHTML = ''; // Clear current list
-      const filteredPDFs = filterSubject === 'all' ? pdfs : pdfs.filter(pdf => (pdf.subject || 'غير محدد') === filterSubject);
+      const filteredPDFs = filterSubject === 'all' ? allPdfs : allPdfs.filter(pdf => (pdf.subject || 'غير محدد') === filterSubject);
   
       if (filteredPDFs.length === 0) {
         displayEmptyState();
@@ -90,60 +149,54 @@
         const pdfTitle = document.createElement('span');
         pdfTitle.className = 'pdf-title';
         pdfTitle.textContent = pdf.title;
+
+        const pdfSubject = document.createElement('span');
+        pdfSubject.className = 'pdf-subject';
+        pdfSubject.textContent = `المادة: ${pdf.subject || 'غير محدد'}`;
   
         const pdfActions = document.createElement('div');
         pdfActions.className = 'pdf-actions';
   
-        // View button
+        // View button (only action for students)
         const viewLink = document.createElement('a');
-        viewLink.href = pdf.data; // Base64 data URL
+        viewLink.href = pdf.link; // Use the link from Firebase
         viewLink.textContent = 'عرض';
         viewLink.setAttribute('target', '_blank'); // Open in new tab
-        viewLink.setAttribute('download', `${pdf.title}.pdf`); // Suggest download with title
         viewLink.classList.add('firstB');
-
-  
-        
   
         pdfActions.appendChild(viewLink);
         pdfItem.appendChild(pdfTitle);
+        pdfItem.appendChild(pdfSubject);
         pdfItem.appendChild(pdfActions);
         pdfList.appendChild(pdfItem);
       });
     }
   
-    // Initial render
-    renderPDFs('all');
+    // Initial load
+    fetchPDFs();
   
     // Filter change event
     subjectFilter.addEventListener('change', (e) => {
       console.log('Filtering by subject:', e.target.value);
       renderPDFs(e.target.value);
     });
-  
-  
-    function updateSubjects() {
-      try {
-        pdfs = JSON.parse(localStorage.getItem('pdfs')) || [];
-        const currentSubjects = [...new Set(pdfs.map(pdf => pdf.subject || 'غير محدد'))].sort();
-        const selectedSubject = subjectFilter.value;
-  
-        // Rebuild dropdown
-        subjectFilter.innerHTML = '<option value="all">الكل</option>';
-        currentSubjects.forEach(subject => {
-          const option = document.createElement('option');
-          option.value = subject;
-          option.textContent = subject;
-          subjectFilter.appendChild(option);
-        });
-  
-        // Restore selection or default to 'all' if selected subject is gone
-        subjectFilter.value = currentSubjects.includes(selectedSubject) ? selectedSubject : 'all';
-        renderPDFs(subjectFilter.value);
-      } catch (error) {
-        console.error('Error updating subjects:', error);
-        displayEmptyState();
-      }
+
+    // Close mobile menu when clicking on a link
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        const navMenu = document.getElementById('navMenu');
+        navMenu.classList.remove('active');
+      });
+    });
+
+    function displayLoading() {
+      pdfList.innerHTML = `
+        <div class="empty-state">
+          <p>جاري تحميل المصادر التعليمية...</p>
+        </div>
+      `;
+      console.log('Displayed loading state');
     }
   
     function displayEmptyState() {
@@ -154,19 +207,14 @@
       `;
       console.log('Displayed empty state');
     }
-  
-    function checkEmptyState() {
-      try {
-        const filteredPDFs = subjectFilter.value === 'all' ? pdfs : pdfs.filter(pdf => (pdf.subject || 'غير محدد') === subjectFilter.value);
-        if (filteredPDFs.length === 0) {
-          displayEmptyState();
-        }
-      } catch (error) {
-        console.error('Error checking empty state:', error);
-        displayEmptyState();
+  });
+          // Logout function
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        sessionStorage.removeItem("currentUser");
+        window.location.href = "index.html";
       }
     }
-  });
   </script>
 </body>
 </html>

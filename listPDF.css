@@ -171,6 +171,13 @@
     transition: var(--transition);
     border: 1px solid rgba(35, 59, 110, 0.1);
   }
+
+  .pdf-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    max-width: 65%;
+  }
   
   .pdf-item:hover {
     transform: translateY(-4px);
@@ -187,6 +194,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .pdf-subject {
+    font-size: 0.9em;
+    color: #666;
+    font-weight: 400;
+    margin-top: 4px;
+    direction: rtl;
   }
   
   .pdf-actions {
@@ -306,10 +321,23 @@
       gap: 12px;
       padding: 14px 16px;
     }
-  
+
+    .pdf-content {
+      max-width: 100%;
+      width: 100%;
+    }
+
     .pdf-title {
       max-width: 100%;
       font-size: 1.1em;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+    }
+
+    .pdf-subject {
+      font-size: 0.85em;
+      margin-top: 2px;
     }
   
     .pdf-actions {
