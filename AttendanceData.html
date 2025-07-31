@@ -340,11 +340,7 @@
 
               await Promise.all(promises);
               
-              const successMsg = document.getElementById('successMessage');
-              successMsg.style.display = 'block';
-              setTimeout(() => {
-                  successMsg.style.display = 'none';
-              }, 3000);
+              showMessage("success");
 
               attendanceData = {};
               
@@ -356,11 +352,7 @@
 
           } catch (error) {
               console.error('Error saving attendance:', error);
-              const errorMsg = document.getElementById('errorMessage');
-              errorMsg.style.display = 'block';
-              setTimeout(() => {
-                  errorMsg.style.display = 'none';
-              }, 3000);
+              showMessage("error");
           }
       }
 
@@ -487,32 +479,24 @@
               navMenu.classList.remove('active');
           });
       });
+      
       function showMessage(type) {
-  const success = document.getElementById("successMessage");
-  const error = document.getElementById("errorMessage");
+          const success = document.getElementById("successMessage");
+          const error = document.getElementById("errorMessage");
 
-  success.style.display = "none";
-  error.style.display = "none";
+          success.style.display = "none";
+          error.style.display = "none";
 
-  if (type === "success") {
-    success.style.display = "block";
-    setTimeout(() => success.style.display = "none", 3000);
-  } else if (type === "error") {
-    error.style.display = "block";
-    setTimeout(() => error.style.display = "none", 3000);
-  }
-}
+          if (type === "success") {
+              success.style.display = "block";
+              setTimeout(() => success.style.display = "none", 3000);
+          } else if (type === "error") {
+              error.style.display = "block";
+              setTimeout(() => error.style.display = "none", 3000);
+          }
+      }
 
-// مثال للاستخدام:
-function saveAttendance() {
-  try {
-    // كود حفظ البيانات هنا...
-    showMessage("success");
-  } catch (err) {
-    showMessage("error");
-  }
-}
-document.querySelector('.menu-toggle').addEventListener('click', function () {
+      document.querySelector('.menu-toggle').addEventListener('click', function () {
   document.querySelector('.nav-right').classList.toggle('show');
 });
 
