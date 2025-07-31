@@ -354,6 +354,75 @@ footer {
       text-align: center;
       box-shadow: 0 3px 15px rgba(0,0,0,0.08);
       border-left: 4px solid #233B6E;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+    }
+
+    .stat-tooltip,
+    .attendance-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #233B6E;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.8em;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      margin-bottom: 10px;
+      width: 220px;
+      text-align: center;
+      line-height: 1.4;
+      direction: rtl;
+      white-space: nowrap;
+    }
+
+    .attendance-tooltip {
+      width: 280px;
+      text-align: right;
+      line-height: 1.6;
+      white-space: normal;
+      padding: 15px 18px;
+    }
+
+    .attendance-tooltip div {
+      margin-bottom: 5px;
+    }
+
+    .attendance-tooltip div:last-child {
+      margin-bottom: 0;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    .stat-tooltip::after,
+    .attendance-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #233B6E;
+    }
+
+    .stat-card:hover .stat-tooltip,
+    .stat-card:hover .attendance-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(-5px);
     }
 
     .stat-number {
@@ -424,6 +493,81 @@ footer {
       .dashboard-card {
         padding: 20px;
       }
+
+      .stat-tooltip,
+      .attendance-tooltip {
+        width: 200px;
+        font-size: 0.75em;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+      }
+
+      .attendance-tooltip {
+        width: 260px;
+        padding: 12px 15px;
+      }
+
+      .attendance-tooltip div {
+        margin-bottom: 4px;
+      }
+
+      .attendance-tooltip div:last-child {
+        padding-top: 6px;
+        margin-top: 6px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-section {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .stat-card {
+        padding: 20px 15px;
+      }
+
+      .stat-number {
+        font-size: 2em;
+      }
+
+      .stat-tooltip {
+        width: 180px;
+        font-size: 0.7em;
+        padding: 8px 10px;
+        margin-bottom: 6px;
+      }
+
+      .attendance-tooltip {
+        width: 240px;
+        font-size: 0.7em;
+        padding: 10px 12px;
+        margin-bottom: 6px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+      }
+
+      .attendance-tooltip div {
+        margin-bottom: 3px;
+        line-height: 1.4;
+      }
+
+      .attendance-tooltip div:last-child {
+        padding-top: 5px;
+        margin-top: 5px;
+      }
+
+      /* Ensure tooltip doesn't go off screen */
+      .stat-card {
+        position: relative;
+        overflow: visible;
+      }
+
+      .stat-card:hover .stat-tooltip,
+      .stat-card:hover .attendance-tooltip {
+        transform: translateX(-50%) translateY(-3px);
+      }
     }
   </style>
 </head>
@@ -450,26 +594,44 @@ footer {
       <div class="stat-card">
         <div class="stat-number" id="studentCount">45</div>
         <div class="stat-label">إجمالي الطلاب</div>
+        <div class="stat-tooltip" id="studentTooltip">
+          العدد الإجمالي للطلاب المسجلين في النظام
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-number" id="alertCount">12</div>
         <div class="stat-label">التنبيهات النشطة</div>
+        <div class="stat-tooltip" id="alertTooltip">
+          عدد التنبيهات والإعلانات المرسلة للطلاب
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-number" id="attendanceRate">87%</div>
         <div class="stat-label">معدل الحضور</div>
+        <div class="attendance-tooltip" id="attendanceTooltip">
+          جاري حساب معدل الحضور...
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-number" id="resourceCount">28</div>
         <div class="stat-label">المصادر التعليمية</div>
+        <div class="stat-tooltip" id="resourceTooltip">
+          عدد الملفات التعليمية والمصادر المرفوعة
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-number" id="examCount">8</div>
         <div class="stat-label">الامتحانات المتاحة</div>
+        <div class="stat-tooltip" id="examTooltip">
+          عدد الامتحانات المنشورة والمتاحة للطلاب
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-number" id="researchCount">15</div>
         <div class="stat-label">البحوث المسلمة</div>
+        <div class="stat-tooltip" id="researchTooltip">
+          عدد البحوث التي قام الطلاب بتسليمها
+        </div>
       </div>
     </div>
 
@@ -593,9 +755,9 @@ footer {
     async function getStatisticsData() {
       const [alerts, students, attendance, pdfs, photos, exams, researches] = await Promise.all([
         getFirebaseData('alerts'),
-        getFirebaseData('students'),
-        getFirebaseData('attendanceHistory'),
-        getFirebaseData('pdfs'),
+        getFirebaseData('users'),
+        getFirebaseData('attendance'),
+        getFirebaseData('educational-resources'),
         getFirebaseData('photos'),
         getFirebaseData('exams'),
         getFirebaseData('researches')
@@ -603,8 +765,8 @@ footer {
 
       return {
         alerts: Object.values(alerts || {}),
-        students: Object.values(students || {}),
-        attendance: Object.values(attendance || {}),
+        students: Object.values(students || {}).filter(user => user.role === 'student'),
+        attendance: attendance || {},
         pdfs: Object.values(pdfs || {}),
         photos: Object.values(photos || {}),
         exams: Object.values(exams || {}),
@@ -648,17 +810,56 @@ footer {
         document.getElementById('alertCount').textContent = (data.alerts || []).length;
         document.getElementById('studentCount').textContent = (data.students || []).length;
 
-        const attendanceArray = data.attendance || [];
-        if (attendanceArray.length > 0) {
-          const presentCount = attendanceArray.filter(record => record.status === 'حاضر').length;
-          const rate = Math.round((presentCount / attendanceArray.length) * 100);
-          document.getElementById('attendanceRate').textContent = rate + '%';
+        // Calculate attendance rate properly
+        const attendanceData = data.attendance || {};
+        const totalStudents = (data.students || []).length;
+        
+        if (totalStudents > 0) {
+          let totalAttendanceRecords = 0;
+          let presentCount = 0;
+          let totalDates = 0;
+          
+          // Loop through all attendance dates
+          Object.keys(attendanceData).forEach(date => {
+            const dateRecords = attendanceData[date];
+            if (typeof dateRecords === 'object' && dateRecords !== null) {
+              totalDates++;
+              // Each dateRecords contains student attendance for that date
+              Object.values(dateRecords).forEach(record => {
+                if (record && record.status) {
+                  totalAttendanceRecords++;
+                  if (record.status === 'حاضر' || record.status === 'present') {
+                    presentCount++;
+                  }
+                }
+              });
+            }
+          });
+          
+          // Calculate attendance rate
+          if (totalAttendanceRecords > 0) {
+            const rate = Math.round((presentCount / totalAttendanceRecords) * 100);
+            document.getElementById('attendanceRate').textContent = rate + '%';
+            
+            // Update tooltip with calculation details
+            const tooltip = document.getElementById('attendanceTooltip');
+            tooltip.innerHTML = `
+              <div>إجمالي أيام الحضور: <strong>${totalDates}</strong></div>
+              <div>إجمالي عدد الطلاب: <strong>${totalAttendanceRecords}</strong></div>
+              <div>عدد الحاضرين: <strong>${presentCount}</strong></div>
+              <div>عدد الغائبين: <strong>${totalAttendanceRecords - presentCount}</strong></div>
+              <div>المعدل: ${presentCount}/${totalAttendanceRecords} × 100 = <strong>${rate}%</strong></div>
+            `;
+          } else {
+            document.getElementById('attendanceRate').textContent = '0%';
+            document.getElementById('attendanceTooltip').textContent = 'لا توجد سجلات حضور متاحة';
+          }
         } else {
           document.getElementById('attendanceRate').textContent = '0%';
+          document.getElementById('attendanceTooltip').textContent = 'لا يوجد طلاب مسجلين';
         }
 
-        document.getElementById('resourceCount').textContent = 
-          (data.pdfs || []).length + (data.photos || []).length;
+        document.getElementById('resourceCount').textContent = (data.pdfs || []).length;
         document.getElementById('examCount').textContent = (data.exams || []).length;
         document.getElementById('researchCount').textContent = (data.researches || []).length;
 
