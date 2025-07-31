@@ -16,7 +16,8 @@ body {
       position: fixed;
       bottom: 25px;
       right: 25px;
-      background-color: #c5e0f4;
+      background-color:#314d9f;
+      border: 2px solid  #233B6E;
       /* background: linear-gradient(to right, var(--primary), var(--secondary)); */
       color: white;
       width: 60px;
