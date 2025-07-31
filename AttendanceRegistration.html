@@ -1,651 +1,528 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar"> 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>عرض الحضور اليومي</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --primary: #233B6E;
-      --secondary: #314d9f;
-      --light: #f5f7fa;
-      --success: #388e3c;
-      --error: #d32f2f;
-      --shadow: 0 2px 10px rgba(0,0,0,0.08);
-      --border-radius: 8px;
-      --transition: all 0.3s ease;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: linear-gradient(to bottom right, #eaf1ff, #dbe5ff);
-      color: #222;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      direction: rtl;
-      background-image: url('knesa.jpg');
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      background-position: center;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      flex: 1;
-    }
-
-    .navbar {
-      background-color: var(--primary);
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    .nav-left .church-logo {
-      height: 80px;
-      border-radius: 8px;
-      background: white;
-      padding: 5px;
-    }
-
-    .nav-right {
-      display: flex;
-      gap: 20px;
-    }
-
-    .nav-link {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      transition: 0.3s;
-      padding: 8px 12px;
-      border-radius: 6px;
-    }
-
-    .nav-link:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .nav-link.active {
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-
-    .menu-toggle:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    main {
-      flex: 1;
-      padding: 30px 0;
-    }
-
-    .section-title {
-      color: var(--primary);
-      text-align: center;
-      margin-bottom: 25px;
-      position: relative;
-      padding-bottom: 15px;
-      font-size: 2.5rem;
-    }
-
-    .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 40%;
-      width: 20%;
-      height: 3px;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-    }
-
-    .controls {
-      max-width: 600px;
-      margin: 0 auto 30px auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      padding: 20px;
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      flex-wrap: wrap;
-    }
-
-    .controls label {
-      font-weight: bold;
-      color: var(--primary);
-      font-size: 1.1em;
-    }
-
-    select {
-      padding: 12px 15px;
-      border: 1px solid #bfc9e1;
-      border-radius: var(--border-radius);
-      font-size: 1.05em;
-      background: #f7faff;
-      font-family: 'Cairo', sans-serif;
-      direction: rtl;
-      cursor: pointer;
-      transition: var(--transition);
-      min-height: 44px;
-      touch-action: manipulation;
-    }
-
-    select:focus {
-      outline: 2px solid var(--secondary);
-      outline-offset: 2px;
-      border-color: var(--primary);
-    }
-
-    button {
-      padding: 12px 24px;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-      color: white;
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-size: 1.05em;
-      font-weight: 600;
-      transition: var(--transition);
-      min-height: 44px;
-      touch-action: manipulation;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    button:hover {
-      background: #1a2d59;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    button:focus {
-      outline: 2px solid var(--secondary);
-      outline-offset: 2px;
-    }
-
-    .table-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 15px 12px;
-      text-align: center;
-      border-bottom: 1px solid #e9ecef;
-      word-wrap: break-word;
-    }
-
-    th {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      font-weight: bold;
-      font-size: 1.1em;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f8f9fa;
-    }
-
-    .status-present {
-      background-color: rgba(76, 175, 80, 0.1);
-      color: var(--success);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      display: inline-block;
-    }
-
-    .status-absent {
-      background-color: rgba(244, 67, 54, 0.1);
-      color: var(--error);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      display: inline-block;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #666;
-      font-size: 1.2em;
-      font-style: italic;
-    }
-
-    footer {
-      background-color: var(--primary);
-      color: white;
-      text-align: center;
-      padding: 20px;
-      font-size: 0.95em;
-      margin-top: auto;
-      box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .container {
-        padding: 0 10px;
-      }
-
-      .navbar {
-        flex-direction: column;
-        padding: 10px;
-      }
-
-      .nav-left {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-
-      .nav-left .church-logo {
-        height: 60px;
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      .nav-right {
-        width: 100%;
-        flex-direction: column;
-        gap: 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-      }
-
-      .nav-right.active {
-        max-height: 300px;
-      }
-
-      .nav-link {
-        width: 100%;
-        text-align: center;
-        padding: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 0;
-      }
-
-      .nav-link:last-child {
-        border-bottom: none;
-      }
-
-      main {
-        padding: 20px 0;
-      }
-
-      .controls {
-        flex-direction: column;
-        gap: 15px;
-        margin: 0 10px 20px 10px;
-        padding: 20px 16px;
-        max-width: none;
-      }
-
-      .controls label {
-        font-size: 1.1em;
-        text-align: center;
-      }
-
-      select, button {
-        /* width: 100%; */
-        font-size: 1.1em;
-        padding: 14px 16px;
-      }
-
-      .table-container {
-        margin: 0 10px;
-        overflow-x: auto;
-        border-radius: var(--border-radius);
-      }
-
-      table {
-        min-width: 400px;
-        font-size: 0.9em;
-      }
-
-      th, td {
-        padding: 12px 8px;
-        font-size: 0.95em;
-      }
-
-      .section-title {
-        font-size: 2em;
-        margin-bottom: 20px;
-        padding: 0 15px;
-      }
-
-      .status-present, .status-absent {
-        font-size: 0.9em;
-        padding: 6px 12px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 0 5px;
-      }
-
-      .navbar {
-        padding: 8px;
-      }
-
-      .nav-left .church-logo {
-        height: 50px;
-      }
-
-      main {
-        padding: 15px 0;
-      }
-
-      .section-title {
-        font-size: 1.6em;
-        margin-bottom: 15px;
-        padding: 0 10px;
-      }
-
-      .section-title::after {
-        left: 35%;
-        width: 30%;
-      }
-
-      .controls {
-        margin: 0 5px 15px 5px;
-        padding: 15px 12px;
-        gap: 12px;
-      }
-
-      .controls label {
-        font-size: 1em;
-      }
-
-      select, button {
-        padding: 12px 14px;
-        font-size: 1em;
-      }
-
-      .table-container {
-        margin: 0 5px;
-      }
-
-      table {
-        min-width: 350px;
-        font-size: 0.85em;
-      }
-
-      th, td {
-        padding: 8px 4px;
-        font-size: 0.85em;
-      }
-
-      th {
-        font-size: 0.9em;
-      }
-
-      .status-present, .status-absent {
-        font-size: 0.8em;
-        padding: 4px 8px;
-      }
-
-      .empty-state {
-        font-size: 1em;
-        padding: 30px 15px;
-      }
-
-      footer {
-        padding: 15px 10px;
-        font-size: 0.9em;
-      }
-    }
-
-    @media (max-width: 320px) {
-      .section-title {
-        font-size: 1.4em;
-      }
-
-      .controls {
-        padding: 12px 8px;
-      }
-
-      select, button {
-        padding: 10px 12px;
-        font-size: 0.95em;
-      }
-
-      table {
-        min-width: 300px;
-      }
-
-      th, td {
-        padding: 6px 2px;
-        font-size: 0.8em;
-      }
-
-      .status-present, .status-absent {
-        font-size: 0.75em;
-        padding: 3px 6px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style attendance.css">
+  <title>تسجيل الحضور </title>
 </head>
 <body>
+    <style>
+      .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="nav-left">
-      <img src="church-logo.png" alt="Church Logo" class="church-logo">
-      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
-    </div>
+.controls > * {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  flex: 1 1 200px;
+  box-sizing: border-box;
+}
+
+.date-picker label,
+.search-box label {
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 1; /* لتوحيد الارتفاع */
+}
+
+.date-picker input,
+.search-box input {
+  flex: 1;
+  padding: 5px 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.btn {
+  padding: 8px 12px;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.btn-primary {
+  background-color: var(--primary, #233B6E);
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.btn-success {
+  background-color: var(--success, #4CAF50);
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+.alert {
+  display: none;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+
+
+          </style>
+
+      <nav class="navbar">
+        <div class="logo">
+          <img src="church-logo.png" alt="شعار الموقع">
+          <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        </div>
     <div class="nav-right" id="navMenu">
-      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
-      <a href="AttendanceData.html" class="nav-link">أخذ الحضور</a>
-      <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
-      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
-    </div>
-  </nav>
+          <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+          <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+          <a href="AttendanceData.html" class="nav-link">أخذ الحضور</a>
+          <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+          <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
+        </div>
+      </nav>
 
-  <div class="container">
-    <main>
-      <h1 class="section-title">📅 عرض الحضور حسب التاريخ</h1>
+      <div class="container">
+        <div class="header">
+          <h2>تسجيل الحضور</h2>
+        </div>
 
-      <div class="controls">
-        <label for="dateSelect">اختر التاريخ:</label>
-        <select id="dateSelect">
-          <option value="">-- تحميل التواريخ --</option>
-        </select>
-        <button onclick="fetchAttendanceByDate()">عرض الحضور</button>
-      </div>
+        <div class="controls">
+            <div class="date-picker">
+                <label for="attendanceDate"></label>
+                <input type="date" id="attendanceDate" value="">
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 ابحث عن الطالب..." oninput="filterStudents()">
+            </div>
+            
+            <button class="btn btn-primary" onclick="loadStudents()">
+                🔄 إعادة تحميل
+            </button>
+            
+            <button class="btn btn-success" onclick="saveAttendance()">
+                💾 حفظ الحضور
+            </button>
+        </div>
 
-      <div class="table-container">
-        <table id="attendanceTable">
-          <thead>
-            <tr>
-              <th>الاسم</th>
-              <th>المجموعة</th>
-              <th>الحالة</th>
-            </tr>
-          </thead>
-          <tbody id="attendanceBody">
-            <tr><td colspan="3" class="empty-state">يرجى اختيار تاريخ لعرض الحضور</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </div>
-
-  <footer>
-    <p>© خدمتي 2025</p>
-  </footer>
-
-  <!-- Firebase -->
+        <div id="successMessage" class="alert success">✅ تم حفظ بيانات الحضور بنجاح!</div>
+        <div id="errorMessage" class="alert error">❌ حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.</div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>إجمالي الطلاب</h3>
+                <div class="number" id="totalStudents">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>الحاضرون</h3>
+                <div class="number" id="presentCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>الغائبون</h3>
+                <div class="number" id="absentCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>لم يتم التسجيل</h3>
+                <div class="number" id="notMarkedCount">0</div>
+            </div>
+        </div>
+        
+        <!-- ✅ مؤشر التحميل -->
+        <div id="loading" style="text-align:center; padding: 30px; color: #666; font-weight: bold; display: none;">
+            ⏳ جاري تحميل بيانات الطلاب...
+        </div>
+        
+        <!-- ✅ حاوية عرض الطلاب -->
+        <div id="studentsContainer" class="students-container" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px;"></div>
+        
+    <!-- Footer -->
+    <footer>
+        <p>© خدمتي 2025</p>
+    </footer>
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  
+  <!-- xlsx library for Excel export functionality -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
-      authDomain: "edad-5odam.firebaseapp.com",
-      databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "edad-5odam",
-      storageBucket: "edad-5odam.appspot.com",
-      messagingSenderId: "679576633778",
-      appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
-    };
+      // Firebase Configuration
+      const firebaseConfig = {
+          apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+          authDomain: "edad-5odam.firebaseapp.com",
+          databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "edad-5odam",
+          storageBucket: "edad-5odam.appspot.com",
+          messagingSenderId: "679576633778",
+          appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+      };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
 
-    function checkAuth() {
-      const currentUser = sessionStorage.getItem("currentUser");
-      if (!currentUser) {
-        alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
-        window.location.href = "login.html";
-        return false;
+      let students = [];
+      let attendanceData = {};
+
+      // Set today's date as default
+      document.getElementById('attendanceDate').valueAsDate = new Date();
+
+      // Load students from Firebase
+      async function loadStudents() {
+          try {
+              document.getElementById('loading').style.display = 'block';
+              document.getElementById('studentsContainer').innerHTML = '';
+              
+              const studentsRef = database.ref('users');
+              const snapshot = await studentsRef.once('value');
+              
+              students = [];
+              if (snapshot.exists()) {
+                  const data = snapshot.val();
+                  
+                  Object.keys(data).forEach(key => {
+                      const student = data[key];
+                      if (!student.role || student.role === 'student' || student.role.toLowerCase() === 'student') {
+                          const studentData = {
+                              id: key,
+                              name: student.username || student.name || student.fullName || 'بدون اسم',
+                              email: student.email || '',
+                              team: student.team || student.group || 'غير محدد',
+                              phone: student.phone || ''
+                          };
+                          students.push(studentData);
+                      }
+                  });
+              }
+              
+              displayStudents();
+              document.getElementById('loading').style.display = 'none';
+              
+          } catch (error) {
+              console.error('Error loading students:', error);
+              document.getElementById('loading').innerHTML = '❌ خطأ في تحميل البيانات';
+          }
       }
-      return true;
-    }
 
-    function toggleMobileMenu() {
-      const navMenu = document.getElementById('navMenu');
-      navMenu.classList.toggle('active');
-    }
+      // Display students in the UI
+      function displayStudents() {
+          const container = document.getElementById('studentsContainer');
+          container.innerHTML = '';
 
-    function logout() {
-      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
-        alert("تم تسجيل الخروج بنجاح!");
-        window.location.href = "login.html";
-      }
-    }
+          if (students.length === 0) {
+              container.innerHTML = '<div style="text-align: center; padding: 40px; color: #6c757d;">لا توجد بيانات طلاب</div>';
+              return;
+          }
 
-    async function loadAvailableDates() {
-      try {
-        const snapshot = await db.ref('attendance').once('value');
-        const data = snapshot.val();
-        const dateSelect = document.getElementById('dateSelect');
-        dateSelect.innerHTML = '<option value="">-- اختر التاريخ --</option>';
-
-        if (data) {
-          const dates = Object.keys(data).sort((a, b) => new Date(b) - new Date(a));
-          dates.forEach(date => {
-            const option = document.createElement('option');
-            option.value = date;
-            option.textContent = new Date(date).toLocaleDateString('ar-EG', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              weekday: 'long'
-            });
-            dateSelect.appendChild(option);
+          students.forEach(student => {
+              const studentCard = document.createElement('div');
+              studentCard.className = 'student-card';
+              studentCard.innerHTML = `
+                  <div class="student-info">
+                      <div class="student-avatar">
+                          ${student.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div class="student-details">
+                          <h4>${student.name}</h4>
+                          <p>📧 ${student.email} | 👥 ${student.team}</p>
+                      </div>
+                  </div>
+                  <div class="attendance-buttons">
+                      <button class="attendance-btn btn-present" onclick="markAttendance('${student.id}', 'present')">
+                          حاضر
+                      </button>
+                      <button class="attendance-btn btn-absent" onclick="markAttendance('${student.id}', 'absent')">
+                          غائب
+                      </button>
+                  </div>
+              `;
+              container.appendChild(studentCard);
           });
-        } else {
-          dateSelect.innerHTML = '<option value="">لا توجد تواريخ متاحة</option>';
-        }
-      } catch (error) {
-        console.error("Error loading dates:", error);
-        alert("❌ حدث خطأ أثناء تحميل التواريخ");
-      }
-    }
 
-    async function fetchAttendanceByDate() {
-      if (!checkAuth()) return;
-
-      const date = document.getElementById('dateSelect').value;
-      const tbody = document.getElementById('attendanceBody');
-      tbody.innerHTML = '';
-
-      if (!date) {
-        tbody.innerHTML = '<tr><td colspan="3" class="empty-state">❌ الرجاء اختيار تاريخ</td></tr>';
-        return;
+          updateStats();
       }
 
-      try {
-        const snapshot = await db.ref('attendance/' + date).once('value');
-        const data = snapshot.val();
-
-        if (!data) {
-          tbody.innerHTML = '<tr><td colspan="3">📭 لا توجد بيانات لهذا اليوم</td></tr>';
-          return;
-        }
-
-        Object.keys(data).forEach(studentId => {
-          const record = data[studentId];
-          const row = document.createElement('tr');
-
-          const nameCell = document.createElement('td');
-          nameCell.textContent = record.studentName || 'غير معروف';
-
-          const teamCell = document.createElement('td');
-          teamCell.textContent = record.team || 'غير محدد';
-
-          const statusCell = document.createElement('td');
-          statusCell.textContent = record.status === 'present' ? 'حاضر ✅' : 'غائب ❌';
-          statusCell.className = record.status === 'present' ? 'status-present' : 'status-absent';
-
-          row.appendChild(nameCell);
-          row.appendChild(teamCell);
-          row.appendChild(statusCell);
-
-          tbody.appendChild(row);
-        });
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        tbody.innerHTML = '<tr><td colspan="3">❌ حدث خطأ أثناء تحميل البيانات</td></tr>';
+      // Mark attendance for a student
+      function markAttendance(studentId, status) {
+          attendanceData[studentId] = status;
+          
+          const studentCard = event.target.closest('.student-card');
+          const buttons = studentCard.querySelectorAll('.attendance-btn');
+          
+          buttons.forEach(btn => {
+              btn.classList.remove('active');
+          });
+          
+          event.target.classList.add('active');
+          
+          event.target.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+              event.target.style.transform = '';
+          }, 150);
+          
+          updateStats();
       }
-    }
 
-    window.onload = function() {
-      checkAuth();
-      loadAvailableDates();
-    };
+      // Update statistics
+      function updateStats() {
+          const totalStudents = students.length;
+          const presentCount = Object.values(attendanceData).filter(status => status === 'present').length;
+          const absentCount = Object.values(attendanceData).filter(status => status === 'absent').length;
+          const notMarkedCount = totalStudents - presentCount - absentCount;
+
+          document.getElementById('totalStudents').textContent = totalStudents;
+          document.getElementById('presentCount').textContent = presentCount;
+          document.getElementById('absentCount').textContent = absentCount;
+          document.getElementById('notMarkedCount').textContent = notMarkedCount;
+      }
+
+      // Filter students based on search
+      function filterStudents() {
+          const searchText = document.getElementById('searchInput').value.toLowerCase();
+          const studentCards = document.querySelectorAll('.student-card');
+          
+          studentCards.forEach(card => {
+              const studentName = card.querySelector('h4').textContent.toLowerCase();
+              const studentDetails = card.querySelector('p').textContent.toLowerCase();
+              
+              if (studentName.includes(searchText) || studentDetails.includes(searchText)) {
+                  card.style.display = 'flex';
+              } else {
+                  card.style.display = 'none';
+              }
+          });
+      }
+
+      // Save attendance to Firebase
+      async function saveAttendance() {
+          try {
+              const selectedDate = document.getElementById('attendanceDate').value;
+              if (!selectedDate) {
+                  alert('يرجى اختيار التاريخ');
+                  return;
+              }
+
+              if (Object.keys(attendanceData).length === 0) {
+                  alert('يرجى تسجيل حضور الطلاب أولاً');
+                  return;
+              }
+
+              const attendanceRef = database.ref('attendance/' + selectedDate);
+              const promises = [];
+
+              Object.keys(attendanceData).forEach(studentId => {
+                  const student = students.find(s => s.id === studentId);
+                  const attendanceRecord = {
+                      studentId: studentId,
+                      studentName: student.name,
+                      team: student.team,
+                      status: attendanceData[studentId],
+                      timestamp: firebase.database.ServerValue.TIMESTAMP
+                  };
+                  
+                  promises.push(attendanceRef.child(studentId).set(attendanceRecord));
+              });
+
+              await Promise.all(promises);
+              
+              const successMsg = document.getElementById('successMessage');
+              successMsg.style.display = 'block';
+              setTimeout(() => {
+                  successMsg.style.display = 'none';
+              }, 3000);
+
+              attendanceData = {};
+              
+              document.querySelectorAll('.attendance-btn.active').forEach(btn => {
+                  btn.classList.remove('active');
+              });
+              
+              updateStats();
+
+          } catch (error) {
+              console.error('Error saving attendance:', error);
+              const errorMsg = document.getElementById('errorMessage');
+              errorMsg.style.display = 'block';
+              setTimeout(() => {
+                  errorMsg.style.display = 'none';
+              }, 3000);
+          }
+      }
+
+      // Print report function
+      function printReport() {
+          if (students.length === 0) {
+              alert('لا توجد بيانات للطباعة');
+              return;
+          }
+
+          // Add print date info
+          const selectedDate = document.getElementById('attendanceDate').value;
+          const today = new Date();
+          const dateStr = selectedDate || today.toLocaleDateString('ar-EG');
+          
+          // Create a temporary div for print date
+          const printDateDiv = document.createElement('div');
+          printDateDiv.className = 'print-date';
+          printDateDiv.innerHTML = `<strong>تاريخ التقرير: ${dateStr}</strong><br><strong>تاريخ الطباعة: ${today.toLocaleDateString('ar-EG')} - ${today.toLocaleTimeString('ar-EG')}</strong>`;
+          
+          // Insert after header
+          const header = document.querySelector('.header');
+          header.parentNode.insertBefore(printDateDiv, header.nextSibling);
+          
+          // Hide elements that shouldn't be printed
+          const hideElements = document.querySelectorAll('.search-box input');
+          hideElements.forEach(el => {
+              el.style.display = 'none';
+          });
+
+          // Trigger print
+          window.print();
+          
+          // Clean up after print
+          setTimeout(() => {
+              printDateDiv.remove();
+              hideElements.forEach(el => {
+                  el.style.display = '';
+              });
+          }, 1000);
+      }
+
+      // Export to Excel function
+      function exportToExcel() {
+          if (students.length === 0) {
+              alert('لا توجد بيانات للتصدير');
+              return;
+          }
+
+          const selectedDate = document.getElementById('attendanceDate').value;
+          const today = new Date();
+          const dateStr = selectedDate || today.toISOString().split('T')[0];
+          
+          // Prepare data for Excel
+          const excelData = students.map((student, index) => {
+              const status = attendanceData[student.id] || 'لم يتم التسجيل';
+              const statusText = status === 'present' ? 'حاضر' : 
+                               status === 'absent' ? 'غائب' : 'لم يتم التسجيل';
+              
+              return {
+                  'الرقم': index + 1,
+                  'الاسم': student.name,
+                  'الفريق': student.team,
+                  'الحالة': statusText,
+                  'البريد الإلكتروني': student.email,
+                  'التاريخ': dateStr
+              };
+          });
+
+          // Create summary data
+          const totalStudents = students.length;
+          const presentCount = Object.values(attendanceData).filter(status => status === 'present').length;
+          const absentCount = Object.values(attendanceData).filter(status => status === 'absent').length;
+          const notMarkedCount = totalStudents - presentCount - absentCount;
+
+          const summaryData = [
+              { 'الإحصائية': 'إجمالي الطلاب', 'العدد': totalStudents },
+              { 'الإحصائية': 'الحاضرون', 'العدد': presentCount },
+              { 'الإحصائية': 'الغائبون', 'العدد': absentCount },
+              { 'الإحصائية': 'لم يتم التسجيل', 'العدد': notMarkedCount },
+              { 'الإحصائية': 'التاريخ', 'العدد': dateStr }
+          ];
+
+          // Create workbook
+          const wb = XLSX.utils.book_new();
+          
+          // Create attendance sheet
+          const ws1 = XLSX.utils.json_to_sheet(excelData);
+          XLSX.utils.book_append_sheet(wb, ws1, 'تقرير الحضور');
+          
+          // Create summary sheet
+          const ws2 = XLSX.utils.json_to_sheet(summaryData);
+          XLSX.utils.book_append_sheet(wb, ws2, 'الإحصائيات');
+
+          // Save the Excel file
+          XLSX.writeFile(wb, `attendance_report_${dateStr}.xlsx`);
+      }
+
+      // Mobile menu toggle function
+      function toggleMobileMenu() {
+          const navMenu = document.getElementById('navMenu');
+          navMenu.classList.toggle('active');
+      }
+
+      // Logout function
+      function logout() {
+          if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+              localStorage.removeItem('userToken');
+              sessionStorage.clear();
+              window.location.href = 'index.html';
+          }
+      }
+
+      // Load students on page load
+      window.onload = function() {
+          loadStudents();
+      };
+
+      // Close mobile menu when clicking on a link
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+          link.addEventListener('click', function() {
+              const navMenu = document.getElementById('navMenu');
+              navMenu.classList.remove('active');
+          });
+      });
+      function showMessage(type) {
+  const success = document.getElementById("successMessage");
+  const error = document.getElementById("errorMessage");
+
+  success.style.display = "none";
+  error.style.display = "none";
+
+  if (type === "success") {
+    success.style.display = "block";
+    setTimeout(() => success.style.display = "none", 3000);
+  } else if (type === "error") {
+    error.style.display = "block";
+    setTimeout(() => error.style.display = "none", 3000);
+  }
+}
+
+// مثال للاستخدام:
+function saveAttendance() {
+  try {
+    // كود حفظ البيانات هنا...
+    showMessage("success");
+  } catch (err) {
+    showMessage("error");
+  }
+}
+document.querySelector('.menu-toggle').addEventListener('click', function () {
+  document.querySelector('.nav-right').classList.toggle('show');
+});
+
   </script>
+</div>
+<script src="attendance.js"></script>
 </body>
 </html>
