@@ -256,7 +256,17 @@ function exportToExcel() {
     return;
   }
 
-  let csvContent = "الاسم,المجموعة,الحالة\n"; // رأس الجدول
+  const RLM = "\u200F"; // Right-To-Left mark
+  const selectedDate = document.getElementById("dateSelect").value;
+  const formattedDate = new Date(selectedDate).toLocaleDateString("ar-EG", {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+  });
+
+  // رأس الجدول مع التاريخ
+  let csvContent = `"${RLM}الاسم","${RLM}المجموعة","${RLM}الحالة","${RLM}التاريخ"\n`;
 
   const rows = table.querySelectorAll("tbody tr");
   rows.forEach(row => {
@@ -265,11 +275,11 @@ function exportToExcel() {
       let name = cols[0].textContent.trim().replace(/✅|❌/g, "");
       let team = cols[1].textContent.trim();
       let status = cols[2].textContent.includes("حاضر") ? "حاضر" : "غائب";
-      csvContent += `"${name}","${team}","${status}"\n`;
+
+      csvContent += `"${RLM + name}","${RLM + team}","${RLM + status}","${RLM + formattedDate}"\n`;
     }
   });
 
-  // إضافة BOM في بداية الملف لحل مشكلة اللغة العربية في Excel
   const BOM = "\uFEFF";
   const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -283,6 +293,7 @@ function exportToExcel() {
   link.click();
   document.body.removeChild(link);
 }
+
 
   </script>
   <script>
