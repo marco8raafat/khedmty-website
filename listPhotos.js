@@ -1,3 +1,19 @@
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+  authDomain: "edad-5odam.firebaseapp.com",
+  databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "edad-5odam",
+  storageBucket: "edad-5odam.appspot.com",
+  messagingSenderId: "679576633778",
+  appId: "1:679576633778:web:566e6aaef9b72f71a824ab",
+  measurementId: "G-7WB1WPDLRH"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 document.addEventListener('DOMContentLoaded', () => {
     const photoList = document.getElementById('photoList');
     const titleFilter = document.getElementById('titleFilter');
@@ -10,22 +26,44 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
   
-    // Retrieve photos from localStorage
-    let photos = [];
-    try {
-      photos = JSON.parse(localStorage.getItem('photos')) || [];
-      console.log('Retrieved photos:', photos.length);
-    } catch (error) {
-      console.error('Error parsing photos from localStorage:', error);
-      displayEmptyState();
-      return;
+    let allPhotos = []; // Store all photos for filtering
+  
+    // Load photos from Firebase
+    function loadPhotosFromFirebase() {
+      database.ref("photos").on("value", (snapshot) => {
+        allPhotos = []; // Clear the array
+        
+        if (!snapshot.exists()) {
+          console.log('No photos found in Firebase');
+          displayEmptyState();
+          return;
+        }
+  
+        snapshot.forEach((childSnapshot) => {
+          const photo = childSnapshot.val();
+          const photoKey = childSnapshot.key;
+          
+          // Add the Firebase key to the photo object for deletion
+          allPhotos.push({
+            ...photo,
+            firebaseKey: photoKey
+          });
+        });
+        
+        console.log('Loaded photos from Firebase:', allPhotos.length);
+        renderPhotos(); // Render all photos initially
+      }, (error) => {
+        console.error('Error loading photos from Firebase:', error);
+        displayEmptyState();
+      });
     }
   
     // Display photos based on filter
     function renderPhotos(filterText = '') {
       photoList.innerHTML = ''; // Clear current list
-      const filteredPhotos = photos.filter(photo =>
-        photo.title.toLowerCase().includes(filterText.toLowerCase())
+      
+      const filteredPhotos = allPhotos.filter(photo =>
+        photo.title && photo.title.toLowerCase().includes(filterText.toLowerCase())
       );
   
       if (filteredPhotos.length === 0) {
@@ -39,22 +77,35 @@ document.addEventListener('DOMContentLoaded', () => {
   
         const photoThumbnail = document.createElement('img');
         photoThumbnail.className = 'photo-thumbnail';
-        photoThumbnail.src = photo.data;
-        photoThumbnail.alt = photo.title;
+        
+        // Use URL if available, fallback to data for backward compatibility
+        const imageSource = photo.url || photo.data;
+        photoThumbnail.src = imageSource;
+        photoThumbnail.alt = photo.title || 'صورة';
+        
+        // Add error handling for broken images
+        photoThumbnail.onerror = function() {
+          this.style.display = 'none';
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'photo-error';
+          errorDiv.textContent = 'صورة غير متاحة';
+          errorDiv.style.cssText = 'padding: 20px; background: #f0f0f0; color: #666; text-align: center; border-radius: 5px;';
+          this.parentNode.insertBefore(errorDiv, this);
+        };
   
         const photoTitle = document.createElement('span');
         photoTitle.className = 'photo-title';
-        photoTitle.textContent = photo.title;
+        photoTitle.textContent = photo.title || 'بدون عنوان';
   
         const photoActions = document.createElement('div');
         photoActions.className = 'photo-actions';
   
-        // View button
+        // View button - open image in new tab
         const viewLink = document.createElement('a');
-        viewLink.href = photo.data;
-        viewLink.textContent = 'تنزيل';
-        viewLink.setAttribute('target', '_blank'); // Open in new tab
-        viewLink.setAttribute('download', `${photo.title}`); // Suggest download with title
+        viewLink.href = imageSource;
+        viewLink.textContent = 'عرض';
+        viewLink.setAttribute('target', '_blank');
+        viewLink.setAttribute('rel', 'noopener noreferrer');
   
         // Delete button
         const deleteLink = document.createElement('a');
@@ -62,9 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteLink.textContent = 'حذف';
         deleteLink.addEventListener('click', (e) => {
           e.preventDefault();
-          deletePhoto(photo.id);
-          photoItem.remove(); // Remove item from DOM
-          checkEmptyState(); // Check if list is now empty
+          deletePhotoFromFirebase(photo.firebaseKey, photo.title);
         });
   
         photoActions.appendChild(viewLink);
@@ -76,8 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   
-    // Initial render
-    renderPhotos();
+    // Initial load from Firebase
+    loadPhotosFromFirebase();
   
     // Filter input event
     titleFilter.addEventListener('input', (e) => {
@@ -85,14 +134,16 @@ document.addEventListener('DOMContentLoaded', () => {
       renderPhotos(e.target.value);
     });
   
-    function deletePhoto(id) {
-      try {
-        let photos = JSON.parse(localStorage.getItem('photos')) || [];
-        photos = photos.filter(photo => photo.id !== id);
-        localStorage.setItem('photos', JSON.stringify(photos));
-        console.log(`Deleted photo with id ${id}`);
-      } catch (error) {
-        console.error('Error deleting photo from localStorage:', error);
+    // Delete photo from Firebase
+    function deletePhotoFromFirebase(firebaseKey, photoTitle) {
+      if (confirm(`هل أنت متأكد من حذف الصورة "${photoTitle}"؟`)) {
+        database.ref("photos/" + firebaseKey).remove().then(() => {
+          console.log('Photo deleted successfully from Firebase');
+          // The real-time listener will automatically update the UI
+        }).catch((error) => {
+          console.error('Error deleting photo from Firebase:', error);
+          alert('حدث خطأ أثناء حذف الصورة');
+        });
       }
     }
   
@@ -103,19 +154,5 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
       console.log('Displayed empty state');
-    }
-  
-    function checkEmptyState() {
-      try {
-        const filteredPhotos = photos.filter(photo =>
-          photo.title.toLowerCase().includes(titleFilter.value.toLowerCase())
-        );
-        if (filteredPhotos.length === 0) {
-          displayEmptyState();
-        }
-      } catch (error) {
-        console.error('Error checking empty state:', error);
-        displayEmptyState();
-      }
     }
   });

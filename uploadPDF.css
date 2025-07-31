@@ -205,7 +205,8 @@ label {
 }
 
 input[type="text"],
-input[type="file"] {
+input[type="file"],
+input[type="url"] {
   padding: 12px 15px;
   border: 1px solid #bfc9e1;
   border-radius: 8px;
@@ -245,23 +246,160 @@ input[type="file"] {
 
 #message {
   margin-top: 20px;
-  padding: 15px;
-  border-radius: 8px;
-  font-weight: bold;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-weight: 600;
   text-align: center;
   display: none;
+  position: relative;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  font-size: 1.05em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#message::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .success {
-  background-color: rgba(56, 142, 60, 0.15);
-  color: var(--success);
-  border: 1px solid var(--success);
+  background: linear-gradient(135deg, #e8f5e8 0%, #f1f9f1 100%);
+  color: #2e7d32;
+  border-color: #4caf50;
+  animation: slideInSuccess 0.4s ease-out;
+}
+
+.success::before {
+  content: '✅';
+  font-size: 16px;
+  background: none;
+  width: auto;
+  height: auto;
 }
 
 .error {
-  background-color: rgba(211, 47, 47, 0.15);
-  color: var(--error);
-  border: 1px solid var(--error);
+  background: linear-gradient(135deg, #ffeaea 0%, #fff5f5 100%);
+  color: #c62828;
+  border-color: #f44336;
+  animation: slideInError 0.4s ease-out;
+}
+
+.error::before {
+  content: '❌';
+  font-size: 16px;
+  background: none;
+  width: auto;
+  height: auto;
+}
+
+.info {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%);
+  color: #1565c0;
+  border-color: #2196f3;
+  animation: slideInInfo 0.4s ease-out;
+}
+
+.info::before {
+  content: 'ℹ️';
+  font-size: 16px;
+  background: none;
+  width: auto;
+  height: auto;
+}
+
+.warning {
+  background: linear-gradient(135deg, #fff8e1 0%, #fffef7 100%);
+  color: #ef6c00;
+  border-color: #ff9800;
+  animation: slideInWarning 0.4s ease-out;
+}
+
+.warning::before {
+  content: '⚠️';
+  font-size: 16px;
+  background: none;
+  width: auto;
+  height: auto;
+}
+
+/* Message animations */
+@keyframes slideInSuccess {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    background: #c8e6c9;
+  }
+  50% {
+    transform: translateY(5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInError {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    background: #ffcdd2;
+  }
+  50% {
+    transform: translateY(5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInInfo {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    background: #bbdefb;
+  }
+  50% {
+    transform: translateY(5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInWarning {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    background: #ffe0b2;
+  }
+  50% {
+    transform: translateY(5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
 }
 
 /* PDF List */

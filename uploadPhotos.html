@@ -6,6 +6,9 @@
   <link rel="icon" type="image/png" href="logoCircle1.png">
   <title>رفع الصور</title>
   <link rel="stylesheet" href="uploadPDF.css">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="uploadPhotos.js"></script>
 </head>
 <body>
@@ -28,16 +31,24 @@
 
       <div id="upload" class="tab-content active">
         <h2 class="section-title">رفع صورة جديدة</h2>
+        <div style="background-color: #e8f4fd; border: 1px solid #0066cc; border-radius: 5px; padding: 15px; margin-bottom: 20px; text-align: center;">
+          <p style="margin: 0; color: #0066cc; font-weight: bold;">
+            📌 يجب رفع الصورة أولاً على هذا الموقع: 
+            <a href="https://postimages.org/" target="_blank" style="color: #0066cc; text-decoration: underline;">https://postimages.org/</a>
+            <br>
+            ثم نسخ الرابط المباشر للصورة ولصقه هنا
+          </p>
+        </div>
         <form id="uploadForm">
           <div class="form-group">
             <label for="title">عنوان الصورة:</label>
             <input type="text" id="title" required>
           </div>
           <div class="form-group">
-            <label for="photoFile">ملف الصورة:</label>
-            <input type="file" id="photoFile" accept="image/*" required>
+            <label for="photoUrl">رابط الصورة:</label>
+            <input type="url" id="photoUrl" placeholder="https://i.postimg.cc/3rVh51QR/profileicon.png" required>
           </div>
-          <button type="submit" class="btn">رفع الصورة</button>
+          <button type="submit" class="btn">إضافة الصورة</button>
         </form>
         <div id="message"></div>
       </div>
