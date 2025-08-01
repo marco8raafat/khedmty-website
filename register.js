@@ -69,6 +69,13 @@ function validateForm() {
     return false;
   }
 
+    // ✅ تأكد أن الاسم يتكون من أربع كلمات بالضبط
+  const nameWords = username.split(/\s+/); // تقسيم بالمسافات
+  if (nameWords.length !== 4) {
+    alert("يرجى إدخال الاسم رباعي.");
+    return false;
+  }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     alert("يرجى إدخال بريد إلكتروني صحيح.");
