@@ -2,14 +2,374 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الامتحانات المتاحة</title>
-    <link rel="stylesheet" href="student-exam.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background-color: #fff;
+            background-image: url('knesa.jpg'); 
+            background-size: cover;        
+            background-repeat: no-repeat;  
+            background-attachment: fixed;  
+            background-position: center;  
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav.navbar {
+            background-color: #233B6E;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-left .church-logo {
+            height: 80px;
+            border-radius: 8px;
+            background: white;
+            padding: 5px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hamburger menu toggle button */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .menu-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hamburger lines */
+        .hamburger-line {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        /* Animation for hamburger when active */
+        .menu-toggle.active .hamburger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .menu-toggle.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active .hamburger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #233B6E;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        #examContainer {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .exam-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 250px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .exam-card h3 {
+            margin-bottom: 15px;
+            color: #233b6e;
+            font-size: 1.2rem;
+        }
+
+        .exam-card button {
+            background: #233b6e;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .exam-card button:hover {
+            background: #1c2f5a;
+            transform: scale(1.05);
+        }
+
+        .loading-message, .no-exams-message, .error-message {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 1.2rem;
+            color: #233b6e;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            max-width: 400px;
+        }
+
+        footer {
+            background-color: #233B6E;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.95em;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+            margin-top: auto;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-wrap: wrap;
+                padding: 10px 15px;
+            }
+
+            .nav-left {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .nav-left .church-logo {
+                height: 60px;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-right {
+                width: 100%;
+                flex-direction: column;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.4s ease-in-out;
+                background-color: rgba(0, 0, 0, 0.1);
+                border-radius: 0 0 8px 8px;
+                order: 3;
+            }
+
+            .nav-right.active {
+                max-height: 350px;
+                margin-top: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .nav-link {
+                width: 100%;
+                text-align: center;
+                padding: 16px 12px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 0;
+                font-size: 1.1rem;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+
+            .nav-link:hover,
+            .nav-link:active {
+                background-color: rgba(255, 255, 255, 0.15);
+                transform: scale(0.98);
+            }
+
+            .nav-link:last-child {
+                border-bottom: none;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+                padding: 0 10px;
+            }
+
+            main {
+                padding: 15px 10px;
+            }
+
+            #examContainer {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .exam-card {
+                width: 90%;
+                max-width: 320px;
+                padding: 20px;
+            }
+
+            .exam-card h3 {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            .exam-card button {
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+
+            .loading-message, .no-exams-message, .error-message {
+                width: 90%;
+                max-width: 320px;
+                padding: 30px 20px;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Extra small phones */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 8px 10px;
+            }
+
+            .nav-left .church-logo {
+                height: 50px;
+            }
+
+            .menu-toggle {
+                width: 36px;
+                height: 36px;
+            }
+
+            .hamburger-line {
+                width: 22px;
+                height: 2px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+                margin-bottom: 15px;
+            }
+
+            main {
+                padding: 10px 8px;
+            }
+
+            .exam-card {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .exam-card h3 {
+                font-size: 1rem;
+            }
+
+            .exam-card button {
+                font-size: 0.9rem;
+                padding: 10px 12px;
+            }
+
+            .loading-message, .no-exams-message, .error-message {
+                width: 95%;
+                padding: 25px 15px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            .exam-card {
+                width: 98%;
+                padding: 12px;
+            }
+
+            .loading-message, .no-exams-message, .error-message {
+                width: 98%;
+                padding: 20px 12px;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-left">
             <img src="church-logo.png" alt="Church Logo" class="church-logo">
-            <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <button class="menu-toggle" id="menuToggle" aria-label="قائمة التنقل" aria-expanded="false">
+                <div class="hamburger-line"></div>
+                <div class="hamburger-line"></div>
+                <div class="hamburger-line"></div>
+            </button>
         </div>
         <div class="nav-right" id="navMenu">
             <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
@@ -18,11 +378,10 @@
             <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
         </div>
     </nav>
-    <br><br>
 
     <main>
-    <h1>الامتحانات المتاحة للطالب</h1>
-    <div id="examContainer"></div>
+        <h1>الامتحانات المتاحة للطالب</h1>
+        <div id="examContainer"></div>
     </main>
     
     <footer>
@@ -34,126 +393,169 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     
     <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
-        authDomain: "edad-5odam.firebaseapp.com",
-        databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "edad-5odam",
-        storageBucket: "edad-5odam.appspot.com",
-        messagingSenderId: "679576633778",
-        appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
-      };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+            authDomain: "edad-5odam.firebaseapp.com",
+            databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "edad-5odam",
+            storageBucket: "edad-5odam.appspot.com",
+            messagingSenderId: "679576633778",
+            appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+        };
 
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-      // Authentication check function
-      async function checkAuthentication() {
-        const currentUser = sessionStorage.getItem("currentUser");
-        
-        if (!currentUser) {
-          alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
-          window.location.href = "login.html";
-          return false;
+        // Authentication check function
+        async function checkAuthentication() {
+            const currentUser = sessionStorage.getItem("currentUser");
+            
+            if (!currentUser) {
+                alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+                window.location.href = "login.html";
+                return false;
+            }
+
+            // Verify user exists in Firebase
+            const emailKey = currentUser.replace(/\./g, '_');
+            try {
+                const snapshot = await db.ref('users/' + emailKey).once('value');
+                if (!snapshot.exists()) {
+                    alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
+                    sessionStorage.removeItem("currentUser");
+                    window.location.href = "login.html";
+                    return false;
+                }
+                
+                const userData = snapshot.val();
+                // Check if user is a student (only students can take exams)
+                if (userData.role !== "student") {
+                    alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للطلاب فقط");
+                    window.location.href = userData.role === "servant" ? "teacherDashboard.html" : "index.html";
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error("Error verifying user:", error);
+                alert("حدث خطأ في التحقق من المستخدم. يرجى تسجيل الدخول مرة أخرى");
+                window.location.href = "login.html";
+                return false;
+            }
         }
 
-        // Verify user exists in Firebase
-        const emailKey = currentUser.replace(/\./g, '_');
-        try {
-          const snapshot = await db.ref('users/' + emailKey).once('value');
-          if (!snapshot.exists()) {
-            alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
-            sessionStorage.removeItem("currentUser");
-            window.location.href = "login.html";
-            return false;
-          }
-          
-          const userData = snapshot.val();
-          // Check if user is a student (only students can take exams)
-          if (userData.role !== "student") {
-            alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للطلاب فقط");
-            window.location.href = userData.role === "servant" ? "teacherDashboard.html" : "index.html";
-            return false;
-          }
-          
-          return true;
-        } catch (error) {
-          console.error("Error verifying user:", error);
-          alert("حدث خطأ في التحقق من المستخدم. يرجى تسجيل الدخول مرة أخرى");
-          window.location.href = "login.html";
-          return false;
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                sessionStorage.removeItem("currentUser");
+                window.location.href = "index.html";
+            }
         }
-      }
 
-      function logout() {
-        if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-          sessionStorage.removeItem("currentUser");
-          window.location.href = "index.html";
+        // Load exams function
+        function loadExamsForStudent() {
+            const container = document.getElementById("examContainer");
+
+            if (!container) {
+                console.error("عنصر examContainer غير موجود في الصفحة.");
+                return;
+            }
+
+            // Show loading message
+            container.innerHTML = '<div class="loading-message">جاري تحميل الامتحانات...</div>';
+
+            // Fetch exams from Firebase
+            firebase.database().ref("exams").once("value")
+                .then(snapshot => {
+                    const data = snapshot.val();
+                    container.innerHTML = ""; // Clear loading message
+
+                    if (!data) {
+                        container.innerHTML = '<div class="no-exams-message">لا يوجد امتحانات حالياً.</div>';
+                        return;
+                    }
+
+                    const exams = Object.values(data); // Convert {key: value} to array
+
+                    exams.forEach((exam) => {
+                        const card = document.createElement("div");
+                        card.className = "exam-card";
+
+                        const title = document.createElement("h3");
+                        title.textContent = exam.name;
+
+                        const button = document.createElement("button");
+                        button.textContent = "ابدأ الامتحان";
+                        button.onclick = () => {
+                            window.open(exam.link, "_blank");
+                        };
+
+                        card.appendChild(title);
+                        card.appendChild(button);
+                        container.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error("خطأ أثناء تحميل الامتحانات:", error);
+                    container.innerHTML = '<div class="error-message">حدث خطأ أثناء تحميل الامتحانات.</div>';
+                });
         }
-      }
 
-      // Initialize page
-      async function initializePage() {
-        const isAuthenticated = await checkAuthentication();
-        if (isAuthenticated) {
-          // Initialize student exam functionality
-          initializeStudentExams();
+        // Initialize page
+        async function initializePage() {
+            const isAuthenticated = await checkAuthentication();
+            if (isAuthenticated) {
+                loadExamsForStudent();
+            }
         }
-      }
 
-      function initializeStudentExams() {
-        // Load student exam functionality here
-        if (typeof loadExamsForStudent === 'function') {
-          loadExamsForStudent();
-        }
-      }
-
-      // Load page when authenticated
-      window.addEventListener('DOMContentLoaded', initializePage);
-
-      // Mobile menu toggle function
-      function toggleMobileMenu() {
-        const navMenu = document.getElementById('navMenu');
-        navMenu.classList.toggle('active');
-        
-        // Add aria-expanded for accessibility
-        const menuToggle = document.querySelector('.menu-toggle');
-        const isExpanded = navMenu.classList.contains('active');
-        menuToggle.setAttribute('aria-expanded', isExpanded);
-      }
-
-      // Close mobile menu when clicking outside
-      document.addEventListener('click', function(event) {
-        const navMenu = document.getElementById('navMenu');
-        const menuToggle = document.querySelector('.menu-toggle');
-        
-        if (!navMenu.contains(event.target) && !menuToggle.contains(event.target)) {
-          navMenu.classList.remove('active');
-          menuToggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-
-      // Close mobile menu when clicking on a link
-      document.addEventListener('DOMContentLoaded', function() {
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-          link.addEventListener('click', function() {
+        // Hamburger menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
             const navMenu = document.getElementById('navMenu');
-            const menuToggle = document.querySelector('.menu-toggle');
-            navMenu.classList.remove('active');
-            menuToggle.setAttribute('aria-expanded', 'false');
-          });
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            // Toggle mobile menu
+            menuToggle.addEventListener('click', function() {
+                navMenu.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+                
+                // Update aria-expanded for accessibility
+                const isExpanded = navMenu.classList.contains('active');
+                menuToggle.setAttribute('aria-expanded', isExpanded);
+            });
+
+            // Close mobile menu when clicking on a link
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const isClickInsideNav = navMenu.contains(event.target) || menuToggle.contains(event.target);
+                
+                if (!isClickInsideNav && navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // Close menu on window resize if screen becomes larger
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    navMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // Initialize the page
+            initializePage();
         });
-
-        // Add accessibility attributes
-        const menuToggle = document.querySelector('.menu-toggle');
-        if (menuToggle) {
-          menuToggle.setAttribute('aria-label', 'فتح/إغلاق القائمة');
-          menuToggle.setAttribute('aria-expanded', 'false');
-        }
-      });
     </script>
-
-    <script src="student-exam.js"></script>
 </body>
 </html>
