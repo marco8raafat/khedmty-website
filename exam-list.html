@@ -2,14 +2,303 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>قائمة الامتحانات</title>
-  <link rel="stylesheet" href="exam-list.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      direction: rtl;
+      display: flex;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      background-image: url('knesa.jpg'); 
+      background-size: cover;        
+      background-repeat: no-repeat;  
+      background-attachment: fixed;  
+      background-position: center; 
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .form-box {
+      width: 90%;
+      max-width: 500px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      margin: 50px auto;
+      flex: 1; 
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f3f4f5;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    button {
+      padding: 8px 12px;
+      margin-top: 10px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #233b6e;
+      color: white;
+      transition: background-color 0.3s;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1a2951;
+    }
+
+    button.delete {
+      background-color: #e74c3c;
+    }
+
+    button.delete:hover {
+      background-color: #c0392b;
+    }
+
+    :root {
+      --primary: #233b6e; 
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .navbar {
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-left .church-logo {
+      height: 80px;
+      border-radius: 8px;
+      background: white;
+      padding: 5px;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Hamburger menu toggle button */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+    }
+
+    .menu-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Hamburger lines */
+    .hamburger-line {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 3px 0;
+      transition: 0.3s;
+      border-radius: 2px;
+    }
+
+    /* Animation for hamburger when active */
+    .menu-toggle.active .hamburger-line:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .menu-toggle.active .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.active .hamburger-line:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    footer {
+      background-color: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.95em;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+      margin-top: auto;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+      .navbar {
+        flex-wrap: wrap;
+        padding: 10px 15px;
+      }
+
+      .nav-left {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .nav-left .church-logo {
+        height: 60px;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .nav-right {
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        order: 3;
+      }
+
+      .nav-right.active {
+        max-height: 300px;
+        margin-top: 10px;
+      }
+
+      .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0;
+        display: block;
+      }
+
+      .nav-link:last-child {
+        border-bottom: none;
+      }
+
+      .form-box {
+        width: 95%;
+        margin: 20px auto;
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      li {
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 6px 10px;
+        margin: 5px 5px 0 0;
+        font-size: 0.9rem;
+      }
+
+      /* Stack buttons vertically on very small screens */
+      @media (max-width: 480px) {
+        li {
+          text-align: center;
+        }
+        
+        button {
+          display: block;
+          width: 100%;
+          margin: 5px 0;
+        }
+      }
+    }
+
+    /* Extra small phones */
+    @media (max-width: 360px) {
+      .form-box {
+        width: 98%;
+        padding: 15px;
+      }
+      
+      .navbar {
+        padding: 8px 10px;
+      }
+      
+      .nav-left .church-logo {
+        height: 50px;
+      }
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
-      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+      <button class="menu-toggle" id="menuToggle">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+      </button>
     </div>
     <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
@@ -19,38 +308,137 @@
     </div>
   </nav>
 
-  <div class="form-box">
-    <h2>قائمة الامتحانات</h2>
-    <ul id="examList"></ul>
-  </div>
+  <main>
+    <div class="form-box">
+      <h2>قائمة الامتحانات</h2>
+      <ul id="examList"></ul>
+    </div>
+  </main>
 
   <footer>
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
 
-<!-- Make sure these scripts are included before your custom script -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
-<script>
-  // Mobile menu toggle function
-  function toggleMobileMenu() {
-    const navMenu = document.getElementById('navMenu');
-    navMenu.classList.toggle('active');
-  }
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+      authDomain: "edad-5odam.firebaseapp.com",
+      databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "edad-5odam",
+      storageBucket: "edad-5odam.appspot.com",
+      messagingSenderId: "679576633778",
+      appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+    };
 
-  // Close mobile menu when clicking on a link
-  document.addEventListener('DOMContentLoaded', function() {
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-      link.addEventListener('click', function() {
-        const navMenu = document.getElementById('navMenu');
-        navMenu.classList.remove('active');
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const examList = document.getElementById("examList");
+
+    function renderExamsFromFirebase() {
+      examList.innerHTML = "<li>جاري تحميل الامتحانات...</li>";
+
+      db.ref("exams").once("value")
+        .then(snapshot => {
+          const examsData = snapshot.val();
+          examList.innerHTML = "";
+
+          if (!examsData) {
+            examList.innerHTML = "<li>لا يوجد امتحانات حالياً.</li>";
+            return;
+          }
+
+          const exams = Object.entries(examsData);
+
+          exams.forEach(([key, exam]) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+              <strong>${exam.name}</strong><br>
+              <button onclick="openExam('${exam.link}')">فتح الامتحان</button>
+              <button class="delete" onclick="deleteExam('${key}')">حذف</button>
+            `;
+            examList.appendChild(li);
+          });
+        })
+        .catch(error => {
+          console.error("حدث خطأ أثناء تحميل الامتحانات:", error);
+          examList.innerHTML = "<li>فشل تحميل الامتحانات.</li>";
+        });
+    }
+
+    function openExam(link) {
+      window.open(link, "_blank");
+    }
+
+    function deleteExam(examKey) {
+      if (confirm("هل أنت متأكد من حذف الامتحان؟")) {
+        db.ref("exams/" + examKey).remove()
+          .then(() => {
+            alert("تم حذف الامتحان.");
+            renderExamsFromFirebase();
+          })
+          .catch(error => {
+            console.error("خطأ أثناء حذف الامتحان:", error);
+            alert("حدث خطأ أثناء حذف الامتحان.");
+          });
+      }
+    }
+
+    function logout() {
+      // Add your logout logic here
+      if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+        // Redirect to login page or clear session
+        window.location.href = "index.html";
+      }
+    }
+
+    // Hamburger menu toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuToggle = document.getElementById('menuToggle');
+      const navMenu = document.getElementById('navMenu');
+      const navLinks = document.querySelectorAll('.nav-link');
+
+      // Toggle mobile menu
+      menuToggle.addEventListener('click', function() {
+        navMenu.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+      });
+
+      // Close mobile menu when clicking on a link
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          navMenu.classList.remove('active');
+          menuToggle.classList.remove('active');
+        });
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', function(event) {
+        const isClickInsideNav = navMenu.contains(event.target) || menuToggle.contains(event.target);
+        
+        if (!isClickInsideNav && navMenu.classList.contains('active')) {
+          navMenu.classList.remove('active');
+          menuToggle.classList.remove('active');
+        }
+      });
+
+      // Close menu on window resize if screen becomes larger
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+          navMenu.classList.remove('active');
+          menuToggle.classList.remove('active');
+        }
       });
     });
-  });
-</script>
 
-<script src="exam-list.js"></script>
+    // Start rendering exams
+    renderExamsFromFirebase();
+  </script>
 </body>
 </html>
