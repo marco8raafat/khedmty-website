@@ -11,14 +11,13 @@
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-
-    <div class="hamburger">☰</div>
-
     <div class="nav-right" id="navLinks">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="login.html" class="nav-link">تسجيل الدخول</a>
-      <a href="register.html" class="nav-link">إنشاء حساب</a>
+      <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+      <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
 
@@ -121,8 +120,8 @@
 
     // Mobile menu toggle function
     function toggleMobileMenu() {
-      const navMenu = document.getElementById('navMenu');
-      navMenu.classList.toggle('active');
+      const navLinks = document.getElementById('navLinks');
+      navLinks.classList.toggle('active');
     }
 
     // Close mobile menu when clicking on a link
@@ -130,7 +129,7 @@
       const navLinks = document.querySelectorAll('.nav-link');
       navLinks.forEach(link => {
         link.addEventListener('click', function() {
-          const navMenu = document.getElementById('navMenu');
+          const navMenu = document.getElementById('navLinks');
           navMenu.classList.remove('active');
         });
       });
