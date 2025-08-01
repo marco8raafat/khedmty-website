@@ -536,7 +536,6 @@ footer {
   .nav-link {
     width: 100%;
     text-align: center;
-    padding: 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0;
     font-size: 1.1em;
@@ -707,7 +706,6 @@ footer {
   .tab-btn,
   .btn,
   .pdf-actions a {
-    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;

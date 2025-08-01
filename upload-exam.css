@@ -1,269 +1,408 @@
-* {
-  box-sizing: border-box;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  font-family: Arial, sans-serif;
-  background: #f8f9fa;
-  background-image: url('knesa.jpg'); 
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: center;
-}
+    html, body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      background-image: url('knesa.jpg'); 
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      direction: rtl;
+    }
 
-:root {
-  --primary: #233B6E;
-}
+    :root {
+      --primary: #233B6E;
+    }
 
-.navbar {
-  background-color: var(--primary);
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  position: relative;
-  direction: rtl;
-  z-index: 100;
-}
+    .navbar {
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 100;
+    }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-}
+    .nav-left {
+      display: flex;
+      align-items: center;
+    }
 
-.nav-left .church-logo {
-  height: 80px;
-  border-radius: 8px;
-  background: white;
-  padding: 5px;
-}
+    .nav-left .church-logo {
+      height: 80px;
+      border-radius: 8px;
+      background: white;
+      padding: 5px;
+    }
 
-.hamburger {
-  display: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: white;
-  margin-right: 10px;
-  padding: 10px;
-  text-align: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: background-color 0.3s;
-}
+    .nav-right {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
 
-.hamburger:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
 
-/* Mobile menu toggle button */
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  
-}
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
 
-.menu-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
 
-.nav-right {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
+    /* Hamburger menu toggle button */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+    }
 
-.nav-link {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  transition: 0.3s;
-  padding: 8px 12px;
-  border-radius: 6px;
-}
+    .menu-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
 
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
+    /* Hamburger lines */
+    .hamburger-line {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 3px 0;
+      transition: 0.3s;
+      border-radius: 2px;
+    }
 
-.nav-link.active {
-  background-color: rgba(255, 255, 255, 0.3);
-}
+    /* Animation for hamburger when active */
+    .menu-toggle.active .hamburger-line:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
 
-main {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    .menu-toggle.active .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
 
-.form-box {
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 30px 40px;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  width: 350px;
-}
+    .menu-toggle.active .hamburger-line:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
 
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #233B6E;
-}
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
 
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-}
+    .form-box {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      backdrop-filter: blur(10px);
+    }
 
-input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: var(--primary);
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
 
-.form-box form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  direction: rtl;
-}
+    .form-group {
+      margin-bottom: 20px;
+    }
 
-.form-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: flex-start;
-}
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: var(--primary);
+      font-size: 1rem;
+    }
 
-.form-box label {
-  min-width: 120px;
-}
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background-color: #fff;
+    }
 
-.form-box input {
-  flex: 1;
-  padding: 8px;
-}
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(35, 59, 110, 0.1);
+    }
 
-button {
-  background-color: #233B6E;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 5px;
-  font-size: 16px;
-}
+    input[type="text"]:valid {
+      border-color: #28a745;
+    }
 
-footer {
-  background-color: var(--primary);
-  color: white;
-  text-align: center;
-  padding: 20px;
-  font-size: 0.95em;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
-}
+    button {
+      width: 100%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    padding: 10px;
-  }
+    button:hover {
+      background-color: #1a2951;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(35, 59, 110, 0.3);
+    }
 
-  .nav-left {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
+    button:active {
+      transform: translateY(0);
+    }
 
-  .nav-left .church-logo {
-    height: 60px;
-  }
+    footer {
+      background-color: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.95em;
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+      margin-top: auto;
+    }
 
-  .menu-toggle {
-    display: block;
-  }
+    /* Success/Error message styles */
+    .message {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
 
-  .hamburger {
-    display: block;
-    order: 2;
-  }
+    .message.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
 
-  .nav-right {
-    width: 100%;
-    flex-direction: column;
-    gap: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
+    .message.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
 
-  .nav-right.active {
-    max-height: 300px;
-  }
+    /* Loading animation */
+    .loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
 
-  .nav-link {
-    width: 100%;
-    text-align: center;
-    padding: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0;
-  }
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
 
-  .nav-link:last-child {
-    border-bottom: none;
-  }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
 
-  .form-box {
-    width: 90%;
-    padding: 20px;
-  }
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+      .navbar {
+        flex-wrap: wrap;
+        padding: 10px 15px;
+      }
 
-  .form-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+      .nav-left {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-  .form-box label {
-    min-width: auto;
-  }
+      .nav-left .church-logo {
+        height: 60px;
+      }
 
-  h2 {
-    font-size: 1.3em;
-  }
+      .menu-toggle {
+        display: flex;
+      }
 
-  button {
-    font-size: 15px;
-    padding: 10px;
-  }
-}
+      .nav-right {
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-in-out;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 0 0 8px 8px;
+        order: 3;
+      }
 
-@media (max-width: 480px) {
-  .church-logo {
-    height: 50px;
-  }
+      .nav-right.active {
+        max-height: 350px;
+        margin-top: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
 
-  footer {
-    font-size: 0.8em;
-    padding: 10px;
-  }
-}
+      .nav-link {
+        width: 100%;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link:active {
+        background-color: rgba(255, 255, 255, 0.15);
+        transform: scale(0.98);
+      }
+
+      .nav-link:last-child {
+        border-bottom: none;
+      }
+
+      main {
+        padding: 15px 10px;
+      }
+
+      .form-box {
+        width: 95%;
+        max-width: none;
+        padding: 25px 20px;
+        margin: 10px 0;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+      }
+
+      input[type="text"] {
+        padding: 12px;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+
+      button {
+        padding: 14px;
+        font-size: 16px;
+      }
+
+      footer {
+        padding: 15px 10px;
+        font-size: 0.9em;
+      }
+    }
+
+    /* Small phones */
+    @media (max-width: 480px) {
+      .navbar {
+        padding: 8px 10px;
+      }
+
+      .nav-left .church-logo {
+        height: 50px;
+      }
+
+      .menu-toggle {
+        width: 36px;
+        height: 36px;
+      }
+
+      .hamburger-line {
+        width: 22px;
+        height: 2px;
+      }
+
+      .form-box {
+        width: 98%;
+        padding: 20px 15px;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        padding: 10px 12px;
+      }
+
+      button {
+        padding: 12px;
+        font-size: 15px;
+      }
+
+      footer {
+        padding: 12px 8px;
+        font-size: 0.85em;
+      }
+    }
+
+    /* Very small screens */
+    @media (max-width: 360px) {
+      .form-box {
+        padding: 15px 10px;
+      }
+
+      h2 {
+        font-size: 1.3rem;
+      }
+    }
