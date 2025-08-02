@@ -1,5 +1,3 @@
-
-
 :root {
   --primary: #233B6E;
   --success: #4CAF50;
@@ -33,33 +31,47 @@ body::before {
   z-index: -1;
 }
 
-
 .navbar {
   background-color: var(--primary);
   color: white;
   display: flex;
-  flex-direction: column;
-  padding: 10px 15px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.nav-left {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.church-logo {
-  height: 60px;
+.nav-left .church-logo {
+  height: 80px;
   border-radius: 8px;
   background: white;
   padding: 5px;
 }
 
+.nav-right {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
 
 .menu-toggle {
-  display: none;
+  display: none; 
   background: none;
   border: none;
   color: white;
@@ -69,7 +81,7 @@ body::before {
   line-height: 1;
   width: auto;
   height: auto;
-  margin-right: auto; 
+  margin-right: auto;  
   border-radius: 6px;
   transition: background-color 0.3s ease;
 }
@@ -78,51 +90,63 @@ body::before {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.nav-right {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-}
-
-.nav-link {
-  color: white;
-  text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-}
-
-.nav-link:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-
 @media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .nav-left {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .nav-left .church-logo {
+    height: 60px;
+  }
+
   .menu-toggle {
     display: block;
   }
 
   .nav-right {
-    flex-direction: column;
-    align-items: center;
     width: 100%;
-    overflow: hidden;
+    flex-direction: column;
+    gap: 0;
     max-height: 0;
+    overflow: hidden;
     transition: max-height 0.3s ease;
   }
 
   .nav-right.active {
-    max-height: 500px;
+    max-height: 300px;
   }
 
   .nav-link {
-    padding: 12px;
     width: 100%;
     text-align: center;
+    padding: 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
   }
 }
 
+@media (max-width: 480px) {
+  .navbar {
+    padding: 8px;
+  }
 
+  .nav-left .church-logo {
+    height: 50px;
+  }
+}
 
 .container,
 .attendance-container {
@@ -135,7 +159,6 @@ body::before {
   box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
-
 h2 {
   text-align: center;
   font-size: 2rem;
@@ -143,7 +166,6 @@ h2 {
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
   margin-bottom: 30px;
 }
-
 
 label {
   font-weight: bold;
@@ -214,7 +236,6 @@ button:hover {
   font-weight: bold;
 }
 
-
 .controls {
   margin-top: 20px;
   display: flex;
@@ -237,7 +258,6 @@ button:hover {
 .btn-success { background: var(--success); }
 .btn-danger  { background: var(--error); }
 .btn-warning { background: orange; }
-
 
 .attendance-grid {
   margin-top: 30px;
@@ -292,7 +312,6 @@ button:hover {
 .student-actions .btn-danger {
   background-color: var(--error);
 }
-
 
 table {
   width: 100%;
@@ -360,6 +379,7 @@ th {
   filter: brightness(1.1);
 }
 
+
 #studentsContainer {
   display: flex;
   flex-direction: column;
@@ -383,6 +403,7 @@ th {
   box-sizing: border-box;
 }
 
+
 .initial {
   position: absolute;
   top: 8px;
@@ -399,6 +420,7 @@ th {
   justify-content: center;
 }
 
+
 .student-avatar {
   position: absolute;
   top: 12px;
@@ -414,6 +436,7 @@ th {
   font-weight: bold;
   font-size: 18px;
 }
+
 
 .student-details {
   margin-top: 40px;
