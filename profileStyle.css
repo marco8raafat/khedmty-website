@@ -1,100 +1,87 @@
-/* إعدادات عامة */
-:root {
-  --primary: #233B6E;
-}
+ * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Cairo', sans-serif;
-}
+    body {
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('knesa.jpg'); /* Change path to your image */
+      background-size: cover;        /* Make image cover the whole page */
+      background-repeat: no-repeat;  /* Prevent repeating */
+      background-attachment: fixed;  /* Keeps background fixed when scrolling */
+      background-position: center;   /* Center the image */
+      font-family: 'Arial', sans-serif;
+    }
 
-body {
-  background: #f0f2f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-image: url('knesa.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: center;
-  font-family: 'Arial', sans-serif;
-  overflow-x: hidden;
-}
+    .phone-frame {
+      width: 360px;
+      height: 640px;
+      background: #fff;
+      border-radius: 30px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-/* إطار الهاتف */
-.phone-frame {
-  width: 360px;
-  height: 640px;
-  background: #fff;
-  border-radius: 30px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    .avatar-image {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 20px;
+      background-color: #eee;
+    }
 
-/* صورة البروفايل */
-.avatar-image {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 20px;
-  background-color: #eee;
-}
+    h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 16px;
+      text-align: center;
+    }
 
-/* الاسم */
-h2 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 16px;
-  text-align: center;
-}
+    .info-line {
+      font-size: 18px;
+      color: #444;
+      margin: 10px 0;
+      width: 100%;
+      text-align: center;
+    }
 
-/* بيانات المستخدم */
-.info-line {
-  font-size: 18px;
-  color: #444;
-  margin: 10px 0;
-  width: 100%;
-  text-align: center;
-}
+    .profile-buttons {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
 
-/* أزرار البروفايل */
-.profile-buttons {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
+    .profile-buttons button {
+      background: #233B6E;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 15px;
+      margin: 10px 0;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s ease;
+    }
 
-.profile-buttons button {
-  background: #233B6E;
-  color: white;
-  border: none;
-  padding: 14px;
-  border-radius: 15px;
-  margin: 10px 0;
-  cursor: pointer;
-  font-size: 18px;
-  transition: background 0.3s ease;
-}
-
-.profile-buttons button:hover {
-  background: #0056b3;
-}
-
-/* زر الرجوع */
+    .profile-buttons button:hover {
+      background: #0056b3;
+    }
 .back-icon {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 20px;
+  left: 20px;
   font-size: 1.8em;
   color: #233B6E;
   text-decoration: none;
@@ -102,60 +89,7 @@ h2 {
   transition: 0.3s ease;
 }
 
-/* القائمة المنسدلة (menu full-screen) */
-.menu-items {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #233B6E;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 999;
-  text-align: center;
-  padding-top: 100px;
-}
-
-.menu-items a {
-  padding: 16px 0;
-  text-decoration: none;
-  color: white;
-  font-size: 20px;
-  width: 100%;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.menu-items a:first-child {
-  border-top: none;
-}
-
-/* زر القائمة */
-.menu-toggle {
-  display: block;
-  background-color: white;
-  border: none;
-  color: #233B6E;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 10px;
-  z-index: 1001;
-  position: fixed;
-  left: 15px;
-  top: 15px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-}
-
-.menu-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* ميديا كويري للموبايل */
-@media (max-width: 768px) {
-  .back-icon {
-    display: none;
-  }
+.back-icon:hover {
+  color: #1a2d59;
+  transform: scale(1.2);
 }
