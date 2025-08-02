@@ -199,7 +199,7 @@ document.body.removeChild(link);
 
 window.addEventListener('scroll', function () {
     const footer = document.querySelector('footer');
-    const scrollThreshold = 150; // المسافة اللي عندها الفوتر يظهر
+    const scrollThreshold = 100; 
 
     if (window.scrollY > scrollThreshold) {
       footer.classList.add('visible');
@@ -207,4 +207,5 @@ window.addEventListener('scroll', function () {
       footer.classList.remove('visible');
     }
   });
+
 
