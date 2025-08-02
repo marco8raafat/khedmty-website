@@ -58,6 +58,7 @@ body {
   margin: 15px 0 5px;
   font-weight: bold;
   font-size: 1.1em;
+  line-height: 1.4;
 }
 
 /* الحقول */
@@ -107,44 +108,33 @@ body {
   }
 
   .container h2 {
-    font-size: 1.6em;
+    font-size: 1.5em;
   }
 
-  .container label {
-    font-size: 1em;
-  }
-
-  .container .btn {
-    font-size: 1em;
-    padding: 12px;
-  }
-  @media (max-width: 768px) {
   .container label {
     font-size: 0.95em;
     margin: 10px 0 5px;
   }
 
   .container input,
+  .container input[type="text"],
+  .container input[type="email"],
+  .container input[type="password"],
+  .container input[type="tel"],
   .container .btn {
     font-size: 1em;
-  }
-
-  .container h2 {
-    font-size: 1.5em;
-  }
-}
-.container label {
-  line-height: 1.4;
-}
-
-  .back-icon {
-    top: 10px;
-    left: 10px;
-    font-size: 1.5em;
+    padding: 12px;
   }
 
   .role-options {
     flex-direction: column;
     gap: 10px;
+    font-size: 0.9em;
+  }
+
+  .back-icon {
+    top: 10px;
+    left: 10px;
+    font-size: 1.5em;
   }
 }
