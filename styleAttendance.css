@@ -1,3 +1,4 @@
+
 :root {
   --primary: #233B6E;
   --success: #4CAF50;
@@ -13,6 +14,7 @@
 }
 
 body {
+  height: 100%;
   background: url("knesa.jpg") no-repeat center center fixed;
   background-size: cover;
   direction: rtl;
@@ -265,8 +267,8 @@ button:hover {
 
 .student-card {
   background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  padding: 15px 20px;
+  border-radius: 10px;
+  padding: 15px;
   margin-bottom: 15px;
   color: #111;
   display: flex;
@@ -274,7 +276,92 @@ button:hover {
   align-items: center;
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   transition: 0.3s ease;
+  flex-wrap: wrap;
 }
+
+
+.attendance-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.attendance-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 70px;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.attendance-btn:active {
+  transform: scale(0.95);
+}
+
+.btn-present {
+  background: var(--success);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-present:hover {
+  background: #18651d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(23, 95, 26, 0.3);
+}
+
+.btn-present.active {
+  background: #0b4e10;
+  transform: scale(0.98);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid #0b460d;
+}
+
+.btn-present.active::before {
+  content: "✓";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.btn-absent {
+  background: var(--error);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-absent:hover {
+  background: #670404;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+}
+
+.btn-absent.active {
+  background: #570202;
+  transform: scale(0.98);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid #4d0702;
+}
+
+.btn-absent.active::before {
+  content: "✗";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  font-size: 14px;
+}
+
 
 .student-info {
   display: flex;
@@ -484,4 +571,21 @@ th {
 
 .attendance-btn.active {
   outline: 3px solid #ffc107;
+}
+
+footer {
+  background-color: var(--primary);
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 0.95em;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+footer.visible {
+  opacity: 1;
+  pointer-events: auto;
 }
