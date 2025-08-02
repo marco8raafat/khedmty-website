@@ -122,19 +122,24 @@ document.querySelector('.nav-right').classList.toggle('show');
 
 function printAttendance() {
   const printContents = document.getElementById("historyTable").outerHTML;
+  const selectedDate = document.getElementById("dateSelect").value || "تاريخ غير محدد";
   const printWindow = window.open("", "", "height=600,width=800");
   printWindow.document.write("<html><head><title>سجل الحضور</title>");
   printWindow.document.write("<style>");
-  printWindow.document.write("table { width: 100%; border-collapse: collapse; direction: rtl; font-family: Arial; }");
+  printWindow.document.write("body { font-family: Arial; direction: rtl; padding: 20px; }");
+  printWindow.document.write("table { width: 100%; border-collapse: collapse; margin-top: 20px; }");
   printWindow.document.write("th, td { border: 1px solid black; padding: 10px; text-align: center; }");
+  printWindow.document.write("h2, h4 { margin: 0; }");
   printWindow.document.write("</style>");
   printWindow.document.write("</head><body>");
   printWindow.document.write("<h2>سجل الحضور</h2>");
+  printWindow.document.write(`<h4>تاريخ يوم: ${selectedDate}</h4>`);
   printWindow.document.write(printContents);
   printWindow.document.write("</body></html>");
   printWindow.document.close();
   printWindow.print();
 }
+
 function filterAttendanceHistory() {
 const input = document.getElementById("searchInput").value.toLowerCase();
 const rows = document.querySelectorAll("#attendanceBody tr");
@@ -205,6 +210,7 @@ document.body.removeChild(link);
         footer.classList.remove('visible');
       }
     });
+
 
 
 
