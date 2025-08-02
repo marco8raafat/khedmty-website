@@ -237,7 +237,7 @@ async function loadStudents() {
             });
 
             const teamFilter = document.getElementById('teamFilter');
-            teamFilter.innerHTML = `<option value="">كل الفرق</option>`;
+            teamFilter.innerHTML = `<option value="">كل المجموعات</option>`;
             teamsSet.forEach(team => {
                 const option = document.createElement('option');
                 option.value = team;
