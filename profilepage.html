@@ -16,9 +16,8 @@
 </a>
 
 <!-- زر القائمة للموبايل -->
-<button class="menu-toggle" id="menuToggle" title="قائمة">
-  <i class="fas fa-bars"></i>
-</button>
+<button class="menu-toggle">☰</button>
+
 
 <!-- القائمة المنسدلة -->
 <div class="menu-items" id="menuItems">
@@ -46,15 +45,13 @@
 <script src="profile.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const toggle = document.getElementById('menuToggle');
-      const menu = document.getElementById('menuItems');
+  const toggleBtn = document.querySelector('.menu-toggle');
+  const menu = document.querySelector('.menu-items');
 
-      toggle.addEventListener('click', () => {
-        menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
-      });
-    });
-  </script>
-  
+  toggleBtn.addEventListener('click', () => {
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  });
+</script>
+
 </body>
 </html>
