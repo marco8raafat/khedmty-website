@@ -1,16 +1,3 @@
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
-  authDomain: "edad-5odam.firebaseapp.com",
-  databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "edad-5odam",
-  storageBucket: "edad-5odam.appspot.com",
-  messagingSenderId: "679576633778",
-  appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 
 // Authentication check function
 async function checkAuthentication() {
@@ -433,4 +420,5 @@ window.onload = async function () {
     console.log("Initializing AttendanceData page");
     await initializePage();
   }
+
 };
