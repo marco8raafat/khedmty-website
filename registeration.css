@@ -97,11 +97,18 @@ body {
   position: absolute;
   top: 20px;
   left: 20px;
-  font-size: 2em;
-  color: #fff;
-  cursor: pointer;
-  z-index: 10;
+  font-size: 1.8em;
+  color: #233B6E;
+  text-decoration: none;
+  z-index: 999;
+  transition: 0.3s ease;
 }
+
+.back-icon:hover {
+  color: #1a2d59;
+  transform: scale(1.2);
+}
+
 
 /* Responsive for mobile */
 @media (max-width: 768px) {
@@ -132,11 +139,5 @@ body {
     flex-direction: column;
     gap: 10px;
     font-size: 0.9em;
-  }
-
-  .back-icon {
-    top: 10px;
-    left: 10px;
-    font-size: 1.5em;
   }
 }
