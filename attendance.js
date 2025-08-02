@@ -198,13 +198,14 @@ document.body.removeChild(link);
 
   window.addEventListener('scroll', function () {
       const footer = document.querySelector('footer');
-      const scrollThreshold = 0;
+      const scrollThreshold = -300;
       if (window.scrollY > scrollThreshold) {
         footer.classList.add('visible');
       } else {
         footer.classList.remove('visible');
       }
     });
+
 
 
 
