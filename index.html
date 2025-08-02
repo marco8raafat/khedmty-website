@@ -47,9 +47,14 @@
         transform: translateY(0);
       }
     }
+    .logo {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      transition: transform 1s ease-in-out;
+    }
     .logo:hover {
       transform: rotate(360deg);
-      transition: transform 1s ease-in-out;
     }
     .tagline {
       animation: glow 2s infinite alternate;
@@ -91,16 +96,44 @@
       box-shadow: 0 12px 25px rgba(0,0,0,0.15);
     }
 
-    /* Responsive styles */
+    nav.navbar, footer {
+      width: 100%;
+      box-sizing: border-box;
+      background-color: #233B6E;
+      color: white;
+    }
+    nav.navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    .nav-left img.church-logo {
+      height: 50px;
+    }
+    .nav-right {
+      display: flex;
+      gap: 15px;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+    }
+
     @media (max-width: 1024px) {
       header h1 {
         font-size: 2em;
       }
       .logo {
         width: 140px;
+        height: 140px;
       }
     }
-
     @media (max-width: 768px) {
       .navbar {
         flex-direction: column;
@@ -126,9 +159,9 @@
       }
       .logo {
         width: 100px;
+        height: 100px;
       }
     }
-
     @media screen and (max-width: 480px) {
       .typing {
         font-size: 0.9em;
