@@ -8,15 +8,16 @@
   
 </head>
 <style>
-
 .export-buttons {
   display: flex;
-  gap: 10px; 
+  flex-wrap: wrap; 
+  gap: 10px;
   margin-top: 10px;
 }
 
 .export-buttons button {
-  flex: 1; 
+  flex: 1 1 45%; 
+  min-width: 120px;
   height: 45px;
   font-size: 1rem;
   font-weight: bold;
@@ -25,6 +26,10 @@
   color: white;
   cursor: pointer;
   transition: 0.3s;
+  white-space: normal;     
+  word-break: break-word;   
+  padding: 5px 10px;
+  text-align: center;
 }
 
 .btn-primary {
@@ -37,6 +42,13 @@
 
 .export-buttons button:hover {
   filter: brightness(1.1);
+}
+
+@media (max-width: 480px) {
+  .export-buttons button {
+    font-size: 0.9rem;
+    flex: 1 1 100%; 
+  }
 }
 
 </style>
@@ -67,7 +79,6 @@
       <div class="controls">
         <input type="text" id="searchInput" placeholder="ابحث بالاسم أو التاريخ" oninput="filterAttendanceHistory()">
 
-        <label for="dateSelect">اختر التاريخ:</label>
 
         <select id="dateSelect">
           <option value="">-- تحميل التواريخ --</option>
