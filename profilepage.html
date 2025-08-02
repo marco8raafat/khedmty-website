@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>صفحة البروفايل</title>
   <link rel="icon" type="image/png" href="logoCircle1.png">
   <link rel="stylesheet" href="profileStyle.css">
@@ -13,7 +14,13 @@
   <i class="fas fa-arrow-left"></i>
 </a>
 
-</a>
+<div class="mobile-menu">
+  <i class="fas fa-bars" id="menuToggle"></i>
+  <div class="menu-items" id="menuItems">
+    <a href="index.html">الصفحة الرئيسية</a>
+    <a href="register.html">انشاء حساب جديد</a>
+  </div>
+</div>
 
   <div class="phone-frame">
     <img class="avatar-image" src="profileicon.png" alt="User Icon">
@@ -29,9 +36,22 @@
       <button id="logoutBtn">تسجيل الخروج</button>
     </div>
   </div>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="profile.js"></script>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  <script src="profile.js"></script>
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById('menuToggle');
+    const menu = document.getElementById('menuItems');
+
+    if (toggle && menu) {
+      toggle.addEventListener('click', () => {
+        menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+      });
+    }
+  });
+</script>
 </body>
 </html>

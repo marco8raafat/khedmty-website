@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تسجيل الدخول</title>
   <link rel="icon" type="image/png" href="logoCircle1.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -16,6 +17,13 @@
   <a href="index.html" class="back-icon" title="العودة للصفحة الرئيسية">
   <i class="fas fa-arrow-left"></i></a>
   
+  <div class="mobile-menu">
+  <i class="fas fa-bars" id="menuToggle"></i>
+  <div class="menu-items" id="menuItems">
+    <a href="index.html">الصفحة الرئيسية</a>
+  </div>
+</div>
+
     <label for="email">البريد الإلكتروني</label>
     <input type="email" id="email" name="email" placeholder="example@gmail.com" required>
 
@@ -31,7 +39,19 @@
  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="login.js"></script>
+<script>
 
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById('menuToggle');
+    const menu = document.getElementById('menuItems');
+
+    if (toggle && menu) {
+      toggle.addEventListener('click', () => {
+        menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+      });
+    }
+  });
+</script>
 
 </body>
 </html>
