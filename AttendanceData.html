@@ -2,8 +2,9 @@
 <html lang="ar"> 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styleAttendance.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <link rel="stylesheet" href="style attendance.css">
   <title>تسجيل الحضور </title>
 </head>
 <body>
@@ -81,10 +82,26 @@
   background-color: #f8d7da;
   color: #721c24;
 }
+.filter-team {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 200px;
+}
+.filter-team label {
+  font-size: 14px;
+}
+.filter-team select {
+  flex: 1;
+  padding: 5px;
+  font-size: 14px;
+}
+
+
 
           </style>
 
-  <nav class="navbar">
+<nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
       <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
@@ -141,6 +158,12 @@
                 <h3>لم يتم التسجيل</h3>
                 <div class="number" id="notMarkedCount">0</div>
             </div>
+            <div class="filter-team">
+                <select id="teamFilter" onchange="filterStudents()">
+                  <option value="">كل الفرق</option>
+                </select>
+              </div>
+              
         </div>
         
         <div id="loading" style="text-align:center; padding: 30px; color: #666; font-weight: bold; display: none;">
@@ -148,22 +171,19 @@
         </div>
         
         <div id="studentsContainer" class="students-container" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px;"></div>
-                </div>
-
+    </div>
+  
     <footer>
         <p>© خدمتي 2025</p>
     </footer>
 
 
-  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  
-  <!-- xlsx library for Excel export functionality -->
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
-      // Firebase Configuration
       const firebaseConfig = {
           apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
           authDomain: "edad-5odam.firebaseapp.com",
@@ -174,54 +194,67 @@
           appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
       };
 
-      // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       const database = firebase.database();
 
       let students = [];
       let attendanceData = {};
 
-      // Set today's date as default
       document.getElementById('attendanceDate').valueAsDate = new Date();
 
-      // Load students from Firebase
-      async function loadStudents() {
-          try {
-              document.getElementById('loading').style.display = 'block';
-              document.getElementById('studentsContainer').innerHTML = '';
-              
-              const studentsRef = database.ref('users');
-              const snapshot = await studentsRef.once('value');
-              
-              students = [];
-              if (snapshot.exists()) {
-                  const data = snapshot.val();
-                  
-                  Object.keys(data).forEach(key => {
-                      const student = data[key];
-                      if (!student.role || student.role === 'student' || student.role.toLowerCase() === 'student') {
-                          const studentData = {
-                              id: key,
-                              name: student.username || student.name || student.fullName || 'بدون اسم',
-                              email: student.email || '',
-                              team: student.team || student.group || 'غير محدد',
-                              phone: student.phone || ''
-                          };
-                          students.push(studentData);
-                      }
-                  });
-              }
-              
-              displayStudents();
-              document.getElementById('loading').style.display = 'none';
-              
-          } catch (error) {
-              console.error('Error loading students:', error);
-              document.getElementById('loading').innerHTML = '❌ خطأ في تحميل البيانات';
-          }
-      }
+async function loadStudents() {
+    try {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('studentsContainer').innerHTML = '';
+        
+        const studentsRef = database.ref('users');
+        const snapshot = await studentsRef.once('value');
+        
+        students = [];
 
-      // Display students in the UI
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+
+            Object.keys(data).forEach(key => {
+                const student = data[key];
+                if (!student.role || student.role === 'student' || student.role.toLowerCase() === 'student') {
+                    const studentData = {
+                        id: key,
+                        name: student.username || student.name || student.fullName || 'بدون اسم',
+                        email: student.email || '',
+                        team: student.team || student.group || 'غير محدد',
+                        phone: student.phone || ''
+                    };
+                    students.push(studentData);
+                }
+            });
+
+            const teamsSet = new Set();
+            students.forEach(student => {
+                if (student.team) {
+                    teamsSet.add(student.team);
+                }
+            });
+
+            const teamFilter = document.getElementById('teamFilter');
+            teamFilter.innerHTML = `<option value="">كل الفرق</option>`;
+            teamsSet.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team;
+                option.textContent = team;
+                teamFilter.appendChild(option);
+            });
+        }
+
+        displayStudents();
+        document.getElementById('loading').style.display = 'none';
+        
+    } catch (error) {
+        console.error('Error loading students:', error);
+        document.getElementById('loading').innerHTML = '❌ خطأ في تحميل البيانات';
+    }
+}
+
       function displayStudents() {
           const container = document.getElementById('studentsContainer');
           container.innerHTML = '';
@@ -259,7 +292,6 @@
           updateStats();
       }
 
-      // Mark attendance for a student
       function markAttendance(studentId, status) {
           attendanceData[studentId] = status;
           
@@ -280,7 +312,6 @@
           updateStats();
       }
 
-      // Update statistics
       function updateStats() {
           const totalStudents = students.length;
           const presentCount = Object.values(attendanceData).filter(status => status === 'present').length;
@@ -293,24 +324,27 @@
           document.getElementById('notMarkedCount').textContent = notMarkedCount;
       }
 
-      // Filter students based on search
       function filterStudents() {
-          const searchText = document.getElementById('searchInput').value.toLowerCase();
-          const studentCards = document.querySelectorAll('.student-card');
-          
-          studentCards.forEach(card => {
-              const studentName = card.querySelector('h4').textContent.toLowerCase();
-              const studentDetails = card.querySelector('p').textContent.toLowerCase();
-              
-              if (studentName.includes(searchText) || studentDetails.includes(searchText)) {
-                  card.style.display = 'flex';
-              } else {
-                  card.style.display = 'none';
-              }
-          });
-      }
+  const searchText = document.getElementById('searchInput').value.toLowerCase();
+  const selectedTeam = document.getElementById('teamFilter').value;
+  const studentCards = document.querySelectorAll('.student-card');
 
-      // Save attendance to Firebase
+  studentCards.forEach(card => {
+    const studentName = card.querySelector('h4').textContent.toLowerCase();
+    const studentDetails = card.querySelector('p').textContent.toLowerCase();
+
+    const matchesSearch = studentName.includes(searchText) || studentDetails.includes(searchText);
+    const matchesTeam = selectedTeam === "" || studentDetails.includes(selectedTeam.toLowerCase());
+
+    if (matchesSearch && matchesTeam) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+
       async function saveAttendance() {
           try {
               const selectedDate = document.getElementById('attendanceDate').value;
@@ -342,7 +376,11 @@
 
               await Promise.all(promises);
               
-              showMessage("success");
+              const successMsg = document.getElementById('successMessage');
+              successMsg.style.display = 'block';
+              setTimeout(() => {
+                  successMsg.style.display = 'none';
+              }, 3000);
 
               attendanceData = {};
               
@@ -354,41 +392,38 @@
 
           } catch (error) {
               console.error('Error saving attendance:', error);
-              showMessage("error");
+              const errorMsg = document.getElementById('errorMessage');
+              errorMsg.style.display = 'block';
+              setTimeout(() => {
+                  errorMsg.style.display = 'none';
+              }, 3000);
           }
       }
 
-      // Print report function
       function printReport() {
           if (students.length === 0) {
               alert('لا توجد بيانات للطباعة');
               return;
           }
 
-          // Add print date info
           const selectedDate = document.getElementById('attendanceDate').value;
           const today = new Date();
           const dateStr = selectedDate || today.toLocaleDateString('ar-EG');
           
-          // Create a temporary div for print date
           const printDateDiv = document.createElement('div');
           printDateDiv.className = 'print-date';
           printDateDiv.innerHTML = `<strong>تاريخ التقرير: ${dateStr}</strong><br><strong>تاريخ الطباعة: ${today.toLocaleDateString('ar-EG')} - ${today.toLocaleTimeString('ar-EG')}</strong>`;
           
-          // Insert after header
           const header = document.querySelector('.header');
           header.parentNode.insertBefore(printDateDiv, header.nextSibling);
           
-          // Hide elements that shouldn't be printed
           const hideElements = document.querySelectorAll('.search-box input');
           hideElements.forEach(el => {
               el.style.display = 'none';
           });
 
-          // Trigger print
           window.print();
           
-          // Clean up after print
           setTimeout(() => {
               printDateDiv.remove();
               hideElements.forEach(el => {
@@ -397,7 +432,6 @@
           }, 1000);
       }
 
-      // Export to Excel function
       function exportToExcel() {
           if (students.length === 0) {
               alert('لا توجد بيانات للتصدير');
@@ -408,7 +442,6 @@
           const today = new Date();
           const dateStr = selectedDate || today.toISOString().split('T')[0];
           
-          // Prepare data for Excel
           const excelData = students.map((student, index) => {
               const status = attendanceData[student.id] || 'لم يتم التسجيل';
               const statusText = status === 'present' ? 'حاضر' : 
@@ -424,7 +457,6 @@
               };
           });
 
-          // Create summary data
           const totalStudents = students.length;
           const presentCount = Object.values(attendanceData).filter(status => status === 'present').length;
           const absentCount = Object.values(attendanceData).filter(status => status === 'absent').length;
@@ -441,25 +473,20 @@
           // Create workbook
           const wb = XLSX.utils.book_new();
           
-          // Create attendance sheet
           const ws1 = XLSX.utils.json_to_sheet(excelData);
           XLSX.utils.book_append_sheet(wb, ws1, 'تقرير الحضور');
           
-          // Create summary sheet
           const ws2 = XLSX.utils.json_to_sheet(summaryData);
           XLSX.utils.book_append_sheet(wb, ws2, 'الإحصائيات');
 
-          // Save the Excel file
           XLSX.writeFile(wb, `attendance_report_${dateStr}.xlsx`);
       }
 
-      // Mobile menu toggle function
       function toggleMobileMenu() {
           const navMenu = document.getElementById('navMenu');
           navMenu.classList.toggle('active');
       }
 
-      // Logout function
       function logout() {
           if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
               localStorage.removeItem('userToken');
@@ -468,12 +495,10 @@
           }
       }
 
-      // Load students on page load
       window.onload = function() {
           loadStudents();
       };
 
-      // Close mobile menu when clicking on a link
       const navLinks = document.querySelectorAll('.nav-link');
       navLinks.forEach(link => {
           link.addEventListener('click', function() {
@@ -481,37 +506,41 @@
               navMenu.classList.remove('active');
           });
       });
-      
       function showMessage(type) {
-          const success = document.getElementById("successMessage");
-          const error = document.getElementById("errorMessage");
+  const success = document.getElementById("successMessage");
+  const error = document.getElementById("errorMessage");
 
-          success.style.display = "none";
-          error.style.display = "none";
+  success.style.display = "none";
+  error.style.display = "none";
 
-          if (type === "success") {
-              success.style.display = "block";
-              setTimeout(() => success.style.display = "none", 3000);
-          } else if (type === "error") {
-              error.style.display = "block";
-              setTimeout(() => error.style.display = "none", 3000);
-          }
-      }
+  if (type === "success") {
+    success.style.display = "block";
+    setTimeout(() => success.style.display = "none", 3000);
+  } else if (type === "error") {
+    error.style.display = "block";
+    setTimeout(() => error.style.display = "none", 3000);
+  }
+}
 
-      document.querySelector('.menu-toggle').addEventListener('click', function () {
+function saveAttendance() {
+  try {
+    showMessage("success");
+  } catch (err) {
+    showMessage("error");
+  }
+}
+document.querySelector('.menu-toggle').addEventListener('click', function () {
   document.querySelector('.nav-right').classList.toggle('show');
 });
- window.addEventListener('scroll', function () {
-    const footer = document.querySelector('footer');
-    const scrollThreshold = 200; 
-
-    if (window.scrollY > scrollThreshold) {
-      footer.classList.add('visible');
-    } else {
-      footer.classList.remove('visible');
-    }
-  });
-
+window.addEventListener('scroll', function () {
+      const footer = document.querySelector('footer');
+      const scrollThreshold = -300;
+      if (window.scrollY > scrollThreshold) {
+        footer.classList.add('visible');
+      } else {
+        footer.classList.remove('visible');
+      }
+    });
   </script>
 </div>
 </body>
