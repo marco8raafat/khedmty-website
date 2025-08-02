@@ -11,12 +11,12 @@
 
 .export-buttons {
   display: flex;
-  gap: 10px; /* مسافة بسيطة بين الزرين */
+  gap: 10px; 
   margin-top: 10px;
 }
 
 .export-buttons button {
-  flex: 1; /* كل زر ياخد نصف المساحة */
+  flex: 1; 
   height: 45px;
   font-size: 1rem;
   font-weight: bold;
@@ -42,12 +42,12 @@
 
 
 <body>
-  <nav class="navbar">
-    <div class="logo">
-      <img src="church-logo.png" alt="شعار الموقع">
+<nav class="navbar">
+    <div class="nav-left">
+      <img src="church-logo.png" alt="Church Logo" class="church-logo">
       <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
-<div class="nav-right" id="navMenu">
+    <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
       <a href="AttendanceData.html" class="nav-link">أخذ الحضور</a>
@@ -55,7 +55,6 @@
       <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
-
   <div class="container">
     <main>
       <h2>سجل الحضور</h2>
