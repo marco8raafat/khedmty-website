@@ -184,15 +184,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
-      const firebaseConfig = {
-          apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
-          authDomain: "edad-5odam.firebaseapp.com",
-          databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
-          projectId: "edad-5odam",
-          storageBucket: "edad-5odam.appspot.com",
-          messagingSenderId: "679576633778",
-          appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
-      };
+    const firebaseConfig = {
+    apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+    authDomain: "edad-5odam.firebaseapp.com",
+    databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "edad-5odam",
+    storageBucket: "edad-5odam.appspot.com",
+    messagingSenderId: "679576633778",
+    appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+  };
 
       firebase.initializeApp(firebaseConfig);
       const database = firebase.database();
@@ -278,10 +278,10 @@ async function loadStudents() {
                       </div>
                   </div>
                   <div class="attendance-buttons">
-                      <button class="attendance-btn btn-present" onclick="markAttendance('${student.id}', 'present')">
+                      <button class="attendance-btn btn-present" onclick="markAttendance(event, '${student.id}', 'present')">
                           حاضر
                       </button>
-                      <button class="attendance-btn btn-absent" onclick="markAttendance('${student.id}', 'absent')">
+                      <button class="attendance-btn btn-absent" onclick="markAttendance(event, '${student.id}', 'absent')">
                           غائب
                       </button>
                   </div>
@@ -292,7 +292,7 @@ async function loadStudents() {
           updateStats();
       }
 
-      function markAttendance(studentId, status) {
+      function markAttendance(event, studentId, status) {
           attendanceData[studentId] = status;
           
           const studentCard = event.target.closest('.student-card');
@@ -522,13 +522,6 @@ async function loadStudents() {
   }
 }
 
-function saveAttendance() {
-  try {
-    showMessage("success");
-  } catch (err) {
-    showMessage("error");
-  }
-}
 document.querySelector('.menu-toggle').addEventListener('click', function () {
   document.querySelector('.nav-right').classList.toggle('show');
 });
