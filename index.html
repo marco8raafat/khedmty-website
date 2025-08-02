@@ -7,6 +7,141 @@
   <title>خدمتي - الصفحة الرئيسية</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="botStyle.css">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+    }
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 2s ease-in forwards;
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+    .scroll-top-btn {
+      position: fixed;
+      bottom: 25px;
+      left: 25px;
+      padding: 12px 16px;
+      background-color: #233B6E;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    .animate-slide-up {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: slideUp 1s ease-out forwards;
+    }
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .logo:hover {
+      transform: rotate(360deg);
+      transition: transform 1s ease-in-out;
+    }
+    .tagline {
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px #fff, 0 0 10px #233B6E;
+      }
+      to {
+        text-shadow: 0 0 10px #fff, 0 0 20px #233B6E;
+      }
+    }
+    .nav-link:hover {
+      color: #FFD700;
+      transform: scale(1.1);
+      transition: all 0.3s ease;
+    }
+    .typing {
+      width: 0;
+      overflow: hidden;
+      border-right: .15em solid #233B6E;
+      white-space: nowrap;
+      animation: typing 4s steps(40, end) forwards, blink .75s step-end infinite;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+    section {
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    section:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    }
+
+    /* Responsive styles */
+    @media (max-width: 1024px) {
+      header h1 {
+        font-size: 2em;
+      }
+      .logo {
+        width: 140px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .nav-left, .nav-right {
+        width: 100%;
+        text-align: right;
+        padding: 10px;
+      }
+      .nav-link {
+        display: block;
+        padding: 10px 0;
+      }
+      header h1 {
+        font-size: 1.6em;
+      }
+      .typing {
+        font-size: 1em;
+      }
+      section {
+        padding: 15px;
+      }
+      .logo {
+        width: 100px;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .typing {
+        font-size: 0.9em;
+      }
+      header h1, .tagline {
+        font-size: 1em;
+        text-align: center;
+      }
+      footer p {
+        font-size: 0.8em;
+      }
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -21,47 +156,46 @@
     </div>
   </nav>
 
-  <header>
+  <header class="fade-in">
     <img src="logo.png" alt="شعار خدمتي" class="logo">
     <h1>خدمتي</h1>
     <p class="tagline">معًا نخدم المسيح في كنيسته</p>
+    <p class="typing"></p>
   </header>
 
   <main>
-    <section class="intro">
+    <section class="intro animate-slide-up">
       <h2>عن البرنامج</h2>
       <p>
         "خدمتي"  هو تطبيق من إعداد أسرة البابا أثناسيوس الرسولي لإعداد الخدام بكنيسة السيدة العذراء مريم - عزبة النخل
- يهدف إلى مساعدة الخادم في تنظيم خدمته مع تسهيل التواصل والتفاعل بين الخدام و المخدومين.
+        يهدف إلى مساعدة الخادم في تنظيم خدمته مع تسهيل التواصل والتفاعل بين الخدام و المخدومين.
       </p>
     </section>
 
-    <section class="about-church">
+    <section class="about-church animate-slide-up">
       <h2>عن الكنيسة</h2>
       <p>
-       كنيسة السيدة العذراء مريم - عزبة النخل .. هي كنيسة أرثوذكسية عريقة تخدم آلاف الأسر في منطقة عزبة النخل على مدار أكثر من 75 عاما ً حيث تقدم خدمات روحية واجتماعية وتعليمية لكل الأعمار و تركز الكنيسة على تربية أجيال قوية في الإيمان  مع الإستعانة بالتكنولوجيا كوسيلة لتسهيل الخدمة وتقويتها
+        كنيسة السيدة العذراء مريم - عزبة النخل .. هي كنيسة أرثوذكسية عريقة تخدم آلاف الأسر في منطقة عزبة النخل على مدار أكثر من 75 عاما ً حيث تقدم خدمات روحية واجتماعية وتعليمية لكل الأعمار و تركز الكنيسة على تربية أجيال قوية في الإيمان  مع الإستعانة بالتكنولوجيا كوسيلة لتسهيل الخدمة وتقويتها
       </p>
     </section>
-
-    <section class="actions">
-      <a href="create-alert.html" class="btn">إضافة تنبيه (لخدام)</a>
-      <a href="alerts-list.html" class="btn">عرض كل التنبيهات</a>
-    </section>
   </main>
-
 
   <footer>
     <p>© كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025</p>
   </footer>
-  
+
+  <button onclick="scrollToTop()" class="scroll-top-btn">↑</button>
+
   <script>
-    // Mobile menu toggle function
     function toggleMobileMenu() {
       const navMenu = document.getElementById('navMenu');
       navMenu.classList.toggle('active');
     }
 
-    // Close mobile menu when clicking on a link
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const navLinks = document.querySelectorAll('.nav-link');
       navLinks.forEach(link => {
@@ -70,9 +204,12 @@
           navMenu.classList.remove('active');
         });
       });
+
+      const el = document.querySelector(".typing");
+      el.textContent = "مرحبًا بك في تطبيق خدمتي ✨";
     });
   </script>
-  
+
   <script src="index.js"></script>
 </body>
 </html>
