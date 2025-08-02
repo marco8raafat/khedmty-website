@@ -1,3 +1,8 @@
+/* إعدادات عامة */
+:root {
+  --primary: #233B6E;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -17,6 +22,7 @@ body {
   background-attachment: fixed;
   background-position: center;
   font-family: 'Arial', sans-serif;
+  overflow-x: hidden;
 }
 
 /* إطار الهاتف */
@@ -96,82 +102,60 @@ h2 {
   transition: 0.3s ease;
 }
 
-/* زر التوجّل للموبايل */
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: #233B6E;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  z-index: 1000;
-  position: absolute;
-  left: 10px;
-  top: 10px;
-}
-
-.menu-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* القائمة المنسدلة */
+/* القائمة المنسدلة (menu full-screen) */
 .menu-items {
   display: none;
   flex-direction: column;
-  background-color: #233B6E; /* الأزرق الغامق */
-  position: absolute;
+  justify-content: center;
+  align-items: center;
+  background-color: #233B6E;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  padding-top: 60px;
+  height: 100%;
   z-index: 999;
   text-align: center;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  padding-top: 100px;
 }
 
-
 .menu-items a {
-  padding: 14px 0;
+  padding: 16px 0;
   text-decoration: none;
   color: white;
-  font-size: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 20px;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .menu-items a:first-child {
   border-top: none;
 }
 
-
-.menu-items a:hover {
-  background-color: #f0f0f0;
-  border-radius: 5px;
-}
-
-/* إظهار/إخفاء حسب حجم الشاشة */
-@media (max-width: 768px) {
-  .back-icon {
-    display: none;
-  }
-
-  .menu-toggle {
+/* زر القائمة */
+.menu-toggle {
   display: block;
   background-color: white;
   border: none;
   color: #233B6E;
   font-size: 1.5rem;
   cursor: pointer;
-  padding: 8px;
+  padding: 8px 12px;
   border-radius: 10px;
-  z-index: 1000;
-  position: absolute;
-  left: 10px;
-  top: 10px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  z-index: 1001;
+  position: fixed;
+  left: 15px;
+  top: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ميديا كويري للموبايل */
+@media (max-width: 768px) {
+  .back-icon {
+    display: none;
+  }
 }
