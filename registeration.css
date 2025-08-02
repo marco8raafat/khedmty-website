@@ -118,6 +118,24 @@ body {
     font-size: 1em;
     padding: 12px;
   }
+  @media (max-width: 768px) {
+  .container label {
+    font-size: 0.95em;
+    margin: 10px 0 5px;
+  }
+
+  .container input,
+  .container .btn {
+    font-size: 1em;
+  }
+
+  .container h2 {
+    font-size: 1.5em;
+  }
+}
+.container label {
+  line-height: 1.4;
+}
 
   .back-icon {
     top: 10px;
