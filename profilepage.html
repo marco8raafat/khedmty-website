@@ -10,21 +10,9 @@
 </head>
 <body>
   
-<!-- زر الرجوع يظهر في الديسكتوب فقط -->
 <a id="backBtn" class="back-icon" title="العودة للصفحة السابقة">
   <i class="fas fa-arrow-left"></i>
 </a>
-
-<!-- زر القائمة للموبايل -->
-<button class="menu-toggle">☰</button>
-
-
-<!-- القائمة المنسدلة -->
-<div class="menu-items" id="menuItems">
-  <a href="index.html">الصفحة الرئيسية</a>
-  <a href="register.html">إنشاءحساب جديد</a>
-</div>
-
 
   <div class="phone-frame">
     <img class="avatar-image" src="profileicon.png" alt="User Icon">
@@ -43,15 +31,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script src="profile.js"></script>
-
-<script>
-  const toggleBtn = document.querySelector('.menu-toggle');
-  const menu = document.querySelector('.menu-items');
-
-  toggleBtn.addEventListener('click', () => {
-    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-  });
-</script>
 
 </body>
 </html>

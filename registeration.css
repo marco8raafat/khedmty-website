@@ -79,7 +79,7 @@ body {
 .container .btn {
   margin-top: 25px;
   padding: 12px;
-  background-color: #2c3e50;
+  background-color: #233B6E;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -89,8 +89,8 @@ body {
 }
 
 .container .btn:hover {
-  background-color: #1a242f;
-}
+transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);}
 
 /* Back arrow */
 .back-icon {
@@ -139,5 +139,76 @@ body {
     flex-direction: column;
     gap: 10px;
     font-size: 0.9em;
+  }
+}
+.phone-frame {
+  width: 90%;
+  max-width: 450px;
+  background-color: #ffffffdd;
+  border-radius: 16px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
+  text-align: center;
+}
+
+.phone-frame h2 {
+  margin-bottom: 25px;
+  color: #233B6E;
+  font-size: 1.8em;
+}
+#editForm input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+#editForm input:disabled {
+  background-color: #eee;
+  color: #888;
+}
+
+#editForm button[type="submit"],
+.phone-frame button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  font-size: 1.1em;
+  background: linear-gradient(to right, #233B6E, #314d9f);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  box-sizing: border-box;
+}
+
+#editForm button[type="submit"]:hover,
+.phone-frame button:hover {
+  background-color: #1a2d59;
+}
+@media (max-width: 768px) {
+  .phone-frame {
+    padding: 25px 20px;
+  }
+
+  .phone-frame h2 {
+    font-size: 1.5em;
+  }
+
+  #editForm input {
+    padding: 12px;
+    font-size: 0.95em;
+  }
+
+  #editForm button[type="submit"],
+  .phone-frame button {
+    padding: 12px;
+    font-size: 1em;
   }
 }
