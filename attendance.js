@@ -168,7 +168,6 @@ const formattedDate = new Date(selectedDate).toLocaleDateString("ar-EG", {
   weekday: 'long'
 });
 
-// رأس الجدول مع التاريخ
 let csvContent = `"${RLM}الاسم","${RLM}المجموعة","${RLM}الحالة","${RLM}التاريخ"\n`;
 
 const rows = table.querySelectorAll("tbody tr");
@@ -197,4 +196,12 @@ link.click();
 document.body.removeChild(link);
 }
 
+ window.onscroll = function () {
+    const footer = document.querySelector("footer");
+    if (window.scrollY > 50) {
+      footer.style.display = "block";
+    } else {
+      footer.style.display = "none";
+    }
+  };
 
