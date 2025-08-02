@@ -14,14 +14,19 @@
   <form  id="loginForm" class="container">
 
     <h2>تسجيل الدخول</h2>
-  <a href="index.html" class="back-icon" title="العودة للصفحة الرئيسية">
-  <i class="fas fa-arrow-left"></i></a>
-  
-  <div class="mobile-menu">
-  <i class="fas fa-bars" id="menuToggle"></i>
-  <div class="menu-items" id="menuItems">
-    <a href="index.html">الصفحة الرئيسية</a>
-  </div>
+<!-- زر الرجوع يظهر في الديسكتوب فقط -->
+<a id="backBtn" class="back-icon" title="العودة للصفحة السابقة">
+  <i class="fas fa-arrow-left"></i>
+</a>
+
+<!-- زر القائمة للموبايل -->
+<button class="menu-toggle" id="menuToggle" title="قائمة">
+  <i class="fas fa-bars"></i>
+</button>
+
+<!-- القائمة المنسدلة -->
+<div class="menu-items" id="menuItems">
+  <a href="index.html">الصفحة الرئيسية</a>
 </div>
 
     <label for="email">البريد الإلكتروني</label>
@@ -40,16 +45,22 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="login.js"></script>
 <script>
-
+  // toggle للقائمة في الموبايل
   document.addEventListener("DOMContentLoaded", function () {
-    const toggle = document.getElementById('menuToggle');
-    const menu = document.getElementById('menuItems');
+    const menuToggle = document.getElementById("menuToggle");
+    const menuItems = document.getElementById("menuItems");
 
-    if (toggle && menu) {
-      toggle.addEventListener('click', () => {
-        menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
-      });
-    }
+    menuToggle.addEventListener("click", () => {
+      // toggle العرض
+      menuItems.style.display = (menuItems.style.display === "flex") ? "none" : "flex";
+    });
+
+    // إخفاء القائمة لما المستخدم يضغط خارجها
+    window.addEventListener("click", function (e) {
+      if (!menuItems.contains(e.target) && !menuToggle.contains(e.target)) {
+        menuItems.style.display = "none";
+      }
+    });
   });
 </script>
 

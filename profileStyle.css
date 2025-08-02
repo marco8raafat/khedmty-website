@@ -1,87 +1,94 @@
- * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Cairo', sans-serif;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Cairo', sans-serif;
+}
 
-    body {
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-image: url('knesa.jpg'); /* Change path to your image */
-      background-size: cover;        /* Make image cover the whole page */
-      background-repeat: no-repeat;  /* Prevent repeating */
-      background-attachment: fixed;  /* Keeps background fixed when scrolling */
-      background-position: center;   /* Center the image */
-      font-family: 'Arial', sans-serif;
-    }
+body {
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url('knesa.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  font-family: 'Arial', sans-serif;
+}
 
-    .phone-frame {
-      width: 360px;
-      height: 640px;
-      background: #fff;
-      border-radius: 30px;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+/* إطار الهاتف */
+.phone-frame {
+  width: 360px;
+  height: 640px;
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    .avatar-image {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 20px;
-      background-color: #eee;
-    }
+/* صورة البروفايل */
+.avatar-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  background-color: #eee;
+}
 
-    h2 {
-      font-size: 24px;
-      color: #333;
-      margin-bottom: 16px;
-      text-align: center;
-    }
+/* الاسم */
+h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 16px;
+  text-align: center;
+}
 
-    .info-line {
-      font-size: 18px;
-      color: #444;
-      margin: 10px 0;
-      width: 100%;
-      text-align: center;
-    }
+/* بيانات المستخدم */
+.info-line {
+  font-size: 18px;
+  color: #444;
+  margin: 10px 0;
+  width: 100%;
+  text-align: center;
+}
 
-    .profile-buttons {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-    }
+/* أزرار البروفايل */
+.profile-buttons {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
 
-    .profile-buttons button {
-      background: #233B6E;
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 15px;
-      margin: 10px 0;
-      cursor: pointer;
-      font-size: 18px;
-      transition: background 0.3s ease;
-    }
+.profile-buttons button {
+  background: #233B6E;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 15px;
+  margin: 10px 0;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.3s ease;
+}
 
-    .profile-buttons button:hover {
-      background: #0056b3;
-    }
+.profile-buttons button:hover {
+  background: #0056b3;
+}
+
+/* زر الرجوع */
 .back-icon {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 10px;
+  left: 10px;
   font-size: 1.8em;
   color: #233B6E;
   text-decoration: none;
@@ -89,15 +96,32 @@
   transition: 0.3s ease;
 }
 
-.back-icon:hover {
-  color: #1a2d59;
-  transform: scale(1.2);
+/* زر التوجّل للموبايل */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #233B6E;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  z-index: 1000;
+  position: absolute;
+  left: 10px;
+  top: 10px;
 }
-/* إخفاء القائمة الافتراضي */
+
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* القائمة المنسدلة */
 .menu-items {
   display: none;
   flex-direction: column;
-  background-color: #fff;
+  background-color: white;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
   position: absolute;
   top: 50px;
@@ -119,20 +143,13 @@
   border-radius: 5px;
 }
 
-/* الأيقونة نفسها */
-#menuToggle {
-  font-size: 24px;
-  cursor: pointer;
-  display: none; /* هتظهر بس في الموبايل */
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 1000;
-}
-
-/* إظهار التوجّل في الشاشات الصغيرة */
+/* إظهار/إخفاء حسب حجم الشاشة */
 @media (max-width: 768px) {
-  #menuToggle {
+  .back-icon {
+    display: none;
+  }
+
+  .menu-toggle {
     display: block;
   }
 }
