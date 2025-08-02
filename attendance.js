@@ -168,7 +168,6 @@ const formattedDate = new Date(selectedDate).toLocaleDateString("ar-EG", {
   weekday: 'long'
 });
 
-// رأس الجدول مع التاريخ
 let csvContent = `"${RLM}الاسم","${RLM}المجموعة","${RLM}الحالة","${RLM}التاريخ"\n`;
 
 const rows = table.querySelectorAll("tbody tr");
@@ -196,3 +195,16 @@ document.body.appendChild(link);
 link.click();
 document.body.removeChild(link);
 }
+
+  window.addEventListener('scroll', function () {
+      const footer = document.querySelector('footer');
+      const scrollThreshold = 0;
+      if (window.scrollY > scrollThreshold) {
+        footer.classList.add('visible');
+      } else {
+        footer.classList.remove('visible');
+      }
+    });
+
+
+
