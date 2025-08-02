@@ -33,113 +33,97 @@ body::before {
   z-index: -1;
 }
 
-/* Navbar */
+
 .navbar {
-  background: var(--primary);
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.nav-left {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  border-radius: 0 0 16px 16px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  flex-wrap: wrap;
 }
 
-.logo img {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+.church-logo {
+  height: 60px;
+  border-radius: 8px;
+  background: white;
+  padding: 5px;
 }
+
 
 .menu-toggle {
   display: none;
   background: none;
   border: none;
-  font-size: 24px;
   color: white;
+  font-size: 1.8rem;
   cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  width: auto;
+  height: auto;
+  margin-right: auto; 
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .nav-right {
   display: flex;
   gap: 15px;
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .nav-link {
   color: white;
   text-decoration: none;
-  font-weight: bold;
-  padding: 8px 14px;
-  border-radius: 8px;
-  transition: 0.3s;
+  padding: 8px 12px;
+  border-radius: 6px;
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* الوضع العادي (شاشات كبيرة) */
-.nav-right {
-  display: flex;
-  gap: 20px;
-}
 
-/* زر التبديل لا يظهر في الشاشات الكبيرة */
-.menu-toggle {
-  display: none;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  .nav-left {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
   .menu-toggle {
-    display: block; /* يظهر الزر */
+    display: block;
   }
 
   .nav-right {
-    display: none; /* تخفي القائمة */
     flex-direction: column;
+    align-items: center;
     width: 100%;
-    background: var(--primary);
-    border-radius: 0 0 12px 12px;
-    margin-top: 10px;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
   }
 
-  .nav-right.show {
-    display: flex; /* تظهر عند الضغط */
+  .nav-right.active {
+    max-height: 500px;
   }
 
   .nav-link {
+    padding: 12px;
     width: 100%;
     text-align: center;
-    padding: 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0;
-  }
-
-  .nav-link:last-child {
-    border-bottom: none;
   }
 }
 
-/* Container */
+
+
 .container,
 .attendance-container {
   background-color: rgba(0, 0, 0, 0.4);
@@ -151,7 +135,7 @@ body::before {
   box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
-/* Header */
+
 h2 {
   text-align: center;
   font-size: 2rem;
@@ -160,7 +144,7 @@ h2 {
   margin-bottom: 30px;
 }
 
-/* Forms */
+
 label {
   font-weight: bold;
   display: block;
@@ -201,7 +185,6 @@ button:hover {
   transform: scale(1.05);
 }
 
-/* Stats */
 .stats {
   display: flex;
   flex-wrap: wrap;
@@ -231,7 +214,7 @@ button:hover {
   font-weight: bold;
 }
 
-/* Controls */
+
 .controls {
   margin-top: 20px;
   display: flex;
@@ -255,7 +238,7 @@ button:hover {
 .btn-danger  { background: var(--error); }
 .btn-warning { background: orange; }
 
-/* Student Cards */
+
 .attendance-grid {
   margin-top: 30px;
 }
@@ -310,7 +293,7 @@ button:hover {
   background-color: var(--error);
 }
 
-/* Table */
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -349,12 +332,12 @@ th {
 
 .export-buttons {
   display: flex;
-  gap: 10px; /* مسافة بسيطة بين الزرين */
+  gap: 10px; 
   margin-top: 10px;
 }
 
 .export-buttons button {
-  flex: 1; /* كل زر ياخد نصف المساحة */
+  flex: 1; 
   height: 45px;
   font-size: 1rem;
   font-weight: bold;
@@ -377,7 +360,6 @@ th {
   filter: brightness(1.1);
 }
 
-/* حاوية الكروت */
 #studentsContainer {
   display: flex;
   flex-direction: column;
@@ -387,7 +369,6 @@ th {
   box-sizing: border-box;
 }
 
-/* تصميم كل كرت */
 .student-card {
   position: relative;
   background-color: #f5f7fa;
@@ -402,7 +383,6 @@ th {
   box-sizing: border-box;
 }
 
-/* أول حرف */
 .initial {
   position: absolute;
   top: 8px;
@@ -419,7 +399,6 @@ th {
   justify-content: center;
 }
 
-/* أول حرف */
 .student-avatar {
   position: absolute;
   top: 12px;
@@ -436,7 +415,6 @@ th {
   font-size: 18px;
 }
 
-/* بيانات الطالب */
 .student-details {
   margin-top: 40px;
 }
@@ -454,7 +432,6 @@ th {
   word-wrap: break-word;
 }
 
-/* أزرار الحضور */
 .attendance-buttons {
   display: flex;
   justify-content: space-between;
