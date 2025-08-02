@@ -51,20 +51,24 @@
       width: 180px;
       height: 180px;
       border-radius: 50%;
+      border: 5px solid #233B6E;
       transition: transform 1s ease-in-out;
     }
     .logo:hover {
       transform: rotate(360deg);
     }
     .tagline {
-      animation: glow 2s infinite alternate;
+      animation: strongGlow 2s infinite alternate;
+      font-weight: bold;
+      color: black;
+      text-shadow: 0 0 10px #00eeff, 0 0 20px #233B6E, 0 0 25px #FFD700;
     }
-    @keyframes glow {
+    @keyframes strongGlow {
       from {
-        text-shadow: 0 0 5px #fff, 0 0 10px #233B6E;
+        text-shadow: 0 0 10px #FFD700, 0 0 15px #233B6E;
       }
       to {
-        text-shadow: 0 0 10px #fff, 0 0 20px #233B6E;
+        text-shadow: 0 0 20px #FFD700, 0 0 25px #233B6E;
       }
     }
     .nav-link:hover {
@@ -127,9 +131,6 @@
     }
 
     @media (max-width: 1024px) {
-      header h1 {
-        font-size: 2em;
-      }
       .logo {
         width: 140px;
         height: 140px;
@@ -149,9 +150,6 @@
         display: block;
         padding: 5px 0;
       }
-      header h1 {
-        font-size: 1.6em;
-      }
       .typing {
         font-size: 1em;
       }
@@ -167,7 +165,7 @@
       .typing {
         font-size: 0.9em;
       }
-      header h1, .tagline {
+      .tagline {
         font-size: 1em;
         text-align: center;
       }
@@ -192,7 +190,6 @@
 
   <header class="fade-in">
     <img src="logo.png" alt="شعار خدمتي" class="logo">
-    <h1>خدمتي</h1>
     <p class="tagline">معًا نخدم المسيح في كنيسته</p>
     <p class="typing"></p>
   </header>
