@@ -196,12 +196,12 @@ link.click();
 document.body.removeChild(link);
 }
 
- window.onscroll = function () {
-    const footer = document.querySelector("footer");
-    if (window.scrollY > 50) {
-      footer.style.display = "block";
-    } else {
-      footer.style.display = "none";
-    }
-  };
-
+  window.addEventListener('scroll', function () {
+      const footer = document.querySelector('footer');
+      const scrollThreshold = 300;
+      if (window.scrollY > scrollThreshold) {
+        footer.classList.add('visible');
+      } else {
+        footer.classList.remove('visible');
+      }
+    });
