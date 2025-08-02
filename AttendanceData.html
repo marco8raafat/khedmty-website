@@ -86,7 +86,9 @@
   align-items: center;
   gap: 5px;
   flex: 1 1 200px;
+  margin-top: 20px; 
 }
+
 .filter-team label {
   font-size: 14px;
 }
@@ -157,14 +159,13 @@
                 <h3>لم يتم التسجيل</h3>
                 <div class="number" id="notMarkedCount">0</div>
             </div>
-            <div class="filter-team">
+        </div>
+          <div class="filter-team">
                 <select id="teamFilter" onchange="filterStudents()">
                   <option value="">كل المجموعات</option>
                 </select>
               </div>
               
-        </div>
-        
         <div id="loading" style="text-align:center; padding: 30px; color: #666; font-weight: bold; display: none;">
             ⏳ جاري تحميل بيانات الطلاب...
         </div>
