@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" href="logoCircle1.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="registeration.css">
+  <script src="js/login.js"></script>
 
 </head>
 <body>
@@ -14,21 +15,9 @@
   <form  id="loginForm" class="container">
 
     <h2>تسجيل الدخول</h2>
-<!-- زر الرجوع يظهر في الديسكتوب فقط -->
-<a id="backBtn" class="back-icon" title="العودة للصفحة السابقة">
-  <i class="fas fa-arrow-left"></i>
-</a>
-
-<!-- زر القائمة للموبايل -->
-<button class="menu-toggle" id="menuToggle" title="قائمة">
-  <i class="fas fa-bars"></i>
-</button>
-
-<!-- القائمة المنسدلة -->
-<div class="menu-items" id="menuItems">
-  <a href="index.html">الصفحة الرئيسية</a>
-</div>
-
+  <a href="index.html" class="back-icon" title="العودة للصفحة الرئيسية">
+  <i class="fas fa-arrow-left"></i></a>
+  
     <label for="email">البريد الإلكتروني</label>
     <input type="email" id="email" name="email" placeholder="example@gmail.com" required>
 
@@ -41,28 +30,7 @@
       لا تملك حساب؟ <a href="register.html" style="color: #007BFF; text-decoration: none;">إنشاء حساب</a>
     </p>
   </form>
- <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  <script src="login.js"></script>
-<script>
-  // toggle للقائمة في الموبايل
-  document.addEventListener("DOMContentLoaded", function () {
-    const menuToggle = document.getElementById("menuToggle");
-    const menuItems = document.getElementById("menuItems");
-
-    menuToggle.addEventListener("click", () => {
-      // toggle العرض
-      menuItems.style.display = (menuItems.style.display === "flex") ? "none" : "flex";
-    });
-
-    // إخفاء القائمة لما المستخدم يضغط خارجها
-    window.addEventListener("click", function (e) {
-      if (!menuItems.contains(e.target) && !menuToggle.contains(e.target)) {
-        menuItems.style.display = "none";
-      }
-    });
-  });
-</script>
+<script src="login.js"></script>
 
 </body>
 </html>

@@ -9,26 +9,15 @@
   <link rel="stylesheet" href="registeration.css">
 </head>
 <body>
-  <form id="registerForm" class="container">
+<form id="registerForm" class="container">
     <h2>تسجيل حساب جديد</h2>
-<!-- زر الرجوع يظهر في الديسكتوب فقط -->
-<a id="backBtn" class="back-icon" title="العودة للصفحة السابقة">
-  <i class="fas fa-arrow-left"></i>
-</a>
+    <a href="index.html" class="back-icon" title="العودة للصفحة الرئيسية">
+      <i class="fas fa-arrow-left"></i>
+    </a>
 
-<!-- زر القائمة للموبايل -->
-<button class="menu-toggle" id="menuToggle" title="قائمة">
-  <i class="fas fa-bars"></i>
-</button>
-
-<!-- القائمة المنسدلة -->
-<div class="menu-items" id="menuItems">
-  <a href="index.html">الصفحة الرئيسية</a>
-</div>
-
-    <label for="username">الاسم الرباعي</label><br>
+    <label for="username">الاسم الرباعي</label>
     <input type="text" id="username" name="username" placeholder="الاسم رباعي باللغة العربية" required>
-    <div id="error" class="error"></div><br>
+
     <label for="email">البريد الإلكتروني</label>
     <input type="email" id="email" name="email" placeholder="example@gmail.com" required>
 
@@ -50,31 +39,7 @@
     <button type="submit" class="btn">تسجيل</button>
   </form>
 
-  <!-- ✅ Firebase SDK scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
-  <!-- ✅ Your script -->
   <script src="register.js"></script>
-  <script>
-  // toggle للقائمة في الموبايل
-  document.addEventListener("DOMContentLoaded", function () {
-    const menuToggle = document.getElementById("menuToggle");
-    const menuItems = document.getElementById("menuItems");
-
-    menuToggle.addEventListener("click", () => {
-      // toggle العرض
-      menuItems.style.display = (menuItems.style.display === "flex") ? "none" : "flex";
-    });
-
-    // إخفاء القائمة لما المستخدم يضغط خارجها
-    window.addEventListener("click", function (e) {
-      if (!menuItems.contains(e.target) && !menuToggle.contains(e.target)) {
-        menuItems.style.display = "none";
-      }
-    });
-  });
-</script>
-
 </body>
+
 </html>

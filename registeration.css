@@ -1,19 +1,21 @@
-/* ==================== الأساسيات ==================== */
+/* القاعدة الأساسية للصفحة */
 body {
   background: #eaf1ff;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-image: url('knesa.jpg'); /* Change path to your image */
+  min-height: 100vh;
+  background-image: url('knesa.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center;
   font-family: 'Arial', sans-serif;
+  padding: 20px;
+  direction: rtl;
 }
 
-/* ==================== زر الرجوع ==================== */
+/* زر الرجوع */
 .back-icon {
   position: absolute;
   top: 20px;
@@ -30,12 +32,12 @@ body {
   transform: scale(1.2);
 }
 
-/* ==================== الحاوية الرئيسية ==================== */
+/* شكل الفورم */
 .container {
-  width: 90%;
-  max-width: 1000px;
-  margin: 50px auto;
-  padding: 50px;
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 30px;
   background-color: #ffffff;
   border-radius: 16px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -43,6 +45,7 @@ body {
   flex-direction: column;
 }
 
+/* العناوين */
 .container h2 {
   text-align: center;
   color: #233B6E;
@@ -50,12 +53,14 @@ body {
   font-size: 2em;
 }
 
+/* العناوين + النصوص */
 .container label {
   margin: 15px 0 5px;
   font-weight: bold;
   font-size: 1.1em;
 }
 
+/* الحقول */
 .container input[type="text"],
 .container input[type="email"],
 .container input[type="password"],
@@ -68,13 +73,16 @@ body {
   width: 100%;
 }
 
-.container .role-options {
+/* اختيار الدور */
+.role-options {
   margin-top: 10px;
   display: flex;
-  gap: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
   font-size: 1.05em;
 }
 
+/* زر التسجيل */
 .container .btn {
   margin-top: 30px;
   padding: 16px;
@@ -92,159 +100,33 @@ body {
   background: #1a2d59;
 }
 
-/* ==================== إطار الهاتف (اختياري) ==================== */
-.phone-frame {
-  width: 90%;
-  max-width: 450px;
-  background-color: #ffffffdd;
-  border-radius: 16px;
-  padding: 40px 30px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(5px);
-  text-align: center;
-}
-
-.phone-frame h2 {
-  margin-bottom: 25px;
-  color: #233B6E;
-  font-size: 1.8em;
-}
-
-#editForm input {
-  width: 100%;
-  padding: 14px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  background-color: #f4f4f4;
-  font-size: 1em;
-}
-
-#editForm input:disabled {
-  background-color: #eee;
-  color: #888;
-}
-
-#editForm button[type="submit"],
-.phone-frame button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 10px;
-  font-size: 1.1em;
-  background: linear-gradient(to right, #233B6E, #314d9f);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-#editForm button[type="submit"]:hover,
-.phone-frame button:hover {
-  background-color: #1a2d59;
-}
-
-/* ==================== ⚙️ Responsive Media Query ==================== */
+/* استجابة الشاشات الصغيرة */
 @media (max-width: 768px) {
-  body {
-    padding: 20px;
-    height: auto;
-    background-attachment: scroll;
-    flex-direction: column;
-  }
-
   .container {
-    padding: 25px 20px;
-    margin: 20px auto;
-    box-shadow: none;
-    border-radius: 10px;
+    padding: 20px 15px;
   }
 
   .container h2 {
-    font-size: 1.5em;
+    font-size: 1.6em;
   }
 
   .container label {
     font-size: 1em;
   }
 
-  .container input[type="text"],
-  .container input[type="email"],
-  .container input[type="password"],
-  .container input[type="tel"] {
+  .container .btn {
     font-size: 1em;
     padding: 12px;
-  }
-
-  .container .btn {
-    font-size: 1.1em;
-    padding: 14px;
-  }
-
-  .container .role-options {
-    flex-direction: column;
-    gap: 10px;
   }
 
   .back-icon {
-    font-size: 1.4em;
     top: 10px;
     left: 10px;
+    font-size: 1.5em;
   }
 
-  .phone-frame {
-    width: 100%;
-    padding: 25px 20px;
-    border-radius: 12px;
-  }
-
-  #editForm input,
-  #editForm button[type="submit"],
-  .phone-frame button {
-    font-size: 1em;
-    padding: 12px;
-  }
-}
-/* إخفاء القائمة الافتراضي */
-.menu-items {
-  display: none;
-  flex-direction: column;
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  position: absolute;
-  top: 50px;
-  left: 10px;
-  z-index: 999;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.menu-items a {
-  padding: 8px 12px;
-  text-decoration: none;
-  color: #333;
-  font-size: 16px;
-}
-
-.menu-items a:hover {
-  background-color: #f0f0f0;
-  border-radius: 5px;
-}
-
-/* الأيقونة نفسها */
-#menuToggle {
-  font-size: 24px;
-  cursor: pointer;
-  display: none; /* هتظهر بس في الموبايل */
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 1000;
-}
-
-/* إظهار التوجّل في الشاشات الصغيرة */
-@media (max-width: 768px) {
-  #menuToggle {
-    display: block;
+  .role-options {
+    flex-direction: column;
+    gap: 10px;
   }
 }
