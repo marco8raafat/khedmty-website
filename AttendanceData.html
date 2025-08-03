@@ -98,6 +98,36 @@
   font-size: 14px;
 }
 
+#scrollToTop {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(145deg, #233B6E, #1b2e5c);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+#scrollToTop:hover {
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+
+#scrollToTop svg {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+}
 
 
           </style>
@@ -172,7 +202,8 @@
         
         <div id="studentsContainer" class="students-container" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px;"></div>
     </div>
-  
+      <button id="scrollToTop" title="إلى الأعلى">⬆</button>
+
     <footer>
         <p>© خدمتي 2025</p>
     </footer>
@@ -534,6 +565,22 @@ window.addEventListener('scroll', function () {
         footer.classList.remove('visible');
       }
     });
+    window.addEventListener('scroll', function () {
+  const scrollBtn = document.getElementById("scrollToTop");
+  if (window.scrollY > 300) {
+    scrollBtn.style.display = "block";
+  } else {
+    scrollBtn.style.display = "none";
+  }
+});
+
+document.getElementById("scrollToTop").addEventListener("click", function () {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+});
+
   </script>
 </div>
 </body>
