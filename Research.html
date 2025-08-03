@@ -2,6 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="logoCircle1.png">
   <title> الأبحاث</title>
   <style>
     :root {
@@ -155,7 +157,85 @@
     margin-top: auto;
     box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
   }
-  @media (max-width: 768px) {
+
+  /* Updated mobile breakpoint for phones like 390x844 */
+  @media (max-width: 480px) {
+    .navbar {
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    .nav-left {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .nav-left .church-logo {
+      height: 60px;
+    }
+
+    .menu-toggle {
+      display: block;
+    }
+
+    .nav-right {
+      width: 100%;
+      flex-direction: column;
+      gap: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .nav-right.active {
+      max-height: 300px;
+    }
+
+    .nav-link {
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0;
+    }
+
+    .nav-link:last-child {
+      border-bottom: none;
+    }
+
+    .pdf-list {
+      padding: 0 12px;
+    }
+
+    .content-box {
+      padding: 20px;
+      width: 98%;
+    }
+
+    h2.page-title {
+      font-size: 22px;
+    }
+
+    table {
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 8px 4px;
+    }
+
+    td input[type="number"] {
+      width: 50px;
+      padding: 3px;
+      font-size: 12px;
+    }
+  }
+
+  /* Additional breakpoint for larger phones and small tablets */
+  @media (min-width: 481px) and (max-width: 768px) {
     .navbar {
       flex-direction: column;
       padding: 10px;
@@ -206,6 +286,7 @@
       padding: 0 12px;
     }
   }
+
   html, body {
   overflow-x: auto;   
   overflow-y: auto;   
@@ -223,8 +304,9 @@
     </div>
     <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="login.html" class="nav-link">تسجيل الدخول</a>
-      <a href="register.html" class="nav-link">إنشاء حساب</a>
+      <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+      <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
 
