@@ -656,15 +656,18 @@ const container = document.querySelector('.cross-background');
 
   `;
 
-  for (let i = 0; i < 25; i++) {
-    const cross = document.createElement('div');
-    cross.className = 'cross';
-    cross.innerHTML = svgCross;
-    cross.style.left = Math.random() * 100 + 'vw';
-    cross.style.top = Math.random() * 100 + 'vh';
-    cross.style.animationDuration = (12 + Math.random() * 11) + 's';
-    container.appendChild(cross);
-  }
+ const isMobile = window.innerWidth < 768;
+const crossCount = isMobile ? 10 : 25;
+
+for (let i = 0; i < crossCount; i++) {
+  const cross = document.createElement('div');
+  cross.className = 'cross';
+  cross.innerHTML = svgCross;
+  cross.style.left = Math.random() * 100 + 'vw';
+  cross.style.top = Math.random() * 100 + 'vh';
+  cross.style.animationDuration = (12 + Math.random() * 11) + 's';
+  container.appendChild(cross);
+}
   </script>
 </div>
 </body>
