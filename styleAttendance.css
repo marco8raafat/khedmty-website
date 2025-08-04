@@ -589,23 +589,4 @@ footer.visible {
   opacity: 1;
   pointer-events: auto;
 }
-html, body {
-  height: 100%;
-}
 
-.page-wrapper {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.page-wrapper > *:not(footer) {
-  flex: 1;
-}
-
-footer {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
-}
