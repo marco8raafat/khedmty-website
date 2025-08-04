@@ -1,58 +1,35 @@
+const firebaseConfig = {
+      apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+      authDomain: "edad-5odam.firebaseapp.com",
+      databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "edad-5odam",
+      storageBucket: "edad-5odam.appspot.com",
+      messagingSenderId: "679576633778",
+      appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 document.addEventListener('DOMContentLoaded', () => {
   // Check user authentication status and update navigation
   updateNavigationBasedOnAuth();
   
   // Verify key non-bot elements
   const navLinks = document.querySelectorAll('.nav-right .nav-link');
-  const addAlertBtn = document.querySelector('.btn[href="#add-alert"]');
-  const viewAlertsBtn = document.querySelector('.btn[href="#view-alerts"]');
+
   const sections = document.querySelectorAll('section');
   const header = document.querySelector('header');
 
   // Debugging: Log element presence
   console.log('Element check:', {
     navLinks: navLinks.length,
-    addAlertBtn: !!addAlertBtn,
-    viewAlertsBtn: !!viewAlertsBtn,
+
     sections: sections.length,
     header: !!header
   });
 
 
-  // Button handling for alerts
-  if (addAlertBtn) {
-    addAlertBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      // Placeholder path (update when available)
-      const targetPage = './addAlert.html';
-      console.log('Add Alert button clicked');
-      window.location.href = targetPage;
-      // Fallback if page doesn't exist
-      if (!targetPage) {
-        alert('ميزة إضافة تنبيه غير متاحة حاليًا');
-        console.warn('Add Alert page not defined');
-      }
-    });
-  } else {
-    console.warn('Add Alert button not found');
-  }
 
-  if (viewAlertsBtn) {
-    viewAlertsBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      // Placeholder path (update when available)
-      const targetPage = './listAlerts.html';
-      console.log('View Alerts button clicked');
-      window.location.href = targetPage;
-      // Fallback if page doesn't exist
-      if (!targetPage) {
-        alert('ميزة عرض التنبيهات غير متاحة حاليًا');
-        console.warn('View Alerts page not defined');
-      }
-    });
-  } else {
-    console.warn('View Alerts button not found');
-  }
 
   // Dynamic section animations
   if (sections.length && header) {
@@ -139,31 +116,75 @@ function updateNavigationBasedOnAuth() {
   }
 
   if (currentUser) {
-    // User is logged in - show logout and hide login/register
+    // User is logged in - show dashboard, logout and hide login/register
     console.log('User is logged in:', currentUser);
     
-    // Find existing navigation links
-    const loginLink = navRight.querySelector('a[href="login.html"]');
-    const registerLink = navRight.querySelector('a[href="register.html"]');
-    
-    if (loginLink) {
-      // Replace login link with logout
-      loginLink.href = 'javascript:void(0)';
-      loginLink.textContent = 'تسجيل الخروج';
-      loginLink.onclick = function(e) {
-        e.preventDefault();
-        logout();
-      };
-    }
-    
-    if (registerLink) {
-      // Hide register link for logged in users
-      registerLink.style.display = 'none';
-    }
+    // Get user data from Firebase to determine role
+    getUserRole(currentUser).then(userRole => {
+      // Find existing navigation links
+      const loginLink = navRight.querySelector('a[href="login.html"]');
+      const registerLink = navRight.querySelector('a[href="register.html"]');
+      
+      // Check if dashboard link already exists
+      let dashboardLink = navRight.querySelector('a[data-dashboard="true"]');
+      
+      if (!dashboardLink && loginLink) {
+        // Create dashboard link before login link
+        dashboardLink = document.createElement('a');
+        dashboardLink.className = 'nav-link';
+        dashboardLink.setAttribute('data-dashboard', 'true');
+        dashboardLink.textContent = 'لوحة التحكم';
+        
+        // Set dashboard URL based on user role
+        if (userRole === 'student') {
+          dashboardLink.href = 'studentDashboard.html';
+        } else if (userRole === 'servant') {
+          dashboardLink.href = 'teacherDashboard.html';
+        } else {
+          dashboardLink.href = 'index.html'; // fallback
+        }
+        
+        // Insert dashboard link before login link
+        navRight.insertBefore(dashboardLink, loginLink);
+      }
+      
+      if (loginLink) {
+        // Replace login link with logout
+        loginLink.href = 'javascript:void(0)';
+        loginLink.textContent = 'تسجيل الخروج';
+        loginLink.onclick = function(e) {
+          e.preventDefault();
+          logout();
+        };
+      }
+      
+      if (registerLink) {
+        // Hide register link for logged in users
+        registerLink.style.display = 'none';
+      }
+    }).catch(error => {
+      console.error('Error getting user role:', error);
+      // Fallback: still show logout without dashboard
+      const loginLink = navRight.querySelector('a[href="login.html"]');
+      if (loginLink) {
+        loginLink.href = 'javascript:void(0)';
+        loginLink.textContent = 'تسجيل الخروج';
+        loginLink.onclick = function(e) {
+          e.preventDefault();
+          logout();
+        };
+      }
+    });
     
   } else {
-    // User is not logged in - show login and register links
+    // User is not logged in - show login and register links, hide dashboard
     console.log('User is not logged in');
+    
+    // Remove dashboard link
+    const dashboardLink = navRight.querySelector('a[data-dashboard="true"]');
+    if (dashboardLink) {
+      dashboardLink.remove();
+    }
     
     // Find logout link and revert to login
     const logoutLink = navRight.querySelector('a[onclick*="logout"]');
@@ -181,11 +202,43 @@ function updateNavigationBasedOnAuth() {
   }
 }
 
+// Function to get user role from Firebase
+async function getUserRole(email) {
+  // Check if Firebase is available
+  if (typeof firebase === 'undefined' || !firebase.database) {
+    console.warn('Firebase not available for role check');
+    return 'student'; // Default fallback
+  }
+  
+  try {
+    const snapshot = await firebase.database().ref("users/" + email.replace(/\./g, "_")).once('value');
+    const userData = snapshot.val();
+    
+    if (userData && userData.role) {
+      console.log('User role:', userData.role);
+      return userData.role;
+    } else {
+      console.warn('User role not found, defaulting to student');
+      return 'student'; // Default fallback
+    }
+  } catch (error) {
+    console.error('Error fetching user role:', error);
+    return 'student'; // Default fallback
+  }
+}
+
 // Logout function
 function logout() {
   if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
     sessionStorage.removeItem("currentUser");
     console.log('User logged out');
+    
+    // Remove dashboard link immediately
+    const navRight = document.querySelector('.nav-right');
+    const dashboardLink = navRight?.querySelector('a[data-dashboard="true"]');
+    if (dashboardLink) {
+      dashboardLink.remove();
+    }
     
     // Update navigation immediately
     updateNavigationBasedOnAuth();
