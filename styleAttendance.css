@@ -589,3 +589,6 @@ footer.visible {
   opacity: 1;
   pointer-events: auto;
 }
+main {
+  flex: 1; 
+}
