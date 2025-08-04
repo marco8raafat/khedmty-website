@@ -21,7 +21,6 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-   flex-direction: column;
 }
 
 body::before {
@@ -590,6 +589,13 @@ footer.visible {
   opacity: 1;
   pointer-events: auto;
 }
-main {
-  flex: 1; 
+
+html, body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto;
 }
