@@ -537,7 +537,86 @@
   © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
 </footer>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
 <script>
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+    authDomain: "edad-5odam.firebaseapp.com",
+    databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "edad-5odam",
+    storageBucket: "edad-5odam.appspot.com",
+    messagingSenderId: "679576633778",
+    appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Check authentication
+  function checkAuth() {
+    const currentUser = sessionStorage.getItem("currentUser");
+    if (!currentUser) {
+      return null;
+    }
+    
+    try {
+      return JSON.parse(currentUser);
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      sessionStorage.removeItem("currentUser");
+      return null;
+    }
+  }
+
+  // Check if user is logged in and show appropriate message
+  async function requireAuth() {
+    const currentUserEmail = sessionStorage.getItem("currentUser");
+    if (!currentUserEmail) {
+      alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    try {
+      // If it's just an email string, fetch user data from Firebase
+      if (typeof currentUserEmail === 'string' && !currentUserEmail.startsWith('{')) {
+        const emailKey = currentUserEmail.replace(/\./g, '_');
+        const snapshot = await db.ref("users/" + emailKey).once("value");
+        
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          console.log("User data from Firebase:", userData); // Debug log
+          return {
+            id: emailKey,
+            name: userData.username || userData.name || userData.fullName || userData.firstName || 'غير محدد',
+            email: currentUserEmail,
+            team: userData.team || userData.class || userData.group || userData.grade || 'غير محدد',
+            role: userData.role || 'student'
+          };
+        } else {
+          alert("خطأ في بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى");
+          sessionStorage.removeItem("currentUser");
+          window.location.href = "login.html";
+          return false;
+        }
+      } else {
+        // Try to parse as JSON if it looks like JSON
+        const userData = JSON.parse(currentUserEmail);
+        return userData;
+      }
+    } catch (error) {
+      console.error("Error getting user data:", error);
+      alert("خطأ في بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى");
+      sessionStorage.removeItem("currentUser");
+      window.location.href = "login.html";
+      return false;
+    }
+  }
+
   // Mobile menu toggle with debug
   function toggleMobileMenu() {
     console.log('Menu toggle clicked!'); // Debug log
@@ -575,17 +654,22 @@
   });
 
   // Logout function
-  function logout() {
-    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-      alert("تم تسجيل الخروج بنجاح!");
-      // Simulate logout - replace with actual logout logic
-      window.location.href = "login.html";
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        sessionStorage.removeItem("currentUser");
+        window.location.href = "index.html";
+      }
     }
-  }
 
   // Simulate form submission for demo
-  document.getElementById("researchForm").addEventListener("submit", function(e) {
+  document.getElementById("researchForm").addEventListener("submit", async function(e) {
     e.preventDefault();
+
+    // Check authentication first
+    const currentUser = await requireAuth();
+    if (!currentUser) {
+      return;
+    }
 
     const messageDiv = document.getElementById("message");
     const title = document.getElementById("researchTitle").value.trim();
@@ -602,8 +686,8 @@
     }
 
     if (!link || !link.startsWith("http")) {
-    showMessage("الرجاء إدخال رابط صحيح للبحث", "error");
-    return;
+      showMessage("الرجاء إدخال رابط صحيح للبحث", "error");
+      return;
     }
 
     // Show loading
@@ -612,19 +696,49 @@
     submitBtn.textContent = "جاري الرفع...";
     submitBtn.disabled = true;
 
-    // Simulate upload process
-    setTimeout(() => {
+    try {
+      // Create research data object
+      const researchData = {
+        studentId: currentUser.id,
+        studentName: currentUser.name,
+        studentEmail: currentUser.email,
+        team: currentUser.team || 'غير محدد',
+        researchTitle: title,
+        researchLink: link,
+        submissionDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+        submissionTime: new Date().toLocaleTimeString('ar-EG'),
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        discussionDate: '',
+        researchGrade: '',
+        discussionGrade: '',
+        totalGrade: ''
+      };
+
+      console.log("Current user data:", currentUser); // Debug log
+      console.log("Research data to save:", researchData); // Debug log
+
+      // Generate unique ID for the research
+      const researchId = db.ref('researches').push().key;
+      
+      // Save to Firebase
+      await db.ref('researches/' + researchId).set(researchData);
+
       showMessage("✅ تم تسليم البحث بنجاح", "success");
       document.getElementById("researchForm").reset();
+      
       // Reset button
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
       
-      // Simulate redirect after 2 seconds
-      setTimeout(() => {
-        alert("سيتم توجيهك إلى لوحة التحكم");
-      }, 2000);
-    }, 1500);
+
+    } catch (error) {
+      console.error("Error uploading research:", error);
+      showMessage("❌ حدث خطأ أثناء رفع البحث. حاول مرة أخرى.", "error");
+      
+      // Reset button
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
   });
 
   function showMessage(text, type) {
@@ -633,6 +747,7 @@
     messageDiv.className = type;
     messageDiv.style.display = "block";
   }
+
   const container = document.querySelector('.cross-background');
 
 const svgCross = `

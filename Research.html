@@ -148,6 +148,24 @@
       padding: 5px;
     }
 
+    td input[type="datetime-local"] {
+      width: 150px;
+      padding: 5px;
+      font-size: 12px;
+    }
+
+    table input {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    table input:focus {
+      outline: none;
+      border-color: #1c2f5c;
+      box-shadow: 0 0 3px rgba(28, 47, 92, 0.3);
+    }
+
     footer {
     background-color: var(--primary);
     color: white;
@@ -398,7 +416,7 @@
 </select>
 <input type="text" id="searchInput" placeholder="ابحث هنا..." style="width: 300px; height: 35px;" />
 
-    <table>
+    <table id="researchTable">
      <thead>
       <tr>
         <th>رقم</th>
@@ -414,6 +432,11 @@
         <th>اجمالي الدرجة</th>
       </tr>
      </thead>
+     <tbody id="researchTableBody">
+       <tr>
+         <td colspan="11" style="text-align: center; padding: 20px;">جاري تحميل البيانات...</td>
+       </tr>
+     </tbody>
     </table>
       </div>
   </div>
@@ -422,7 +445,51 @@
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
 <script>
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+  authDomain: "edad-5odam.firebaseapp.com",
+  databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "edad-5odam",
+  storageBucket: "edad-5odam.appspot.com",
+  messagingSenderId: "679576633778",
+  appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Check authentication
+function checkAuth() {
+  const currentUser = sessionStorage.getItem("currentUser");
+  if (!currentUser) {
+    alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+    window.location.href = "login.html";
+    return null;
+  }
+  
+  // Handle both string email and JSON object formats
+  try {
+    return JSON.parse(currentUser);
+  } catch (e) {
+    // If parsing fails, it's just an email string
+    return { email: currentUser };
+  }
+}
+
+// Logout function
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        sessionStorage.removeItem("currentUser");
+        window.location.href = "index.html";
+      }
+    }
+
 // Mobile menu toggle function
 function toggleMobileMenu() {
   const navMenu = document.getElementById('navMenu');
@@ -439,9 +506,102 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+// Load research data from Firebase
+async function loadResearchData() {
+  try {
+    const snapshot = await db.ref('researches').once('value');
+    const data = snapshot.val();
+    const tableBody = document.getElementById('researchTableBody');
+    
+    if (!data) {
+      tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px;">لا توجد أبحاث مسجلة</td></tr>';
+      return;
+    }
+
+    // Convert data to array and sort by timestamp (newest first)
+    const researches = Object.keys(data).map(key => ({
+      id: key,
+      ...data[key]
+    })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    // Clear loading message
+    tableBody.innerHTML = '';
+
+    // Populate table
+    researches.forEach((research, index) => {
+      const row = document.createElement('tr');
+      
+      // Format submission date
+      const submissionDate = research.submissionDate || 'غير محدد';
+      const submissionTime = research.submissionTime || 'غير محدد';
+      
+      // Create research link
+      const researchLink = research.researchLink ? 
+        `<a href="${research.researchLink}" target="_blank" style="color: #233B6E; text-decoration: underline;">عرض البحث</a>` : 
+        'غير متوفر';
+
+      // Calculate total grade if both grades are available
+      let totalGrade = research.totalGrade || '';
+      if (!totalGrade && research.researchGrade && research.discussionGrade) {
+        const researchScore = parseFloat(research.researchGrade) || 0;
+        const discussionScore = parseFloat(research.discussionGrade) || 0;
+        totalGrade = (researchScore + discussionScore).toString();
+      }
+
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${research.studentName || 'غير محدد'}</td>
+        <td>${research.team || 'غير محدد'}</td>
+        <td>${research.researchTitle || 'غير محدد'}</td>
+        <td>${submissionDate}</td>
+        <td>${submissionTime}</td>
+        <td>${researchLink}</td>
+        <td><input type="datetime-local" value="${research.discussionDate || ''}" onchange="updateResearch('${research.id}', 'discussionDate', this.value)" /></td>
+        <td><input type="number" min="0" max="100" value="${research.researchGrade || ''}" onchange="updateResearch('${research.id}', 'researchGrade', this.value)" /></td>
+        <td><input type="number" min="0" max="100" value="${research.discussionGrade || ''}" onchange="updateResearch('${research.id}', 'discussionGrade', this.value)" /></td>
+        <td style="font-weight: bold; background-color: #f0f8ff;">${totalGrade}</td>
+      `;
+      
+      tableBody.appendChild(row);
+    });
+
+  } catch (error) {
+    console.error("Error loading research data:", error);
+    document.getElementById('researchTableBody').innerHTML = 
+      '<tr><td colspan="11" style="text-align: center; padding: 20px; color: red;">حدث خطأ أثناء تحميل البيانات</td></tr>';
+  }
+}
+
+// Update research data in Firebase
+async function updateResearch(researchId, field, value) {
+  try {
+    await db.ref(`researches/${researchId}/${field}`).set(value);
+    
+    // If updating grades, recalculate total
+    if (field === 'researchGrade' || field === 'discussionGrade') {
+      const snapshot = await db.ref(`researches/${researchId}`).once('value');
+      const research = snapshot.val();
+      
+      if (research.researchGrade && research.discussionGrade) {
+        const total = (parseFloat(research.researchGrade) || 0) + (parseFloat(research.discussionGrade) || 0);
+        await db.ref(`researches/${researchId}/totalGrade`).set(total.toString());
+        
+        // Update the display
+        loadResearchData();
+      }
+    }
+    
+    console.log("Research updated successfully");
+  } catch (error) {
+    console.error("Error updating research:", error);
+    alert("حدث خطأ أثناء حفظ التعديلات");
+  }
+}
+
 const searchInput = document.getElementById("searchInput");
   const filterColumn = document.getElementById("filterColumn");
-  const table = document.getElementById("researchTable"); // تأكدي إن جدولك فيه id="researchTable"
+  const table = document.getElementById("researchTable");
 
   searchInput.addEventListener("input", function () {
     const searchValue = this.value.toLowerCase();
@@ -469,14 +629,18 @@ const searchInput = document.getElementById("searchInput");
         }
       }
 
-      rows[i].style.display = match ? "" : "none";
-    }
-  });
+    rows[i].style.display = match ? "" : "none";
+  }
+});
+
+// Initialize page when loaded
+window.onload = function() {
+  checkAuth();
+  loadResearchData();
+};
 
 
- const container = document.querySelector('.cross-background');
-
-const svgCross = `
+ const container = document.querySelector('.cross-background');const svgCross = `
 <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
      viewBox="0 0 60 60" xml:space="preserve">
   <path d="M52.247,19.665c-0.396,0-0.785,0.049-1.162,0.145c-0.403-2.214-2.347-3.897-4.675-3.897
