@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Check user authentication status and update navigation
+  updateNavigationBasedOnAuth();
+  
   // Verify key non-bot elements
   const navLinks = document.querySelectorAll('.nav-right .nav-link');
   const addAlertBtn = document.querySelector('.btn[href="#add-alert"]');
@@ -124,3 +127,70 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', handleResize);
   console.log('Initial window width:', window.innerWidth);
 });
+
+// Function to update navigation based on authentication status
+function updateNavigationBasedOnAuth() {
+  const currentUser = sessionStorage.getItem("currentUser");
+  const navRight = document.querySelector('.nav-right');
+  
+  if (!navRight) {
+    console.warn('Navigation container not found');
+    return;
+  }
+
+  if (currentUser) {
+    // User is logged in - show logout and hide login/register
+    console.log('User is logged in:', currentUser);
+    
+    // Find existing navigation links
+    const loginLink = navRight.querySelector('a[href="login.html"]');
+    const registerLink = navRight.querySelector('a[href="register.html"]');
+    
+    if (loginLink) {
+      // Replace login link with logout
+      loginLink.href = 'javascript:void(0)';
+      loginLink.textContent = 'تسجيل الخروج';
+      loginLink.onclick = function(e) {
+        e.preventDefault();
+        logout();
+      };
+    }
+    
+    if (registerLink) {
+      // Hide register link for logged in users
+      registerLink.style.display = 'none';
+    }
+    
+  } else {
+    // User is not logged in - show login and register links
+    console.log('User is not logged in');
+    
+    // Find logout link and revert to login
+    const logoutLink = navRight.querySelector('a[onclick*="logout"]');
+    if (logoutLink) {
+      logoutLink.href = 'login.html';
+      logoutLink.textContent = 'تسجيل الدخول';
+      logoutLink.onclick = null;
+    }
+    
+    // Show register link
+    const registerLink = navRight.querySelector('a[href="register.html"]');
+    if (registerLink) {
+      registerLink.style.display = '';
+    }
+  }
+}
+
+// Logout function
+function logout() {
+  if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+    sessionStorage.removeItem("currentUser");
+    console.log('User logged out');
+    
+    // Update navigation immediately
+    updateNavigationBasedOnAuth();
+    
+    // Optionally redirect to home page or refresh
+    window.location.reload();
+  }
+}
