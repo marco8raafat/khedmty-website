@@ -21,6 +21,7 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+   flex-direction: column;
 }
 
 body::before {
