@@ -13,14 +13,22 @@
   font-family: "Cairo", sans-serif;
 }
 
-body {
+html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   background: url("knesa.jpg") no-repeat center center fixed;
   background-size: cover;
   direction: rtl;
-  min-height: 100vh;
-  position: relative;
   overflow-x: hidden;
+  font-family: "Cairo", sans-serif;
+  position: relative;
 }
 
 body::before {
@@ -568,7 +576,7 @@ th {
 .attendance-btn.btn-absent {
   background-color: #E53935;
 }
-
+ِ
 .attendance-btn.active {
   outline: 3px solid #ffc107;
 }
@@ -583,6 +591,7 @@ footer {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s ease;
+  margin-top: auto;
 }
 
 footer.visible {
@@ -591,19 +600,3 @@ footer.visible {
 }
 
 
-html, body {
-  height: 100%;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-main {
-  flex: 1;
-}
-footer {
-  margin-top: auto;
-}
