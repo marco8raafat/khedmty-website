@@ -259,3 +259,5 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('load', function() {
     console.log('[PDF System] Page loaded, PDF cache system active');
   });
+
+  
