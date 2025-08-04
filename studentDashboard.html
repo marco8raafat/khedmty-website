@@ -458,27 +458,87 @@ label {
     .study-progress h3 {
       color: #233B6E;
       margin-bottom: 20px;
+      font-size: 1.3em;
     }
 
     .progress-bar {
       background: #e8f5e8;
       border-radius: 20px;
-      height: 20px;
+      height: 25px;
       margin: 20px 0;
       overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .progress-fill {
-      background: linear-gradient(45deg, #1a2d59, #233B6E);
+      background: linear-gradient(45deg, #1a2d59, #233B6E, #314d9f);
       height: 100%;
-      width: 75%;
+      width: 0%;
       border-radius: 20px;
-      transition: width 0.3s ease;
+      transition: width 0.8s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
     }
 
     .progress-text {
-      color: #666;
+      color: #233B6E;
       margin-top: 10px;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .progress-details {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      border-left: 4px solid #233B6E;
+    }
+
+    .loading-progress .progress-fill {
+      background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { background-position: -200px 0; }
+      100% { background-position: 200px 0; }
+    }
+
+    .refresh-btn {
+      background: none;
+      border: none;
+      color: #233B6E;
+      margin-left: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      color: white;
+      transform: rotate(180deg);
+    }
+
+    .refresh-btn:active {
+      transform: rotate(360deg);
     }
 
     .empty-notifications {
@@ -654,15 +714,17 @@ label {
     </div>
 
     <div class="study-progress">
-      <h3>📈 تقدمك في التعلم</h3>
+      <h3>📈 تقدمك في التعلم 
+        <button onclick="updateProgressDisplay()" class="refresh-btn" title="تحديث التقدم">🔄</button>
+      </h3>
       <div class="progress-bar">
         <div class="progress-fill"></div>
       </div>
       <div class="progress-text">
-        75% من الترم الحالي مكتمل
+        جاري حساب التقدم...
       </div>
       <p style="color: #666; margin-top: 15px;">
-        استمر في المتابعة! أداؤك ممتاز هذا الترم
+        يتم حساب تقدمك بناءً على الحضور وتسليم البحوث المطلوبة
       </p>
     </div>
   </div>
@@ -687,7 +749,6 @@ label {
   </footer>
 
   <script src="botScript.js"></script>
-  <!-- Place this at the bottom of your studentDashboard.html file before </body> -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script>
@@ -832,13 +893,33 @@ label {
     // Setup real-time notifications listener
     loadLatestNotifications();
     
+    // Calculate and display initial progress
+    await updateProgressDisplay();
+    
     // Set up real-time listener for alerts that will auto-update notifications
     dataCache.getData('alerts', () => {
       console.log("[Student Dashboard] Alerts updated, refreshing notifications...");
       debouncedLoadNotifications();
     });
 
-    console.log("[Student Dashboard] Dashboard setup complete with smart caching");
+    // Set up real-time listeners for attendance and research data to update progress
+    dataCache.getData('attendance', () => {
+      console.log("[Student Dashboard] Attendance data updated, recalculating progress...");
+      debouncedUpdateProgress();
+    });
+
+    dataCache.getData('researches', () => {
+      console.log("[Student Dashboard] Research data updated, recalculating progress...");
+      debouncedUpdateProgress();
+    });
+
+    console.log("[Student Dashboard] Dashboard setup complete with smart caching and progress tracking");
+    
+    // Set up periodic progress updates every 5 minutes
+    setInterval(() => {
+      console.log("[Student Dashboard] Periodic progress update");
+      updateProgressDisplay();
+    }, 5 * 60 * 1000); // 5 minutes
   });
 
   // 🔔 Enhanced notifications with smart caching
@@ -880,8 +961,218 @@ label {
     });
   }
 
+  // 📊 Calculate student progress based on attendance and research submissions
+  async function calculateStudentProgress() {
+    console.log("[Student Dashboard] Calculating student progress...");
+    
+    if (!currentEmail) {
+      console.log("[Student Dashboard] No current user for progress calculation");
+      return 0;
+    }
+
+    try {
+      const emailKey = currentEmail.replace(/\./g, '_');
+      
+      // Get user data to get student name for attendance lookup
+      const userSnapshot = await database.ref(`users/${emailKey}`).once('value');
+      const userData = userSnapshot.val();
+      
+      if (!userData) {
+        console.log("[Student Dashboard] No user data found for progress calculation");
+        return 0;
+      }
+
+      const studentName = userData.username || userData.name || userData.fullName || userData.firstName;
+      console.log("[Student Dashboard] Calculating progress for student:", studentName);
+
+      // Get attendance data
+      const attendanceSnapshot = await database.ref('attendance').once('value');
+      const attendanceData = attendanceSnapshot.val() || {};
+      
+      // Get research submissions data
+      const researchSnapshot = await database.ref('researches').once('value');
+      const researchData = researchSnapshot.val() || {};
+
+      // Calculate attendance progress
+      let totalAttendanceDays = 0;
+      let presentDays = 0;
+      
+      Object.values(attendanceData).forEach(dateData => {
+        Object.values(dateData).forEach(record => {
+          if (record.studentName === studentName || 
+              record.studentName?.includes(studentName?.split(' ')[0]) ||
+              studentName?.includes(record.studentName?.split(' ')[0])) {
+            totalAttendanceDays++;
+            if (record.status === 'present') {
+              presentDays++;
+            }
+          }
+        });
+      });
+
+      // Calculate research submissions progress
+      let totalRequiredResearches = 1; // Based on requirement: "one resource of one resource"
+      let submittedResearches = 0;
+      
+      Object.values(researchData).forEach(research => {
+        if (research.studentEmail === currentEmail || 
+            research.studentName === studentName ||
+            research.studentName?.includes(studentName?.split(' ')[0]) ||
+            studentName?.includes(research.studentName?.split(' ')[0])) {
+          submittedResearches++;
+        }
+      });
+
+      // Limit submitted researches to required amount
+      submittedResearches = Math.min(submittedResearches, totalRequiredResearches);
+
+      // Calculate overall progress
+      let attendanceWeight = 0.7; // 70% weight for attendance
+      let researchWeight = 0.3;   // 30% weight for research submission
+
+      let attendanceProgress = totalAttendanceDays > 0 ? (presentDays / totalAttendanceDays) : 0;
+      let researchProgress = submittedResearches / totalRequiredResearches;
+
+      let overallProgress = (attendanceProgress * attendanceWeight) + (researchProgress * researchWeight);
+      
+      // Convert to percentage and cap at 100%
+      let progressPercentage = Math.min(Math.round(overallProgress * 100), 100);
+
+      console.log("[Student Dashboard] Progress calculation:", {
+        studentName,
+        totalAttendanceDays,
+        presentDays,
+        attendanceProgress: Math.round(attendanceProgress * 100) + '%',
+        submittedResearches,
+        totalRequiredResearches,
+        researchProgress: Math.round(researchProgress * 100) + '%',
+        overallProgress: progressPercentage + '%'
+      });
+
+      return {
+        percentage: progressPercentage,
+        attendance: {
+          present: presentDays,
+          total: totalAttendanceDays,
+          percentage: Math.round(attendanceProgress * 100)
+        },
+        research: {
+          submitted: submittedResearches,
+          required: totalRequiredResearches,
+          percentage: Math.round(researchProgress * 100)
+        }
+      };
+
+    } catch (error) {
+      console.error("[Student Dashboard] Error calculating progress:", error);
+      return {
+        percentage: 0,
+        attendance: { present: 0, total: 0, percentage: 0 },
+        research: { submitted: 0, required: 1, percentage: 0 }
+      };
+    }
+  }
+
+  // 📊 Update progress display
+  async function updateProgressDisplay() {
+    console.log("[Student Dashboard] Updating progress display...");
+    
+    const progressFill = document.querySelector('.progress-fill');
+    const progressText = document.querySelector('.progress-text');
+    const studyProgress = document.querySelector('.study-progress');
+    const refreshBtn = document.querySelector('.refresh-btn');
+    
+    // Show loading state
+    if (progressText) {
+      progressText.textContent = 'جاري حساب التقدم...';
+    }
+    if (progressFill) {
+      progressFill.style.width = '0%';
+      progressFill.parentElement.classList.add('loading-progress');
+    }
+    if (refreshBtn) {
+      refreshBtn.style.transform = 'rotate(180deg)';
+      refreshBtn.disabled = true;
+    }
+    
+    try {
+      const progressData = await calculateStudentProgress();
+      
+      // Remove loading state
+      if (progressFill) {
+        progressFill.parentElement.classList.remove('loading-progress');
+        
+        // Animate progress bar
+        setTimeout(() => {
+          progressFill.style.width = progressData.percentage + '%';
+        }, 200);
+      }
+      
+      if (progressText) {
+        // Update progress text with detailed information
+        progressText.innerHTML = `${progressData.percentage}% من متطلبات الترم مكتملة`;
+      }
+      
+      // Update the description with breakdown
+      const progressDescription = studyProgress.querySelector('p');
+      if (progressDescription) {
+        let statusMessage = '';
+        let statusColor = '#666';
+        
+        if (progressData.percentage >= 90) {
+          statusMessage = 'ممتاز! انت ضمن الطلاب الاكثر تفاعل 🎉';
+          statusColor = '#388e3c';
+        } else if (progressData.percentage >= 75) {
+          statusMessage = 'أداء جيد جداً! استمر في المتابعة 👏';
+          statusColor = '#2e7d32';
+        } else if (progressData.percentage >= 50) {
+          statusMessage = 'أداء جيد، يمكنك تحسينه أكثر 💪';
+          statusColor = '#f57c00';
+        } else {
+          statusMessage = 'تحتاج لمزيد من المشاركة والحضور 📚';
+          statusColor = '#d32f2f';
+        }
+        
+        progressDescription.innerHTML = `
+          <div style="color: ${statusColor}; margin-bottom: 10px; font-weight: bold;">
+            ${statusMessage}
+          </div>
+          <div style="font-size: 0.9em; line-height: 1.6;">
+            📊 <strong>تفاصيل التقدم:</strong><br>
+            • الحضور: ${progressData.attendance.present} من ${progressData.attendance.total} يوم (${progressData.attendance.percentage}%)<br>
+            • البحوث المسلمة: ${progressData.research.submitted} من ${progressData.research.required} مطلوب (${progressData.research.percentage}%)
+          </div>
+        `;
+        progressDescription.style.color = '#666';
+        progressDescription.style.marginTop = '15px';
+      }
+      
+      console.log("[Student Dashboard] Progress display updated:", progressData);
+      
+    } catch (error) {
+      console.error("[Student Dashboard] Error updating progress display:", error);
+      
+      if (progressText) {
+        progressText.textContent = 'حدث خطأ في حساب التقدم';
+      }
+      if (progressFill) {
+        progressFill.parentElement.classList.remove('loading-progress');
+        progressFill.style.width = '0%';
+      }
+    } finally {
+      // Reset refresh button
+      if (refreshBtn) {
+        setTimeout(() => {
+          refreshBtn.style.transform = 'rotate(0deg)';
+          refreshBtn.disabled = false;
+        }, 500);
+      }
+    }
+  }
+
   // Debounced version to prevent rapid updates
   const debouncedLoadNotifications = debounce(loadLatestNotifications, 200);
+  const debouncedUpdateProgress = debounce(updateProgressDisplay, 500);
 
   // Mobile menu toggle function
   function toggleMobileMenu() {

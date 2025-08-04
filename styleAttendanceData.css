@@ -1,0 +1,595 @@
+
+:root {
+  --primary: #233B6E;
+  --success: #4CAF50;
+  --error: #F44336;
+  --light: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Cairo", sans-serif;
+}
+
+body {
+  height: 100%;
+  background: url("knesa.jpg") no-repeat center center fixed;
+  background-size: cover;
+  direction: rtl;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: inherit;
+  filter: blur(4px);
+  z-index: -1;
+}
+
+.navbar {
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.nav-left .church-logo {
+  height: 80px;
+  border-radius: 8px;
+  background: white;
+  padding: 5px;
+}
+
+.nav-right {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.menu-toggle {
+  display: none; 
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  width: auto;
+  height: auto;
+  margin-right: auto;  
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .nav-left {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .nav-left .church-logo {
+    height: 60px;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-right {
+    width: 100%;
+    flex-direction: column;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .nav-right.active {
+    max-height: 300px;
+  }
+
+  .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 8px;
+  }
+
+  .nav-left .church-logo {
+    height: 50px;
+  }
+}
+
+.container,
+.attendance-container {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 1000px;
+  margin: 30px auto;
+  color: white;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  margin-bottom: 30px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin: 15px 0 5px;
+  color: #ede9e9;
+}
+
+input,
+button,
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+select:focus {
+  border-color: var(--primary);
+}
+
+button {
+  background: linear-gradient(to left, rgba(0, 0, 61, 0.776), rgba(24, 24, 74, 0.826));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(4, 1, 56, 0.1);
+  backdrop-filter: blur(6px);
+  padding: 12px 32px;
+}
+
+button:hover {
+  background-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.stat-card {
+  flex: 1 1 calc(25% - 20px);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.stat-card h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.stat-card .number {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.controls {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.controls input[type="date"],
+.controls input[type="text"],
+.controls button {
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: none;
+}
+
+.btn-primary { background: var(--primary); }
+.btn-success { background: var(--success); }
+.btn-danger  { background: var(--error); }
+.btn-warning { background: orange; }
+
+.attendance-grid {
+  margin-top: 30px;
+}
+
+.student-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  color: #111;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: 0.3s ease;
+  flex-wrap: wrap;
+}
+
+
+.attendance-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.attendance-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 70px;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.attendance-btn:active {
+  transform: scale(0.95);
+}
+
+.btn-present {
+  background: var(--success);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-present:hover {
+  background: #18651d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(23, 95, 26, 0.3);
+}
+
+.btn-present.active {
+  background: #0b4e10;
+  transform: scale(0.98);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid #0b460d;
+}
+
+.btn-present.active::before {
+  content: "✓";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.btn-absent {
+  background: var(--error);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-absent:hover {
+  background: #670404;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+}
+
+.btn-absent.active {
+  background: #570202;
+  transform: scale(0.98);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid #4d0702;
+}
+
+.btn-absent.active::before {
+  content: "✗";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.student-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.student-email {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.student-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.student-actions button {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+}
+
+.student-actions .btn-success {
+  background-color: var(--success);
+}
+
+.student-actions .btn-danger {
+  background-color: var(--error);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  backdrop-filter: blur(6px);
+}
+
+th, td {
+  padding: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #111;
+  backdrop-filter: blur(5px);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+th {
+  background-color: rgba(255, 255, 255, 0.6);
+  color: #000;
+}
+
+.output {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #000;
+  border-radius: 8px;
+  border: 1px dashed #666;
+  backdrop-filter: blur(8px);
+}
+
+.export-buttons {
+  display: flex;
+  gap: 10px; 
+  margin-top: 10px;
+}
+
+.export-buttons button {
+  flex: 1; 
+  height: 45px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+}
+
+.btn-success {
+  background-color: var(--success);
+}
+
+.export-buttons button:hover {
+  filter: brightness(1.1);
+}
+
+
+#studentsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.student-card {
+  position: relative;
+  background-color: #f5f7fa;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  font-family: 'Cairo', sans-serif;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+.initial {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #233B6E;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.student-avatar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 35px;
+  height: 35px;
+  background-color: #233B6E;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+
+.student-details {
+  margin-top: 40px;
+}
+
+.student-details h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #233B6E;
+}
+
+.student-details p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #555;
+  word-wrap: break-word;
+}
+
+.attendance-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.attendance-btn {
+  flex: 1;
+  padding: 8px 10px;
+  margin: 0 5px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  color: white;
+}
+
+.attendance-btn.btn-present {
+  background-color: #4CAF50;
+}
+
+.attendance-btn.btn-absent {
+  background-color: #E53935;
+}
+ِ
+.attendance-btn.active {
+  outline: 3px solid #ffc107;
+}
+
+footer {
+  background-color: var(--primary);
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 0.95em;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  margin-top: auto;
+}
+
+footer.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+
