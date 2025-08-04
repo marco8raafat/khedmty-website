@@ -212,10 +212,9 @@ document.body.removeChild(link);
     });
 
 
-
 const container = document.querySelector('.cross-background');
 
-  const svgCross = 
+  const svgCross = `
   <?xml version="1.0" encoding="iso-8859-1"?>
 <!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!-- License: CC0. Made by SVG Repo: https://www.svgrepo.com/svg/90761/cross -->
@@ -233,18 +232,20 @@ const container = document.querySelector('.cross-background');
 	c2.621,0,4.753-2.132,4.753-4.752S54.868,19.665,52.247,19.665z"/>
 </svg>
 
-  ;
+  `;
 
-  for (let i = 0; i < 25; i++) {
-    const cross = document.createElement('div');
-    cross.className = 'cross';
-    cross.innerHTML = svgCross;
-    cross.style.left = Math.random() * 100 + 'vw';
-    cross.style.top = Math.random() * 100 + 'vh';
-    cross.style.animationDuration = (12 + Math.random() * 11) + 's';
-    container.appendChild(cross);
-  }
+ const isMobile = window.innerWidth < 768;
+const crossCount = isMobile ? 10 : 25;
 
+for (let i = 0; i < crossCount; i++) {
+  const cross = document.createElement('div');
+  cross.className = 'cross';
+  cross.innerHTML = svgCross;
+  cross.style.left = Math.random() * 100 + 'vw';
+  cross.style.top = Math.random() * 100 + 'vh';
+  cross.style.animationDuration = (12 + Math.random() * 11) + 's';
+  container.appendChild(cross);
+}
 
 
 
