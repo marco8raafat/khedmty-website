@@ -14,7 +14,6 @@
 
 
 
-/* Main body setup for sticky footer */
 body {
   height: 100vh;
     background: url("knesa.jpg") no-repeat center center fixed;
@@ -264,7 +263,6 @@ th {
 }
 
 
-/* Fixed footer styles */
 footer {
   background-color: var(--primary);
   color: white;
@@ -277,7 +275,6 @@ footer {
   width: 100%;
 }
 
-/* Cross background animation */
 .cross-background {
   position: fixed;
   top: 0;
@@ -333,5 +330,14 @@ footer {
   .controls button {
     width: 100%;
     min-width: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0; 
   }
 }
