@@ -664,8 +664,8 @@ label {
       <a href="uploadResearch.html" class="quick-link">
         📋<br>تسليم البحوث
       </a>
-      <a href="index.html" class="quick-link">
-        🏠<br>الصفحة الرئيسية
+      <a href="studentRank.html" class="quick-link">
+        🏆<br>أفضل الطلاب
       </a>
     </div>
 
@@ -711,6 +711,13 @@ label {
         <div class="card-description">إدارة بياناتك الشخصية ومعلومات الحساب</div>
         <a href="profilepage.html" class="card-btn">إدارة الملف</a>
       </div>
+
+      <div class="dashboard-card">
+        <div class="card-icon">🏆</div>
+        <div class="card-title">أفضل الطلاب</div>
+        <div class="card-description">اطلع على ترتيب أفضل الطلاب حسب الحضور والمشاركة</div>
+        <a href="studentRank.html" class="card-btn">عرض الترتيب</a>
+      </div>
     </div>
 
     <div class="study-progress">
@@ -724,7 +731,7 @@ label {
         جاري حساب التقدم...
       </div>
       <p style="color: #666; margin-top: 15px;">
-        يتم حساب تقدمك بناءً على الحضور وتسليم البحوث المطلوبة
+        يتم حساب تقدمك بناءً على نسبة الحضور فقط
       </p>
     </div>
   </div>
@@ -1026,14 +1033,11 @@ label {
       // Limit submitted researches to required amount
       submittedResearches = Math.min(submittedResearches, totalRequiredResearches);
 
-      // Calculate overall progress
-      let attendanceWeight = 0.7; // 70% weight for attendance
-      let researchWeight = 0.3;   // 30% weight for research submission
-
+      // Calculate overall progress based on attendance only
       let attendanceProgress = totalAttendanceDays > 0 ? (presentDays / totalAttendanceDays) : 0;
       let researchProgress = submittedResearches / totalRequiredResearches;
 
-      let overallProgress = (attendanceProgress * attendanceWeight) + (researchProgress * researchWeight);
+      let overallProgress = attendanceProgress;
       
       // Convert to percentage and cap at 100%
       let progressPercentage = Math.min(Math.round(overallProgress * 100), 100);
@@ -1110,7 +1114,7 @@ label {
       
       if (progressText) {
         // Update progress text with detailed information
-        progressText.innerHTML = `${progressData.percentage}% من متطلبات الترم مكتملة`;
+        progressText.innerHTML = `${progressData.percentage}% تقدمك في التعلم`;
       }
       
       // Update the description with breakdown
@@ -1139,8 +1143,7 @@ label {
           </div>
           <div style="font-size: 0.9em; line-height: 1.6;">
             📊 <strong>تفاصيل التقدم:</strong><br>
-            • الحضور: ${progressData.attendance.present} من ${progressData.attendance.total} يوم (${progressData.attendance.percentage}%)<br>
-            • البحوث المسلمة: ${progressData.research.submitted} من ${progressData.research.required} مطلوب (${progressData.research.percentage}%)
+            • الحضور: ${progressData.attendance.present} من ${progressData.attendance.total} يوم (${progressData.attendance.percentage}%)
           </div>
         `;
         progressDescription.style.color = '#666';
