@@ -402,19 +402,7 @@
   <div class="container">
 <div class="content-box">
       <h2 class="page-title">الأبحاث</h2>
-<select id="filterColumn" style="width: 200px; height: 35px;">
-  <option value="all">الكل</option>
-  <option value="0">رقم</option>
-  <option value="1">اسم الطالب</option>
-  <option value="2">المجموعة</option>
-  <option value="3">اسم البحث</option>
-  <option value="4">تاريخ التسليم</option>
-  <option value="7">تاريخ ووقت المناقشة</option>
-  <option value="8">درجة البحث</option>
-  <option value="9">درجة المناقشة</option>
-  <option value="10">اجمالي الدرجة</option>
-</select>
-<input type="text" id="searchInput" placeholder="ابحث هنا..." style="width: 300px; height: 35px;" />
+  <input type="text" id="searchInput" placeholder="ابحث هنا..." style="width: 300px; height: 35px;" />
 
     <table id="researchTable">
      <thead>
@@ -521,15 +509,17 @@ async function loadResearchData() {
 
     // Convert data to array and sort by timestamp (newest first)
     const researches = Object.keys(data).map(key => ({
-      id: key,
-      ...data[key]
-    })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+     id: key,
+     ...data[key]
+    })).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
 
     // Clear loading message
     tableBody.innerHTML = '';
 
-    // Populate table
-    researches.forEach((research, index) => {
+     // Populate table
+     const reversed = [...researches].reverse();
+     reversed.forEach((research, index) => {
       const row = document.createElement('tr');
       
       // Format submission date
@@ -550,7 +540,7 @@ async function loadResearchData() {
       }
 
       row.innerHTML = `
-        <td>${index + 1}</td>
+        <td>${researches.length - index}</td>
         <td>${research.studentName || 'غير محدد'}</td>
         <td>${research.team || 'غير محدد'}</td>
         <td>${research.researchTitle || 'غير محدد'}</td>
@@ -600,12 +590,11 @@ async function updateResearch(researchId, field, value) {
 }
 
 const searchInput = document.getElementById("searchInput");
-  const filterColumn = document.getElementById("filterColumn");
   const table = document.getElementById("researchTable");
 
   searchInput.addEventListener("input", function () {
     const searchValue = this.value.toLowerCase();
-    const selectedColumn = filterColumn.value;
+    const selectedColumn = "all";
     const rows = table.getElementsByTagName("tr");
 
     for (let i = 1; i < rows.length; i++) {
