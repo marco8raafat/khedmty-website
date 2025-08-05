@@ -61,7 +61,7 @@
       background-color: #e60000;
     }
 
-   
+
 
     /* Mobile responsive styles */
     @media (max-width: 768px) {
@@ -70,13 +70,21 @@
         padding: 10px;
       }
 
-   
+      .nav-left {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
 
       .nav-left .church-logo {
         height: 60px;
       }
 
-      
+      .menu-toggle {
+        display: block;
+      }
 
       .nav-right {
         width: 100%;
@@ -94,7 +102,19 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
 
-      
+      .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 16px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0;
+        font-size: 1.1rem;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
 
       .nav-link:hover,
       .nav-link:active {
@@ -183,6 +203,12 @@
         height: 50px;
       }
 
+      .menu-toggle {
+        font-size: 1.6rem;
+        padding: 10px;
+        min-width: 40px;
+        min-height: 40px;
+      }
 
       .alert-form {
         padding: 10px;
@@ -223,7 +249,12 @@
         height: 45px;
       }
 
-
+      .menu-toggle {
+        font-size: 1.5rem;
+        padding: 8px;
+        min-width: 36px;
+        min-height: 36px;
+      }
 
       .alert-form {
         padding: 8px;
@@ -234,6 +265,39 @@
         font-size: 1.4rem;
       }
     }
+   @media (max-width: 480px) {
+  main {
+    padding: 15px;
+  }
+
+  .alert-form {
+    gap: 12px;
+  }
+
+  .alert-form input,
+  .alert-form textarea {
+    padding: 14px;
+    font-size: 1rem;
+    width: 100%;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+
+  .alert-form .btn {
+    font-size: 1rem;
+    padding: 12px;
+    margin-top: 4px;
+    width: 100%;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+
+  #alertsSection h2 {
+    font-size: 1.4rem;
+    margin-top: 30px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -274,7 +338,7 @@
   </main>
 
   <footer>
-    <p>© خدمتي 2025</p>
+    © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
 
   <!-- Firebase -->
