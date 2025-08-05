@@ -23,7 +23,18 @@ body {
   overflow-x: hidden;
 }
 
-
+/* Main body setup for sticky footer */
+body {
+  height: 100vh;
+    background: url("knesa.jpg") no-repeat center center fixed;
+  background-size: cover;
+  direction: rtl;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
 .page-wrapper {
   flex: 1;
   display: flex;
