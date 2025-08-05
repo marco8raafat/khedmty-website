@@ -484,7 +484,7 @@
 <div class="container">
   <div class="header-section">
     <h1>🏆 ترتيب أفضل الطلاب</h1>
-    <p>ترتيب الطلاب حسب نسبة الحضور فقط</p>
+    <p style="text-align: center;">ترتيب الطلاب حسب نسبة الحضور </p>
   </div>
 
   <div class="ranking-controls">
@@ -831,8 +831,6 @@
     // Load initial ranking
     loadStudentRanking();
 
-    // Set up auto-refresh every 5 minutes
-    setInterval(loadStudentRanking, 5 * 60 * 1000);
   });
 
   // Cross background animation
