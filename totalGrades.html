@@ -566,7 +566,7 @@
             <tr>
               <th>اسم الطالب</th>
               <th>الإيميل</th>
-              <th>الفريق</th>
+              <th>المجموعة</th>
               <th>المادة</th>
               <th>الدرجة</th>
               <th>الحالة</th>
@@ -642,14 +642,25 @@
     }
   }
 
-  // Get grade class based on grade value
-  function getGradeClass(grade) {
+  // Get grade class based on grade value and status
+  function getGradeClass(grade, status) {
     const numGrade = parseFloat(grade);
     if (isNaN(numGrade)) return '';
+    
+    // Check if student passed - if so, don't mark as poor even with low grade
+    const isPassed = status && (
+      status.toLowerCase().includes('ناجح') || 
+      status.toLowerCase().includes('نجح') || 
+      status.toLowerCase().includes('pass')
+    );
     
     if (numGrade >= 90) return 'grade-excellent';
     if (numGrade >= 80) return 'grade-good';
     if (numGrade >= 60) return 'grade-average';
+    
+    // If grade is below 60 but student passed, show as average instead of poor
+    if (isPassed && numGrade < 60) return 'grade-average';
+    
     return 'grade-poor';
   }
 
@@ -794,7 +805,7 @@
     filteredGradesData.forEach((grade, index) => {
       const row = document.createElement('tr');
       
-      const gradeClass = getGradeClass(grade.grade);
+      const gradeClass = getGradeClass(grade.grade, grade.status);
       const statusClass = getStatusClass(grade.status);
       
       row.innerHTML = `
