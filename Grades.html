@@ -335,10 +335,15 @@
         padding: 6px 4px;
       }
     }
+    @keyframes spin {
+     0% { transform: rotate(0deg); }
+     100% { transform: rotate(360deg); }
+   }
   
   </style>
 </head>
 <body>
+</div>
 <div class="cross-background"></div>
 <nav class="navbar">
     <div class="nav-left">
@@ -353,7 +358,7 @@
   </nav>
  <div class="container">
     <h2 class="title">الدرجات</h2>
-    
+
   <table id="gradesTable">
     <thead>
       <tr>
@@ -366,6 +371,18 @@
   </tbody>
   </table>
   </div>
+   <div id="loadingSpinner" style="text-align:center; padding:20px;">
+  <div style="
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #0b2e59;;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin:auto;">
+  </div>
+  <p>جاري تحميل البيانات...</p>
+</div>
    <footer>
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
@@ -374,8 +391,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     
     <script>
-    // Mobile menu toggle function
-    function toggleMobileMenu() {
+       // Mobile menu toggle function
+      function toggleMobileMenu() {
       const navMenu = document.getElementById('navMenu');
       navMenu.classList.toggle('active');
       
@@ -499,6 +516,8 @@ for (let i = 0; i < crossCount; i++) {
 
   // Function to load grades data
   function loadGradesData(studentName, studentEmail) {
+    // إظهار الـ spinner
+    document.getElementById("loadingSpinner").style.display = "block";
     fetch('https://script.google.com/macros/s/AKfycbyWbp6mp9l7djfsSc75eLDWaH8PYED0lOgZsEObfqtRCyxFqG5iMJnXtKqgWpYnWzUs/exec')
       .then(response => response.json())
       .then(data => {
@@ -546,6 +565,7 @@ for (let i = 0; i < crossCount; i++) {
               لا توجد درجات متاحة حالياً
             </td>
           `;
+          
           tableBody.appendChild(row);
         }
       })
@@ -559,7 +579,10 @@ for (let i = 0; i < crossCount; i++) {
             </td>
           </tr>
         `;
-      });
+      })
+        .finally(() => {
+        document.getElementById("loadingSpinner").style.display = "none";
+        });
   }
 
 
