@@ -334,7 +334,6 @@
         padding: 6px 4px;
       }
     }
-    
   
   </style>
 </head>
@@ -353,7 +352,7 @@
   </nav>
  <div class="container">
     <h2 class="title">الدرجات</h2>
-
+    
   <table id="gradesTable">
     <thead>
       <tr>
@@ -473,7 +472,6 @@ for (let i = 0; i < crossCount; i++) {
     }
 
     console.log("المستخدم الحالي:", currentUser);
-    
     try {
       // Get user data from Firebase using your existing system
       const emailKey = currentUser.replace(/\./g, '_');
@@ -488,9 +486,7 @@ for (let i = 0; i < crossCount; i++) {
 
       const studentName = userData.username || userData.name || userData.fullName;
       const studentEmail = currentUser;
-      
       console.log("بيانات الطالب:", { studentName, studentEmail });
-
       // Load grades data
       loadGradesData(studentName, studentEmail);
       
@@ -502,7 +498,7 @@ for (let i = 0; i < crossCount; i++) {
 
   // Function to load grades data
   function loadGradesData(studentName, studentEmail) {
-    fetch('https://script.google.com/macros/s/AKfycbyP2-NxIpEE5JHsKrAczJTgmYQHt5DZu-7jcjQa7VMjHDQr2m7EVtzLY9FrKSaXp72F/exec')
+    fetch('https://script.google.com/macros/s/AKfycbyWbp6mp9l7djfsSc75eLDWaH8PYED0lOgZsEObfqtRCyxFqG5iMJnXtKqgWpYnWzUs/exec')
       .then(response => response.json())
       .then(data => {
         const tableBody = document.querySelector("#gradesTable tbody");
@@ -526,14 +522,14 @@ for (let i = 0; i < crossCount; i++) {
             
             // Add styling based on status
             let statusClass = "";
-            if (status.includes("نجح") || status.includes("ممتاز") || status.includes("جيد")) {
+            if (status.includes("ناجح") ) {
               statusClass = "success";
-            } else if (status.includes("راسب") || status.includes("ضعيف")) {
+            } else if (status.includes("راسب")) {
               statusClass = "fail";
             }
             
             row.innerHTML = `
-              <td>${entry["اسم المادة"] || "-"}</td>
+              <td>${entry["اسم الماده"] || "-"}</td>
               <td>${grade}</td>
               <td class="${statusClass}">${status}</td>
             `;
