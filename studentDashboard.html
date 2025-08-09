@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="logoCircle1.png">
-  <link rel="stylesheet" href="botStyle.css">
   <title>لوحة تحكم الطالب - خدمتي</title>
   <style>
   body {
@@ -664,6 +663,9 @@ label {
       <a href="uploadResearch.html" class="quick-link">
         📋<br>تسليم البحوث
       </a>
+      <a href="Grades.html" class="quick-link">
+        📊<br>الدرجات
+      </a>
       <a href="studentRank.html" class="quick-link">
         🏆<br>أفضل الطلاب
       </a>
@@ -706,6 +708,13 @@ label {
       </div>
 
       <div class="dashboard-card">
+        <div class="card-icon">🧑‍🎓</div>
+        <div class="card-title">الدرجات والنتائج</div>
+        <div class="card-description">اطلع على درجاتك ونتائجك الأكاديمية في جميع المواد</div>
+        <a href="Grades.html" class="card-btn">عرض الدرجات</a>
+      </div>
+
+      <div class="dashboard-card">
         <div class="card-icon">👤</div>
         <div class="card-title">الملف الشخصي</div>
         <div class="card-description">إدارة بياناتك الشخصية ومعلومات الحساب</div>
@@ -736,26 +745,11 @@ label {
     </div>
   </div>
 
-  <!-- Chat Button -->
-  <div id="chat-button" onclick="toggleChat()">
-    🤖
-  </div>
-
-  <!-- Chat Container -->
-  <div id="chat-container">
-    <div id="chat-header">المساعد الذكي</div>
-    <div id="chat-body"></div>
-    <div id="chat-input">
-      <input type="text" style="font-size: 20px;" id="user-input" placeholder="أسالني اي سؤال..." onkeydown="if(event.key === 'Enter') sendMessage()">
-      <button onclick="sendMessage()">📤</button>
-    </div>
-  </div>
 
   <footer>
     <p>© كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025</p>
   </footer>
 
-  <script src="botScript.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script>
