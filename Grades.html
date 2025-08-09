@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <title>الدرجات</title>
@@ -91,7 +89,6 @@
     transition: background-color 0.3s;
     min-width: 44px;
     min-height: 44px;
-    display: flex;
     align-items: center;
     justify-content: center;
     touch-action: manipulation;
@@ -350,8 +347,8 @@
     </div>
     <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="login.html" class="nav-link">تسجيل الدخول</a>
-      <a href="register.html" class="nav-link">إنشاء حساب</a>
+      <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
  <div class="container">
@@ -372,8 +369,11 @@
    <footer>
     © كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي 2025
   </footer>
-  <script>
-    // Firebase configuration (same as in register.js)
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
+    <script>
     // Mobile menu toggle function
     function toggleMobileMenu() {
       const navMenu = document.getElementById('navMenu');
@@ -445,11 +445,8 @@ for (let i = 0; i < crossCount; i++) {
   container.appendChild(cross);
 }
 </script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+<script>
+  // Initialize Firebase with compat SDK (same as other pages)
   const firebaseConfig = {
     apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
     authDomain: "edad-5odam.firebaseapp.com",
@@ -461,46 +458,121 @@ for (let i = 0; i < crossCount; i++) {
     measurementId: "G-7WB1WPDLRH"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const database = getDatabase(app); // حتى لو مش استخدمته دلوقتي
+  // Initialize Firebase (compat version)
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const studentName = user.displayName?.trim();
-      const studentEmail = user.email?.trim();
-      console.log("الطالب:", studentName, studentEmail);
-
-      fetch('https://script.google.com/macros/s/AKfycbyP2-NxIpEE5JHsKrAczJTgmYQHt5DZu-7jcjQa7VMjHDQr2m7EVtzLY9FrKSaXp72F/exec')
-        .then(response => response.json())
-        .then(data => {
-          const tableBody = document.querySelector("#gradesTable tbody");
-          tableBody.innerHTML = "";
-
-          data.forEach(entry => {
-            if (
-              entry["الاسم"]?.trim() === studentName &&
-              entry["الإيميل"]?.trim() === studentEmail
-            ) {
-              const row = document.createElement("tr");
-              row.innerHTML = `
-                <td>${entry["اسم المادة"] || "-"}</td>
-                <td>${entry["الدرجة"] || "-"}</td>
-                <td>${entry["الحالة"] || "-"}</td>
-              `;
-              tableBody.appendChild(row);
-            }
-          });
-        })
-        .catch(error => {
-          console.error("خطأ أثناء جلب البيانات:", error);
-        });
-
-    } else {
+  // Check authentication using sessionStorage (same as other pages)
+  document.addEventListener('DOMContentLoaded', async function() {
+    const currentUser = sessionStorage.getItem("currentUser");
+    
+    if (!currentUser) {
       alert("برجاء تسجيل الدخول أولًا");
       window.location.href = "login.html";
+      return;
+    }
+
+    console.log("المستخدم الحالي:", currentUser);
+    
+    try {
+      // Get user data from Firebase using your existing system
+      const emailKey = currentUser.replace(/\./g, '_');
+      const userSnapshot = await database.ref(`users/${emailKey}`).once('value');
+      const userData = userSnapshot.val();
+      
+      if (!userData) {
+        alert("لم يتم العثور على بيانات المستخدم");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const studentName = userData.username || userData.name || userData.fullName;
+      const studentEmail = currentUser;
+      
+      console.log("بيانات الطالب:", { studentName, studentEmail });
+
+      // Load grades data
+      loadGradesData(studentName, studentEmail);
+      
+    } catch (error) {
+      console.error("خطأ في جلب بيانات المستخدم:", error);
+      alert("حدث خطأ أثناء تحميل البيانات");
     }
   });
+
+  // Function to load grades data
+  function loadGradesData(studentName, studentEmail) {
+    fetch('https://script.google.com/macros/s/AKfycbyP2-NxIpEE5JHsKrAczJTgmYQHt5DZu-7jcjQa7VMjHDQr2m7EVtzLY9FrKSaXp72F/exec')
+      .then(response => response.json())
+      .then(data => {
+        const tableBody = document.querySelector("#gradesTable tbody");
+        tableBody.innerHTML = "";
+        let foundGrades = false;
+
+        data.forEach(entry => {
+          // More flexible name matching
+          const entryName = entry["الاسم"]?.trim();
+          const entryEmail = entry["الإيميل"]?.trim();
+          
+          if ((entryEmail === studentEmail) || 
+              (entryName === studentName) ||
+              (entryName && studentName && entryName.includes(studentName.split(' ')[0])) ||
+              (entryName && studentName && studentName.includes(entryName.split(' ')[0]))) {
+            
+            foundGrades = true;
+            const row = document.createElement("tr");
+            const grade = entry["الدرجة"] || "-";
+            const status = entry["الحالة"] || "-";
+            
+            // Add styling based on status
+            let statusClass = "";
+            if (status.includes("نجح") || status.includes("ممتاز") || status.includes("جيد")) {
+              statusClass = "success";
+            } else if (status.includes("راسب") || status.includes("ضعيف")) {
+              statusClass = "fail";
+            }
+            
+            row.innerHTML = `
+              <td>${entry["اسم المادة"] || "-"}</td>
+              <td>${grade}</td>
+              <td class="${statusClass}">${status}</td>
+            `;
+            tableBody.appendChild(row);
+          }
+        });
+
+        // Show message if no grades found
+        if (!foundGrades) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td colspan="3" style="text-align: center; color: #666; font-style: italic;">
+              لا توجد درجات متاحة حالياً
+            </td>
+          `;
+          tableBody.appendChild(row);
+        }
+      })
+      .catch(error => {
+        console.error("خطأ أثناء جلب البيانات:", error);
+        const tableBody = document.querySelector("#gradesTable tbody");
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="3" style="text-align: center; color: #d32f2f;">
+              حدث خطأ أثناء تحميل البيانات
+            </td>
+          </tr>
+        `;
+      });
+  }
+
+
+//logout function
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        sessionStorage.removeItem("currentUser");
+        window.location.href = "index.html";
+      }
+    }
 </script>
 </body>
 </html>
