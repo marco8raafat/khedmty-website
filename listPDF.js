@@ -175,6 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
         viewLink.textContent = 'عرض';
         viewLink.setAttribute('target', '_blank'); // Open in new tab
         viewLink.classList.add('firstB');
+
+        // Share button
+        const shareButton = document.createElement('button');
+        shareButton.textContent = 'مشاركة';
+        shareButton.className = 'share-button-pdf';
+        shareButton.onclick = function() {
+          sharePDF(pdf.link, pdf.title || 'مصدر تعليمي من الكنيسة');
+        };
   
         // Delete button (only show if user has permission)
         const deleteLink = document.createElement('a');
@@ -188,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
   
         pdfActions.appendChild(viewLink);
+        pdfActions.appendChild(shareButton);
         pdfActions.appendChild(deleteLink);
         
         pdfItem.appendChild(pdfTitle);
@@ -259,5 +268,104 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('load', function() {
     console.log('[PDF System] Page loaded, PDF cache system active');
   });
+
+  // Share PDF functionality
+  function sharePDF(pdfUrl, title) {
+    // Check if Web Share API is supported
+    if (navigator.share && navigator.canShare) {
+      navigator.share({
+        title: title || 'مصدر تعليمي من الكنيسة',
+        text: `شاهد هذا المصدر التعليمي: ${title}`,
+        url: pdfUrl
+      }).catch(error => {
+        console.log('Error sharing:', error);
+        fallbackSharePDF(pdfUrl, title);
+      });
+    } else {
+      fallbackSharePDF(pdfUrl, title);
+    }
+  }
+
+  // Fallback share function for browsers that don't support Web Share API
+  function fallbackSharePDF(pdfUrl, title) {
+    const textToCopy = `${title}\n${pdfUrl}`;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showPDFNotification('تم نسخ رابط المصدر التعليمي إلى الحافظة!', 'success');
+      }).catch(() => {
+        // Fallback for older browsers
+        copyToClipboardFallbackPDF(textToCopy);
+      });
+    } else {
+      copyToClipboardFallbackPDF(textToCopy);
+    }
+  }
+
+  // Legacy clipboard copy method for PDFs
+  function copyToClipboardFallbackPDF(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      showPDFNotification('تم نسخ رابط المصدر التعليمي إلى الحافظة!', 'success');
+    } catch (err) {
+      showPDFNotification('فشل في نسخ الرابط', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+  }
+
+  // Simple notification system for PDFs
+  function showPDFNotification(message, type = 'info', duration = 3000) {
+    // Remove existing notification
+    const existing = document.querySelector('.pdf-notification');
+    if (existing) {
+      existing.remove();
+    }
+
+    const notification = document.createElement('div');
+    notification.className = 'pdf-notification';
+    
+    const colors = {
+      success: '#10b981',
+      error: '#ef4444',
+      warning: '#f59e0b',
+      info: '#3b82f6'
+    };
+    
+    notification.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${colors[type]};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-weight: 600;
+        font-size: 14px;
+        max-width: 300px;
+        word-wrap: break-word;
+      ">
+        ${message}
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, duration);
+  }
 
   

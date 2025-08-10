@@ -202,6 +202,8 @@
     font-weight: 400;
     margin-top: 4px;
     direction: rtl;
+    margin-left: 10px;
+    margin-right: 10px;
   }
   
   .pdf-actions {
@@ -233,6 +235,40 @@
   .pdf-actions a:focus {
     outline: 2px solid var(--secondary);
     outline-offset: 2px;
+  }
+
+  /* Share button styling for PDFs */
+  .share-button-pdf {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+  }
+
+  .share-button-pdf:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .share-button-pdf:focus {
+    outline: 2px solid #10b981;
+    outline-offset: 2px;
+  }
+
+  .share-button-pdf:active {
+    transform: translateY(0);
   }
   
   .empty-state {
@@ -343,13 +379,17 @@
     .pdf-actions {
       width: 100%;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
   
-    .pdf-actions a {
+    .pdf-actions a,
+    .share-button-pdf {
       flex: 1;
       text-align: center;
-      padding: 10px;
+      padding: 12px 8px;
+      min-width: 80px;
+      max-width: 120px;
     }
   
     .filter-group {
@@ -367,9 +407,19 @@
       font-size: 1em;
     }
   
-    .pdf-actions a {
+    .pdf-actions {
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pdf-actions a,
+    .share-button-pdf {
       font-size: 0.9em;
-      padding: 8px 16px;
+      padding: 10px 6px;
+      flex: 1;
+      min-width: 70px;
+      max-width: 100px;
     }
   
     .filter-group select {
@@ -384,7 +434,7 @@
 
   
 .firstB{
-    margin-right: 100px;
+    /* margin-right: 100px; */
 }
 
 .cross-background {
