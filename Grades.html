@@ -514,75 +514,130 @@ for (let i = 0; i < crossCount; i++) {
     }
   });
 
-  // Function to load grades data
-  function loadGradesData(studentName, studentEmail) {
-    // إظهار الـ spinner
-    document.getElementById("loadingSpinner").style.display = "block";
-    fetch('https://script.google.com/macros/s/AKfycbyWbp6mp9l7djfsSc75eLDWaH8PYED0lOgZsEObfqtRCyxFqG5iMJnXtKqgWpYnWzUs/exec')
-      .then(response => response.json())
-      .then(data => {
-        const tableBody = document.querySelector("#gradesTable tbody");
-        tableBody.innerHTML = "";
-        let foundGrades = false;
-
-        data.forEach(entry => {
-          // More flexible name matching
-          const entryName = entry["الاسم"]?.trim();
-          const entryEmail = entry["الإيميل"]?.trim();
-          
-          if ((entryEmail === studentEmail) || 
-              (entryName === studentName) ||
-              (entryName && studentName && entryName.includes(studentName.split(' ')[0])) ||
-              (entryName && studentName && studentName.includes(entryName.split(' ')[0]))) {
-            
-            foundGrades = true;
+  // Function to load research grades from Firebase
+  async function loadResearchGrades(studentName, tableBody) {
+    try {
+      const snapshot = await database.ref('researches').once('value');
+      const researches = snapshot.val();
+      
+      if (researches) {
+        // Find research for this student
+        Object.values(researches).forEach(research => {
+          if (research.studentName === studentName && research.totalGrade) {
             const row = document.createElement("tr");
-            const grade = entry["الدرجة"] || "-";
-            const status = entry["الحالة"] || "-";
+            const totalGrade = research.totalGrade;
             
-            // Add styling based on status
+            // Determine status based on grade
             let statusClass = "";
-            if (status.includes("ناجح") ) {
+            let status = "";
+            if (totalGrade && parseFloat(totalGrade) >= 50) {
               statusClass = "success";
-            } else if (status.includes("راسب")) {
+              status = totalGrade;
+            } else if (totalGrade) {
               statusClass = "fail";
+              status = totalGrade;
+            } else {
+              status = "-";
             }
             
             row.innerHTML = `
-              <td>${entry["اسم الماده"] || "-"}</td>
-              <td>${grade}</td>
+              <td>الأبحاث</td>
+              <td>${totalGrade || "-"}</td>
               <td class="${statusClass}">${status}</td>
             `;
             tableBody.appendChild(row);
           }
         });
+      }
+    } catch (error) {
+      console.error("خطأ في تحميل درجات الأبحاث:", error);
+    }
+  }
 
-        // Show message if no grades found
-        if (!foundGrades) {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td colspan="3" style="text-align: center; color: #666; font-style: italic;">
-              لا توجد درجات متاحة حالياً
-            </td>
-          `;
+  // Function to load grades data
+  function loadGradesData(studentName, studentEmail) {
+    // إظهار الـ spinner
+    document.getElementById("loadingSpinner").style.display = "block";
+    
+    Promise.all([
+      // Load regular grades from Google Sheets
+      fetch('https://script.google.com/macros/s/AKfycbyWbp6mp9l7djfsSc75eLDWaH8PYED0lOgZsEObfqtRCyxFqG5iMJnXtKqgWpYnWzUs/exec')
+        .then(response => response.json()),
+      // Load research grades from Firebase
+      loadResearchGrades(studentName, null)
+    ])
+    .then(async ([sheetsData]) => {
+      const tableBody = document.querySelector("#gradesTable tbody");
+      tableBody.innerHTML = "";
+      let foundGrades = false;
+
+      // Add regular grades from Google Sheets
+      sheetsData.forEach(entry => {
+        // More flexible name matching
+        const entryName = entry["الاسم"]?.trim();
+        const entryEmail = entry["الإيميل"]?.trim();
+        
+        if ((entryEmail === studentEmail) || 
+            (entryName === studentName) ||
+            (entryName && studentName && entryName.includes(studentName.split(' ')[0])) ||
+            (entryName && studentName && studentName.includes(entryName.split(' ')[0]))) {
           
+          foundGrades = true;
+          const row = document.createElement("tr");
+          const grade = entry["الدرجة"] || "-";
+          const status = entry["الحالة"] || "-";
+          
+          // Add styling based on status
+          let statusClass = "";
+          if (status.includes("ناجح") ) {
+            statusClass = "success";
+          } else if (status.includes("راسب")) {
+            statusClass = "fail";
+          }
+          
+          row.innerHTML = `
+            <td>${entry["اسم الماده"] || "-"}</td>
+            <td>${grade}</td>
+            <td class="${statusClass}">${status}</td>
+          `;
           tableBody.appendChild(row);
         }
-      })
-      .catch(error => {
-        console.error("خطأ أثناء جلب البيانات:", error);
-        const tableBody = document.querySelector("#gradesTable tbody");
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="3" style="text-align: center; color: #d32f2f;">
-              حدث خطأ أثناء تحميل البيانات
-            </td>
-          </tr>
+      });
+
+      // Add research grades from Firebase
+      await loadResearchGrades(studentName, tableBody);
+
+      // Check if we found any grades after adding research grades
+      if (tableBody.children.length > 0) {
+        foundGrades = true;
+      }
+
+      // Show message if no grades found
+      if (!foundGrades) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td colspan="3" style="text-align: center; color: #666; font-style: italic;">
+            لا توجد درجات متاحة حالياً
+          </td>
         `;
-      })
-        .finally(() => {
-        document.getElementById("loadingSpinner").style.display = "none";
-        });
+        
+        tableBody.appendChild(row);
+      }
+    })
+    .catch(error => {
+      console.error("خطأ أثناء جلب البيانات:", error);
+      const tableBody = document.querySelector("#gradesTable tbody");
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="3" style="text-align: center; color: #d32f2f;">
+            حدث خطأ أثناء تحميل البيانات
+          </td>
+        </tr>
+      `;
+    })
+    .finally(() => {
+      document.getElementById("loadingSpinner").style.display = "none";
+    });
   }
 
 
