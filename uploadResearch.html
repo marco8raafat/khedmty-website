@@ -265,6 +265,41 @@
 }   
 
 
+    }
+    
+    /* Discussion Schedule Styles */
+    .discussion-scheduled {
+      background: linear-gradient(to right, #f8fff8, #ffffff);
+      border: 2px solid #388e3c;
+      color: #2e7d32;
+    }
+    
+    .discussion-not-scheduled {
+      background: linear-gradient(to right, #fff8f0, #ffffff);
+      border: 2px solid #ff9800;
+      color: #f57c00;
+    }
+    
+    .discussion-date-text {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    
+    .discussion-subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    #discussionScheduleSection {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
     /* Hide hamburger on desktop by default */
     @media (min-width: 769px) {
       .menu-toggle {
@@ -530,6 +565,16 @@
     <button type="submit">رفع البحث</button>
   </form>
   <div id="message"></div>
+  
+  <!-- Discussion Schedule Section -->
+  <div id="discussionScheduleSection" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #1c2f5c; display: none;">
+    <h3 style="color: #1c2f5c; font-size: 18px; margin-bottom: 15px; text-align: center;">
+      موعد مناقشة البحث
+    </h3>
+    <div id="discussionInfo" style="background: linear-gradient(to right, #f8fff8, #ffffff); border: 1px solid #388e3c; border-radius: 8px; padding: 15px; text-align: center;">
+      <!-- Discussion date will be populated here -->
+    </div>
+  </div>
 </div>
 </div>
 
@@ -615,6 +660,72 @@
       window.location.href = "login.html";
       return false;
     }
+  }
+
+  // Load student's discussion schedule
+  async function loadDiscussionSchedule() {
+    const currentUser = await requireAuth();
+    if (!currentUser) return;
+
+    try {
+      const snapshot = await db.ref('researches').once('value');
+      const researches = snapshot.val();
+      
+      if (researches) {
+        // Find research for current student
+        const studentResearch = Object.values(researches).find(research => 
+          research.studentName === currentUser.name || 
+          research.studentEmail === currentUser.email
+        );
+        
+        if (studentResearch) {
+          displayDiscussionSchedule(studentResearch);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading discussion schedule:", error);
+    }
+  }
+
+  // Display discussion schedule
+  function displayDiscussionSchedule(research) {
+    const scheduleSection = document.getElementById('discussionScheduleSection');
+    const discussionInfo = document.getElementById('discussionInfo');
+    
+    if (research.discussionDate && research.discussionDate.trim() !== '') {
+      try {
+        const date = new Date(research.discussionDate);
+        const options = { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        };
+        const formattedDate = date.toLocaleDateString('ar-EG', options);
+        
+        discussionInfo.className = 'discussion-scheduled';
+        discussionInfo.innerHTML = `
+          <div class="discussion-date-text">📅 ${formattedDate}</div>
+          <div class="discussion-subtitle">موعد مناقشة بحث: "${research.researchTitle || 'البحث الخاص بك'}"</div>
+        `;
+      } catch (e) {
+        discussionInfo.className = 'discussion-scheduled';
+        discussionInfo.innerHTML = `
+          <div class="discussion-date-text">📅 ${research.discussionDate}</div>
+          <div class="discussion-subtitle">موعد مناقشة بحث: "${research.researchTitle || 'البحث الخاص بك'}"</div>
+        `;
+      }
+    } else {
+      discussionInfo.className = 'discussion-not-scheduled';
+      discussionInfo.innerHTML = `
+        <div class="discussion-date-text">⏳ لم يتم تحديد موعد المناقشة بعد</div>
+        <div class="discussion-subtitle">سيتم إعلامك عندما يحدد الأستاذ موعد المناقشة</div>
+      `;
+    }
+    
+    scheduleSection.style.display = 'block';
   }
 
   // Mobile menu toggle with debug
@@ -726,6 +837,11 @@
       showMessage("✅ تم تسليم البحث بنجاح", "success");
       document.getElementById("researchForm").reset();
       
+      // Load discussion schedule after successful submission
+      setTimeout(() => {
+        loadDiscussionSchedule();
+      }, 1000);
+      
       // Reset button
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
@@ -781,6 +897,14 @@ for (let i = 0; i < crossCount; i++) {
   cross.style.animationDuration = (12 + Math.random() * 11) + 's';
   container.appendChild(cross);
 }
+
+// Initialize page - load discussion schedule on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Small delay to ensure Firebase is initialized
+  setTimeout(() => {
+    loadDiscussionSchedule();
+  }, 500);
+});
 </script>
 
 </body>
