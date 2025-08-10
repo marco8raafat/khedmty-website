@@ -654,14 +654,10 @@
       status.toLowerCase().includes('pass')
     );
     
-    if (numGrade >= 90) return 'grade-excellent';
-    if (numGrade >= 80) return 'grade-good';
-    if (numGrade >= 60) return 'grade-average';
-    
-    // If grade is below 60 but student passed, show as average instead of poor
-    if (isPassed && numGrade < 60) return 'grade-average';
-    
-    return 'grade-poor';
+    if (numGrade >= 45) return 'grade-excellent';
+    if (numGrade >= 40) return 'grade-good';
+    if (numGrade >= 30) return 'grade-average';
+    if (numGrade < 30 && !isPassed) return 'grade-poor';
   }
 
   // Get status class based on status text

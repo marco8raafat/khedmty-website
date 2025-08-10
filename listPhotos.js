@@ -178,6 +178,14 @@ document.addEventListener('DOMContentLoaded', () => {
         viewLink.textContent = 'عرض';
         viewLink.setAttribute('target', '_blank');
         viewLink.setAttribute('rel', 'noopener noreferrer');
+
+        // Share button
+        const shareButton = document.createElement('button');
+        shareButton.textContent = 'مشاركة';
+        shareButton.className = 'share-button';
+        shareButton.onclick = function() {
+          shareImage(imageSource, photo.title || 'صورة من الكنيسة');
+        };
   
         // Delete button
         const deleteLink = document.createElement('a');
@@ -189,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
   
         photoActions.appendChild(viewLink);
+        photoActions.appendChild(shareButton);
         photoActions.appendChild(deleteLink);
         photoItem.appendChild(photoThumbnail);
         photoItem.appendChild(photoTitle);
@@ -243,6 +252,105 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('load', function() {
     console.log('[Photo List] Page loaded, photo cache system active');
   });
+
+  // Share image functionality
+  function shareImage(imageUrl, title) {
+    // Check if Web Share API is supported
+    if (navigator.share && navigator.canShare) {
+      navigator.share({
+        title: title || 'صورة من الكنيسة',
+        text: `شاهد هذه الصورة: ${title}`,
+        url: imageUrl
+      }).catch(error => {
+        console.log('Error sharing:', error);
+        fallbackShare(imageUrl, title);
+      });
+    } else {
+      fallbackShare(imageUrl, title);
+    }
+  }
+
+  // Fallback share function for browsers that don't support Web Share API
+  function fallbackShare(imageUrl, title) {
+    const textToCopy = `${title}\n${imageUrl}`;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showNotification('تم نسخ رابط الصورة إلى الحافظة!', 'success');
+      }).catch(() => {
+        // Fallback for older browsers
+        copyToClipboardFallback(textToCopy);
+      });
+    } else {
+      copyToClipboardFallback(textToCopy);
+    }
+  }
+
+  // Legacy clipboard copy method
+  function copyToClipboardFallback(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      showNotification('تم نسخ رابط الصورة إلى الحافظة!', 'success');
+    } catch (err) {
+      showNotification('فشل في نسخ الرابط', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+  }
+
+  // Simple notification system
+  function showNotification(message, type = 'info', duration = 3000) {
+    // Remove existing notification
+    const existing = document.querySelector('.notification');
+    if (existing) {
+      existing.remove();
+    }
+
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    
+    const colors = {
+      success: '#10b981',
+      error: '#ef4444',
+      warning: '#f59e0b',
+      info: '#3b82f6'
+    };
+    
+    notification.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${colors[type]};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-weight: 600;
+        font-size: 14px;
+        max-width: 300px;
+        word-wrap: break-word;
+      ">
+        ${message}
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, duration);
+  }
 
       const container = document.querySelector('.cross-background');
 

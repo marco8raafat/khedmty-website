@@ -219,7 +219,7 @@
   
   .photo-actions {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     justify-content: space-between;
   }
   
