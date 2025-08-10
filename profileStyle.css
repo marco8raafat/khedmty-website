@@ -78,3 +78,12 @@
     .profile-buttons button:hover {
       background: #0056b3;
     }
+
+    .back-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: #333;
+      text-decoration: none;
+    }
