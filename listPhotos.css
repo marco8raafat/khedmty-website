@@ -252,6 +252,43 @@
     outline: none;
     box-shadow: 0 0 0 3px rgba(49, 77, 159, 0.3);
   }
+
+  /* Share button styling */
+  .share-button {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 10px 0;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    flex: 1;
+    text-align: center;
+    min-width: 80px;
+    touch-action: manipulation;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .share-button:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .share-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+  }
+
+  .share-button:active {
+    transform: translateY(0);
+  }
   
   .empty-state {
     text-align: center;

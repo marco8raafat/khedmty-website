@@ -45,8 +45,7 @@
       <span onclick="closeModal()" style="position: absolute; top: 10px; right: 25px; color: white; font-size: 35px; font-weight: bold; cursor: pointer;">&times;</span>
       <img id="modalImage" src="" alt="" style="max-width: 100%; max-height: 70vh; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
     </div>
-  </div>content">
-      <span class="close-modal" onclick="closeModal()">&times;</span>
+  </div>
       <img id="modalImage" class="modal-image" src="" alt="">
     </div>
   </div>
@@ -121,6 +120,20 @@
       const filteredPhotos = allPhotos.filter(photo =>
         photo.title && photo.title.toLowerCase().includes(filterText.toLowerCase())
       );
+
+      // Sort photos by timestamp/date (latest first)
+      filteredPhotos.sort((a, b) => {
+        // Try to get timestamp from multiple possible fields
+        const timeA = a.timestamp || a.uploadTime || a.dateUploaded || a.createdAt || 0;
+        const timeB = b.timestamp || b.uploadTime || b.dateUploaded || b.createdAt || 0;
+        
+        // Convert to numbers if they're strings
+        const numTimeA = typeof timeA === 'string' ? new Date(timeA).getTime() : timeA;
+        const numTimeB = typeof timeB === 'string' ? new Date(timeB).getTime() : timeB;
+        
+        // Sort descending (latest first)
+        return numTimeB - numTimeA;
+      });
   
       if (filteredPhotos.length === 0) {
         displayEmptyState();
@@ -163,7 +176,16 @@
         viewLink.setAttribute('target', '_blank');
         viewLink.setAttribute('rel', 'noopener noreferrer');
 
-        photoActions.appendChild(viewLink); // Only adding view link, no delete button
+        // Share button
+        const shareButton = document.createElement('button');
+        shareButton.textContent = 'مشاركة';
+        shareButton.className = 'share-button';
+        shareButton.onclick = function() {
+          shareImage(imageSource, photo.title || 'صورة من الكنيسة');
+        };
+
+        photoActions.appendChild(viewLink);
+        photoActions.appendChild(shareButton);
   
         photoItem.appendChild(photoThumbnail);
         photoItem.appendChild(photoTitle);
@@ -225,6 +247,106 @@
         closeModal();
       }
     });
+
+    // Share image functionality
+    function shareImage(imageUrl, title) {
+      // Check if Web Share API is supported
+      if (navigator.share && navigator.canShare) {
+        navigator.share({
+          title: title || 'صورة من الكنيسة',
+          text: `شاهد هذه الصورة: ${title}`,
+          url: imageUrl
+        }).catch(error => {
+          console.log('Error sharing:', error);
+          fallbackShare(imageUrl, title);
+        });
+      } else {
+        fallbackShare(imageUrl, title);
+      }
+    }
+
+    // Fallback share function for browsers that don't support Web Share API
+    function fallbackShare(imageUrl, title) {
+      const textToCopy = `${title}\n${imageUrl}`;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          showNotification('تم نسخ رابط الصورة إلى الحافظة!', 'success');
+        }).catch(() => {
+          // Fallback for older browsers
+          copyToClipboardFallback(textToCopy);
+        });
+      } else {
+        copyToClipboardFallback(textToCopy);
+      }
+    }
+
+    // Legacy clipboard copy method
+    function copyToClipboardFallback(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        showNotification('تم نسخ رابط الصورة إلى الحافظة!', 'success');
+      } catch (err) {
+        showNotification('فشل في نسخ الرابط', 'error');
+      }
+      
+      document.body.removeChild(textArea);
+    }
+
+    // Simple notification system
+    function showNotification(message, type = 'info', duration = 3000) {
+      // Remove existing notification
+      const existing = document.querySelector('.notification');
+      if (existing) {
+        existing.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      
+      const colors = {
+        success: '#10b981',
+        error: '#ef4444',
+        warning: '#f59e0b',
+        info: '#3b82f6'
+      };
+      
+      notification.innerHTML = `
+        <div style="
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: ${colors[type]};
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 10000;
+          font-weight: 600;
+          font-size: 14px;
+          max-width: 300px;
+          word-wrap: break-word;
+        ">
+          ${message}
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, duration);
+    }
+
         function toggleMobileMenu() {
       const navMenu = document.getElementById('navMenu');
       navMenu.classList.toggle('active');
