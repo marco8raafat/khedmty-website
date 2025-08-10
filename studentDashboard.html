@@ -284,7 +284,7 @@ label {
       border-radius: 20px;
       text-align: center;
       margin-bottom: 40px;
-      box-shadow: 0 8px 25px rgba(56, 142, 60, 0.3);
+      box-shadow: 0 8px 25px rgba(9, 9, 9, 0.3);
     }
 
     .welcome-section h1 {
@@ -552,7 +552,7 @@ label {
       }
       
       .quick-links {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       }
       
       .welcome-section h1 {
@@ -648,6 +648,9 @@ label {
     </div>
 
     <div class="quick-links">
+      <a href="index.html" class="quick-link">
+        🏠<br>الصفحة الرئيسية
+      </a>
       <a href="alerts-list.html" class="quick-link">
         🔔<br>التنبيهات
       </a>
