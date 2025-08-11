@@ -23,6 +23,67 @@
     return true;
   }
 
+  // Check if user is authenticated and has servant role
+  async function checkAuthentication() {
+    const currentEmail = sessionStorage.getItem("currentUser");
+    console.log("Current email from session:", currentEmail);
+    
+    if (!currentEmail) {
+      alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
+    
+    try {
+      const userSnapshot = await db.ref(`users/${emailKey}`).once('value');
+      const userData = userSnapshot.val();
+      
+      if (!userData || Object.keys(userData).length === 0) {
+        console.log("No user data found, redirecting to login");
+        alert("لم يتم العثور على بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى");
+        window.location.href = "login.html";
+        return false;
+      }
+
+      // Check if user is a servant/teacher
+      if (!checkIfServant(userData)) {
+        console.log("User is not a servant, access denied");
+        alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للخدام فقط");
+        window.location.href = "login.html";
+        return false;
+      }
+
+      console.log("User authenticated successfully as servant");
+      return true;
+      
+    } catch (error) {
+      console.error("Error checking authentication:", error);
+      alert("حدث خطأ أثناء التحقق من الصلاحيات. يرجى المحاولة مرة أخرى");
+      window.location.href = "login.html";
+      return false;
+    }
+  }
+
+  function checkIfServant(userData) {
+    if (!userData || !userData.role) {
+      console.log("No role found in user data");
+      return false;
+    }
+    
+    const userRole = userData.role.toLowerCase();
+    const allowedRoles = ['teacher', 'servant', 'admin', 'خادم', 'معلم', 'مدير'];
+    
+    console.log("User role:", userRole);
+    console.log("Checking against allowed roles:", allowedRoles);
+    
+    const isServant = allowedRoles.includes(userRole);
+    console.log("Is servant:", isServant);
+    
+    return isServant;
+  }
+
   function toggleMobileMenu() {
     const navMenu = document.getElementById('navMenu');
     navMenu.classList.toggle('active');
@@ -37,6 +98,12 @@
   }
 
   async function loadAvailableDates() {
+    // Check authentication before loading data
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) {
+      return;
+    }
+
     try {
       const snapshot = await db.ref('attendance').once('value');
       const data = snapshot.val();
@@ -66,7 +133,10 @@
   }
 
   async function fetchAttendanceByDate() {
-    if (!checkAuth()) return;
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) {
+      return;
+    }
 
     const date = document.getElementById('dateSelect').value;
     const tbody = document.getElementById('attendanceBody');
@@ -113,7 +183,6 @@
   }
 
   window.onload = function() {
-    checkAuth();
     loadAvailableDates();
   };
   document.querySelector('.menu-toggle').addEventListener('click', function () {

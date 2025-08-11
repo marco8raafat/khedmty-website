@@ -751,6 +751,15 @@ footer {
       </div>
 
       <div class="dashboard-card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">إدارة الدرجات</div>
+        <div class="card-description">عرض شامل لجميع درجات الطلاب مع إمكانية البحث</div>
+        <div class="card-actions">
+          <a href="totalGrades.html" class="card-btn">عرض جميع الدرجات</a>
+        </div>
+      </div>
+      
+      <div class="dashboard-card">
         <div class="card-icon">🏆</div>
         <div class="card-title">ترتيب الطلاب</div>
         <div class="card-description">عرض ترتيب أفضل الطلاب حسب الحضور والمشاركة</div>
@@ -759,14 +768,6 @@ footer {
         </div>
       </div>
 
-      <div class="dashboard-card">
-        <div class="card-icon">📊</div>
-        <div class="card-title">إدارة الدرجات</div>
-        <div class="card-description">عرض شامل لجميع درجات الطلاب مع إمكانية البحث</div>
-        <div class="card-actions">
-          <a href="totalGrades.html" class="card-btn">عرض جميع الدرجات</a>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -925,6 +926,7 @@ footer {
       console.log("Current email from session:", currentEmail);
       
       if (!currentEmail) {
+        alert("يرجى تسجيل الدخول أولاً");
         window.location.href = "login.html";
         return false;
       }
@@ -941,6 +943,15 @@ footer {
       
       if (!userData || Object.keys(userData).length === 0) {
         console.log("No user data found, redirecting to login");
+        alert("لم يتم العثور على بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى");
+        window.location.href = "login.html";
+        return false;
+      }
+
+      // Check if user is a servant/teacher
+      if (!checkIfServant(userData)) {
+        console.log("User is not a servant, access denied");
+        alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للخدام فقط");
         window.location.href = "login.html";
         return false;
       }
@@ -954,6 +965,24 @@ footer {
       }
 
       return true;
+    }
+
+    function checkIfServant(userData) {
+      if (!userData || !userData.role) {
+        console.log("No role found in user data");
+        return false;
+      }
+      
+      const userRole = userData.role.toLowerCase();
+      const allowedRoles = ['teacher', 'servant', 'admin', 'خادم', 'معلم', 'مدير'];
+      
+      console.log("User role:", userRole);
+      console.log("Checking against allowed roles:", allowedRoles);
+      
+      const isServant = allowedRoles.includes(userRole);
+      console.log("Is servant:", isServant);
+      
+      return isServant;
     }
 
     async function updateStats() {

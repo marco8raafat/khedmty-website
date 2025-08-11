@@ -28,7 +28,7 @@ const firebaseConfig = {
       const currentUser = sessionStorage.getItem("currentUser");
       
       if (!currentUser) {
-        showMessage("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة", "error");
+        showMessage("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة", "error");
         setTimeout(() => {
           window.location.href = "login.html";
         }, 2000);
@@ -36,7 +36,7 @@ const firebaseConfig = {
       }
 
       // Verify user exists in Firebase
-      const emailKey = currentUser.replace(/\./g, '_');
+      const emailKey = currentUser.replace(/[.#$\[\]]/g, '_');
       try {
         const snapshot = await db.ref('users/' + emailKey).once('value');
         if (!snapshot.exists()) {
@@ -49,11 +49,11 @@ const firebaseConfig = {
         }
         
         const userData = snapshot.val();
-        // Check if user is a servant (only servants can upload exams)
-        if (userData.role !== "servant") {
+        // Check if user is a servant using enhanced role checking
+        if (!checkIfServant(userData)) {
           showMessage("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للخدام فقط", "error");
           setTimeout(() => {
-            window.location.href = userData.role === "student" ? "studentDashboard.html" : "index.html";
+            window.location.href = userData.role === "student" ? "studentDashboard.html" : "login.html";
           }, 2000);
           return false;
         }
@@ -69,6 +69,24 @@ const firebaseConfig = {
       }
     }
 
+    function checkIfServant(userData) {
+      if (!userData || !userData.role) {
+        console.log("No role found in user data");
+        return false;
+      }
+      
+      const userRole = userData.role.toLowerCase();
+      const allowedRoles = ['teacher', 'servant', 'admin', 'خادم', 'معلم', 'مدير'];
+      
+      console.log("User role:", userRole);
+      console.log("Checking against allowed roles:", allowedRoles);
+      
+      const isServant = allowedRoles.includes(userRole);
+      console.log("Is servant:", isServant);
+      
+      return isServant;
+    }
+
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
         sessionStorage.removeItem("currentUser");
@@ -77,8 +95,14 @@ const firebaseConfig = {
     }
 
     // Form submission handler
-    document.getElementById("examForm").addEventListener("submit", function(e) {
+    document.getElementById("examForm").addEventListener("submit", async function(e) {
       e.preventDefault();
+
+      // Check authentication before processing upload
+      const isAuthenticated = await checkAuthentication();
+      if (!isAuthenticated) {
+        return;
+      }
 
       const examName = document.getElementById("examName").value.trim();
       const examLink = document.getElementById("examLink").value.trim();
