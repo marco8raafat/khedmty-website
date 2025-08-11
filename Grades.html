@@ -525,32 +525,29 @@ for (let i = 0; i < crossCount; i++) {
         Object.values(researches).forEach(research => {
           if (research.studentName === studentName && research.totalGrade) {
             const row = document.createElement("tr");
-            const totalGrade = research.totalGrade;
+            const totalGrade = parseFloat(research.totalGrade) || 0;
             
             // Determine status based on grade
             let statusClass = "";
             let status = "";
-            if (totalGrade && parseFloat(totalGrade) >= 50) {
-              statusClass = "success";
-              status = totalGrade;
-            } else if (totalGrade) {
-              statusClass = "fail";
-              status = totalGrade;
-            } else {
-              status = "-";
-            }
-            
+            if (totalGrade >= 30) {
+            statusClass = "success";
+            statusText = "ناجح";
+          } else {
+            statusClass = "fail";
+            statusText = "راسب";
+          }
             row.innerHTML = `
-              <td>الأبحاث</td>
-              <td>${totalGrade || "-"}</td>
-              <td class="${statusClass}">${status}</td>
+              <td>البحث</td>
+                <td>${totalGrade}</td>
+                <td class="${statusClass}">${statusText}</td>
             `;
             tableBody.appendChild(row);
           }
         });
       }
     } catch (error) {
-      console.error("خطأ في تحميل درجات الأبحاث:", error);
+      console.error("خطأ في تحميل درجة البحث :", error);
     }
   }
 
