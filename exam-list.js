@@ -1,1 +1,68 @@
-const _0x48c656=_0xf6b9;function _0xf6b9(_0x4c14c6,_0xb986b1){const _0x2234dc=_0x2234();return _0xf6b9=function(_0x17b316,_0x5e488d){_0x17b316=_0x17b316-0x1ed;let _0x57a708=_0x2234dc[_0x17b316];return _0x57a708;},_0xf6b9(_0x4c14c6,_0xb986b1);}(function(_0x5bfa6e,_0x3dafc9){const _0x3f6649=_0xf6b9,_0x58693a=_0x5bfa6e();while(!![]){try{const _0x3f7992=parseInt(_0x3f6649(0x21e))/0x1*(-parseInt(_0x3f6649(0x214))/0x2)+-parseInt(_0x3f6649(0x202))/0x3+parseInt(_0x3f6649(0x215))/0x4+-parseInt(_0x3f6649(0x206))/0x5*(parseInt(_0x3f6649(0x201))/0x6)+-parseInt(_0x3f6649(0x1fa))/0x7*(parseInt(_0x3f6649(0x21b))/0x8)+parseInt(_0x3f6649(0x1f4))/0x9*(parseInt(_0x3f6649(0x20b))/0xa)+parseInt(_0x3f6649(0x210))/0xb;if(_0x3f7992===_0x3dafc9)break;else _0x58693a['push'](_0x58693a['shift']());}catch(_0x41e7a2){_0x58693a['push'](_0x58693a['shift']());}}}(_0x2234,0xbc3c7),document[_0x48c656(0x21a)]('DOMContentLoaded',function(){const _0x1c9267=_0x48c656,_0x59b96f={'apiKey':'AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac','authDomain':_0x1c9267(0x208),'databaseURL':_0x1c9267(0x203),'projectId':_0x1c9267(0x1f2),'storageBucket':_0x1c9267(0x1fd),'messagingSenderId':_0x1c9267(0x20c),'appId':_0x1c9267(0x217)};firebase[_0x1c9267(0x1fe)](_0x59b96f);const _0x1451c4=firebase[_0x1c9267(0x21d)](),_0x264c3f=document['getElementById'](_0x1c9267(0x1f6));function _0x3f1d04(){const _0x1f350d=_0x1c9267;_0x264c3f[_0x1f350d(0x209)]='<li>جاري\x20تحميل\x20الامتحانات...</li>',_0x1451c4[_0x1f350d(0x204)](_0x1f350d(0x20d))['once'](_0x1f350d(0x216))['then'](_0x5ef5c1=>{const _0xd369a=_0x1f350d,_0x11a31e=_0x5ef5c1['val']();_0x264c3f[_0xd369a(0x209)]='';if(!_0x11a31e){_0x264c3f['innerHTML']='<li>لا\x20يوجد\x20امتحانات\x20حالياً.</li>';return;}const _0x51bce4=Object[_0xd369a(0x20f)](_0x11a31e);_0x51bce4['forEach'](([_0x185d52,_0x1f99e8])=>{const _0x401e70=_0xd369a,_0x45a5a4=document[_0x401e70(0x1f5)]('li');_0x45a5a4[_0x401e70(0x209)]=_0x401e70(0x219)+_0x1f99e8[_0x401e70(0x220)]+'</strong><br>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22openExam(\x27'+_0x1f99e8['link']+_0x401e70(0x1ee)+_0x185d52+'\x27)\x22>حذف</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',_0x264c3f[_0x401e70(0x1f1)](_0x45a5a4);});})['catch'](_0x53e188=>{const _0x5378db=_0x1f350d;console[_0x5378db(0x1fb)](_0x5378db(0x21c),_0x53e188),_0x264c3f[_0x5378db(0x209)]=_0x5378db(0x207);});}function _0x4bedb6(_0x179b23){const _0x2b6fc6=_0x1c9267;window[_0x2b6fc6(0x20e)](_0x179b23,_0x2b6fc6(0x1f7));}function _0x2897c2(_0x513ab9){const _0x3edfce=_0x1c9267;confirm(_0x3edfce(0x21f))&&_0x1451c4['ref'](_0x3edfce(0x1ef)+_0x513ab9)['remove']()[_0x3edfce(0x1ed)](()=>{const _0x5de82a=_0x3edfce;alert(_0x5de82a(0x1f3)),_0x3f1d04();})[_0x3edfce(0x1f0)](_0x369930=>{const _0x61681d=_0x3edfce;console[_0x61681d(0x1fb)](_0x61681d(0x212),_0x369930),alert(_0x61681d(0x1ff));});}_0x3f1d04();const _0x514439=document[_0x1c9267(0x200)]('.cross-background'),_0x442cdb=_0x1c9267(0x213),_0x3afd6f=window[_0x1c9267(0x1fc)]<0x300,_0x233619=_0x3afd6f?0xa:0x19;for(let _0x13670a=0x0;_0x13670a<_0x233619;_0x13670a++){const _0x3c3c2a=document[_0x1c9267(0x1f5)](_0x1c9267(0x1f9));_0x3c3c2a['className']='cross',_0x3c3c2a['innerHTML']=_0x442cdb,_0x3c3c2a[_0x1c9267(0x211)][_0x1c9267(0x20a)]=Math[_0x1c9267(0x1f8)]()*0x64+'vw',_0x3c3c2a[_0x1c9267(0x211)][_0x1c9267(0x218)]=Math[_0x1c9267(0x1f8)]()*0x64+'vh',_0x3c3c2a[_0x1c9267(0x211)][_0x1c9267(0x205)]=0xc+Math['random']()*0xb+'s',_0x514439[_0x1c9267(0x1f1)](_0x3c3c2a);}}));function _0x2234(){const _0x1ff89c=['style','خطأ\x20أثناء\x20حذف\x20الامتحان:','\x0a\x20\x20<?xml\x20version=\x221.0\x22\x20encoding=\x22iso-8859-1\x22?>\x0a<!--\x20Generator:\x20Adobe\x20Illustrator\x2019.0.0,\x20SVG\x20Export\x20Plug-In\x20.\x20SVG\x20Version:\x206.00\x20Build\x200)\x20\x20-->\x0a<!--\x20License:\x20CC0.\x20Made\x20by\x20SVG\x20Repo:\x20https://www.svgrepo.com/svg/90761/cross\x20-->\x0a<svg\x20version=\x221.1\x22\x20id=\x22Capa_1\x22\x20xmlns=\x22http://www.w3.org/2000/svg\x22\x20xmlns:xlink=\x22http://www.w3.org/1999/xlink\x22\x20x=\x220px\x22\x20y=\x220px\x22\x0a\x09\x20viewBox=\x220\x200\x2060\x2060\x22\x20style=\x22enable-background:new\x200\x200\x2060\x2060;\x22\x20xml:space=\x22preserve\x22>\x0a<path\x20d=\x22M52.247,19.665c-0.396,0-0.785,0.049-1.162,0.145c-0.403-2.214-2.347-3.897-4.675-3.897c-2.396,0-4.382,1.781-4.707,4.087\x0a\x09H35v-4.811c2.077-0.517,3.594-2.381,3.594-4.599c0-2.188-1.486-4.036-3.503-4.586c0.11-0.404,0.167-0.824,0.167-1.251\x0a\x09C35.258,2.132,33.126,0,30.506,0c-2.621,0-4.753,2.132-4.753,4.753c0,0.395,0.049,0.785,0.145,1.162C23.684,6.318,22,8.262,22,10.59\x0a\x09c0,2.364,1.735,4.331,4,4.693V20h-7.812c-0.516-2.077-2.38-3.594-4.599-3.594c-2.188,0-4.035,1.486-4.585,3.503\x0a\x09c-0.405-0.11-0.825-0.167-1.252-0.167C5.132,19.742,3,21.874,3,24.495s2.132,4.753,4.753,4.753c0.396,0,0.785-0.049,1.162-0.145\x0a\x09C9.318,31.316,11.262,33,13.59,33c2.365,0,4.332-1.736,4.693-4H26v15.84c-2.026,0.551-3.506,2.405-3.506,4.569\x0a\x09c0,2.188,1.486,4.036,3.502,4.586c-0.11,0.405-0.167,0.825-0.167,1.252c0,2.621,2.132,4.752,4.753,4.752s4.753-2.132,4.753-4.752\x0a\x09c0-0.395-0.049-0.785-0.146-1.162c2.215-0.404,3.898-2.347,3.898-4.676c0-2.395-1.781-4.382-4.088-4.706V29h6.84\x0a\x09c0.552,2.027,2.406,3.506,4.57,3.506c2.188,0,4.035-1.486,4.585-3.503c0.405,0.11,0.825,0.167,1.252,0.167\x0a\x09c2.621,0,4.753-2.132,4.753-4.752S54.868,19.665,52.247,19.665z\x22/>\x0a</svg>\x0a\x0a\x20\x20','56NMuzle','2034916qclCaD','value','1:679576633778:web:566e6aaef9b72f71a824ab','top','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>','addEventListener','11057064ujzBQQ','حدث\x20خطأ\x20أثناء\x20تحميل\x20الامتحانات:','database','1201fnlgZN','هل\x20أنت\x20متأكد\x20من\x20حذف\x20الامتحان؟','name','then','\x27)\x22>فتح\x20الامتحان</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22delete\x22\x20onclick=\x22deleteExam(\x27','exams/','catch','appendChild','edad-5odam','تم\x20حذف\x20الامتحان.','9fGRKKl','createElement','examList','_blank','random','div','7fIuAAQ','error','innerWidth','edad-5odam.appspot.com','initializeApp','حدث\x20خطأ\x20أثناء\x20حذف\x20الامتحان.','querySelector','4123572FNPSAl','4153143wiBhxQ','https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app','ref','animationDuration','5KfSUSl','<li>فشل\x20تحميل\x20الامتحانات.</li>','edad-5odam.firebaseapp.com','innerHTML','left','4930650XgtCFU','679576633778','exams','open','entries','35822875yEbhvh'];_0x2234=function(){return _0x1ff89c;};return _0x2234();}
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+    authDomain: "edad-5odam.firebaseapp.com",
+    databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "edad-5odam",
+    storageBucket: "edad-5odam.appspot.com",
+    messagingSenderId: "679576633778",
+    appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const examList = document.getElementById("examList");
+
+  function renderExamsFromFirebase() {
+    examList.innerHTML = "<li>جاري تحميل الامتحانات...</li>";
+
+    db.ref("exams").once("value")
+      .then(snapshot => {
+        const examsData = snapshot.val();
+        examList.innerHTML = "";
+
+        if (!examsData) {
+          examList.innerHTML = "<li>لا يوجد امتحانات حالياً.</li>";
+          return;
+        }
+
+        const exams = Object.entries(examsData); // [ [key, data], ... ]
+
+        exams.forEach(([key, exam]) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <strong>${exam.name}</strong><br>
+            <button onclick="openExam('${exam.link}')">فتح الامتحان</button>
+            <button class="delete" onclick="deleteExam('${key}')">حذف</button>
+          `;
+          examList.appendChild(li);
+        });
+      })
+      .catch(error => {
+        console.error("حدث خطأ أثناء تحميل الامتحانات:", error);
+        examList.innerHTML = "<li>فشل تحميل الامتحانات.</li>";
+      });
+  }
+
+  function openExam(link) {
+    window.open(link, "_blank");
+  }
+
+  function deleteExam(examKey) {
+    if (confirm("هل أنت متأكد من حذف الامتحان؟")) {
+      db.ref("exams/" + examKey).remove()
+        .then(() => {
+          alert("تم حذف الامتحان.");
+          renderExamsFromFirebase(); // Reload after delete
+        })
+        .catch(error => {
+          console.error("خطأ أثناء حذف الامتحان:", error);
+          alert("حدث خطأ أثناء حذف الامتحان.");
+        });
+    }
+  }
+
+  // Start rendering
+  renderExamsFromFirebase();
