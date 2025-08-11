@@ -32,8 +32,15 @@
 
     <label>الدور</label>
     <div class="role-options">
-      <label><input type="radio" name="role" value="student" checked> طالب</label>
-      <label><input type="radio" name="role" value="servant"> خادم</label>
+      <label><input type="radio" name="role" value="student" checked onchange="toggleServantToken()"> طالب</label>
+      <label><input type="radio" name="role" value="servant" onchange="toggleServantToken()"> خادم</label>
+    </div>
+
+    <!-- Servant Token Field - Initially Hidden -->
+    <div id="servantTokenField" style="display: none;">
+      <label for="servantToken">الرمز السري للخادم</label>
+      <input type="password" id="servantToken" name="servantToken" placeholder="أدخل الرمز السري للخادم">
+      <small style="color: #666; font-size: 0.9em;">هذا الحقل مطلوب فقط للخدام - يرجى الحصول على الرمز من إدارة الكنيسة</small>
     </div>
 
     <button type="submit" class="btn">تسجيل</button>
