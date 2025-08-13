@@ -40,6 +40,7 @@ document.querySelectorAll('.nav-link').forEach(link => {
       navMenu.classList.remove('active');
       // Remove body class when menu closes
       body.classList.remove('menu-active');
+      body.style.paddingTop = '80px'; // إعادة تعيين الـ padding
     }
   });
 });
