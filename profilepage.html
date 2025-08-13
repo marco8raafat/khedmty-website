@@ -3,15 +3,256 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>صفحة البروفايل</title>
+  <title>صفحة البروفايل | خدمتي</title>
   <link rel="icon" type="image/png" href="logoCircle1.png">
-  <link rel="stylesheet" href="profileStyle.css">
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="صفحة البروفايل في تطبيق خدمتي - إدارة بيانات الخدام والمخدومين في كنيسة السيدة العذراء مريم بعزبة النخل.">
+  <meta name="keywords" content="خدمتي, صفحة بروفايل, كنيسة السيدة العذراء مريم, عزبة النخل, إدارة الخدام, المخدومين">
+  <meta name="author" content="أسرة البابا أثناسيوس الرسولي">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="Arabic">
+  <meta name="theme-color" content="#233B6E">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background-image: url('knesa.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      padding: 20px;
+      padding-top: 80px; /* Space for navbar */
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .cross-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .cross {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      animation: float 12s linear infinite;
+      opacity: 0.7;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+    }
+
+    .cross svg {
+      width: 100%;
+      height: 100%;
+      fill: rgba(255, 255, 255, 0.265);
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) scale(1);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-20vh) scale(1.3);
+        opacity: 0;
+      }
+    }
+
+    nav.navbar {
+      width: 100%;
+      max-width: 1200px;
+      background-color: #233B6E;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      margin: 0 auto;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-left img.church-logo {
+      height: 50px;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      padding: 0;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #FFD700;
+      transform: scale(1.1);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .profile-frame {
+      width: 100%;
+      max-width: 360px;
+      background: #fff;
+      border-radius: 30px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 15px; /* Reduced margin-top, handled by body padding */
+      box-sizing: border-box;
+      opacity: 1;
+      z-index: 2;
+    }
+
+    .avatar-image {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 20px;
+      background-color: #eee;
+    }
+
+    h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .info-line {
+      font-size: 18px;
+      color: #444;
+      margin: 10px 0;
+      width: 100%;
+      text-align: center;
+    }
+
+    .profile-buttons {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .profile-buttons button {
+      background: #233B6E;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 15px;
+      margin: 10px 0;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s ease;
+    }
+
+    .profile-buttons button:hover {
+      background: #0056b3;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 16px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .retry-button {
+      background: #233B6E;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .retry-button:hover {
+      background: #0056b3;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      .nav-right {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: #233B6E;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        padding: 10px;
+        z-index: 1000;
+      }
+
+      .nav-right.active {
+        display: flex;
+      }
+
+      .nav-link {
+        padding: 10px;
+        text-align: right;
+      }
+
+      .profile-frame {
+        margin-top: 120px; /* Extra space for nav-right on mobile */
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="cross-background"></div>
+  <div class="cross-background"></div>
 
-<nav class="navbar">
+  <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="شعار الكنيسة" class="church-logo">
       <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
@@ -23,24 +264,273 @@
     </div>
   </nav>
 
-  <div class="profile-frame ">
+  <div class="profile-frame">
     <img class="avatar-image" src="profileicon.png" alt="User Icon">
-
-    <h2 id="username"></h2>
-    <div class="info-line" id="email"></div>
-    <div class="info-line" id="phone"></div>
-    <div class="info-line" id="group"></div>
-    <div class="info-line" id="role"></div>
-
+    <h2 id="username">جاري التحميل...</h2>
+    <div class="info-line" id="email">📧 جاري التحميل...</div>
+    <div class="info-line" id="phone">📞 جاري التحميل...</div>
+    <div class="info-line" id="group">👥 جاري التحميل...</div>
+    <div class="info-line" id="role">🎓 جاري التحميل...</div>
+    <div class="error-message" id="errorMessage" style="display: none;"></div>
+    <button class="retry-button" id="retryBtn" style="display: none;">إعادة المحاولة</button>
     <div class="profile-buttons">
-      <button id="editBtn">تعديل البيانات</button>
-      <button id="logoutBtn">تسجيل الخروج</button>
+      <button id="editBtn" disabled>تعديل البيانات</button>
+      <button id="logoutBtn" disabled>تسجيل الخروج</button>
     </div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script src="sessionUtils.js"></script>
-<script src="profile.js"></script>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script>
+    const svgCross = `
+    <?xml version="1.0" encoding="iso-8859-1"?>
+    <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 60 60" xml:space="preserve">
+    <path d="M52.247,19.665c-0.396,0-0.785,0.049-1.162,0.145c-0.403-2.214-2.347-3.897-4.675-3.897c-2.396,0-4.382,1.781-4.707,4.087
+    H35v-4.811c2.077-0.517,3.594-2.381,3.594-4.599c0-2.188-1.486-4.036-3.503-4.586c0.11-0.404,0.167-0.824,0.167-1.251
+    C35.258,2.132,33.126,0,30.506,0c-2.621,0-4.753,2.132-4.753,4.753c0,0.395,0.049,0.785,0.145,1.162C23.684,6.318,22,8.262,22,10.59
+    c0,2.364,1.735,4.331,4,4.693V20h-7.812c-0.516-2.077-2.38-3.594-4.599-3.594c-2.188,0-4.035,1.486-4.585,3.503
+    c-0.405-0.11-0.825-0.167-1.252-0.167C5.132,19.742,3,21.874,3,24.495s2.132,4.753,4.753,4.753c0.396,0,0.785-0.049,1.162-0.145
+    C9.318,31.316,11.262,33,13.59,33c2.365,0,4.332-1.736,4.693-4H26v15.84c-2.026,0.551-3.506,2.405-3.506,4.569
+    c0,2.188,1.486,4.036,3.502,4.586c-0.11,0.405-0.167,0.825-0.167,1.252c0,2.621,2.132,4.752,4.753,4.752s4.753-2.132,4.753-4.752
+    c0-0.395-0.049-0.785-0.146-1.162c2.215-0.404,3.898-2.347,3.898-4.676c0-2.395-1.781-4.382-4.088-4.706V29h6.84
+    c0.552,2.027,2.406,3.506,4.57,3.506c2.188,0,4.035-1.486,4.585-3.503c0.405,0.11,0.825,0.167,1.252,0.167c2.621,0,4.753-2.132,4.753-4.752S54.868,19.665,52.247,19.665z"/>
+    </svg>
+    `;
+
+    const container = document.querySelector('.cross-background');
+    const isMobile = window.innerWidth < 768;
+    const crossCount = isMobile ? 10 : 25;
+
+    for (let i = 0; i < crossCount; i++) {
+      const cross = document.createElement('div');
+      cross.className = 'cross';
+      cross.innerHTML = svgCross;
+      cross.style.left = Math.random() * 100 + 'vw';
+      cross.style.top = Math.random() * 100 + 'vh';
+      cross.style.animationDuration = (12 + Math.random() * 11) + 's';
+      container.appendChild(cross);
+    }
+
+    function toggleMobileMenu() {
+      const navMenu = document.getElementById('navMenu');
+      const profileFrame = document.querySelector('.profile-frame');
+      navMenu.classList.toggle('active');
+
+      // Scroll to profile-frame when menu is toggled on mobile
+      if (isMobile) {
+        setTimeout(() => {
+          const navHeight = document.querySelector('.navbar').offsetHeight;
+          const menuHeight = navMenu.classList.contains('active') ? navMenu.offsetHeight : 0;
+          console.log('Nav Height:', navHeight, 'Menu Height:', menuHeight); // Debugging
+          profileFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          window.scrollBy(0, -(navHeight + menuHeight + 20));
+        }, 100); // Small delay to ensure menu is rendered
+      }
+    }
+
+    // Scroll to profile-frame on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const profileFrame = document.querySelector('.profile-frame');
+        const navHeight = document.querySelector('.navbar').offsetHeight;
+        console.log('Nav Height on Load:', navHeight); // Debugging
+        profileFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.scrollBy(0, -(navHeight + 20));
+      }, 100); // Small delay to ensure elements are rendered
+    });
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+      authDomain: "edad-5odam.firebaseapp.com",
+      databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "edad-5odam",
+      storageBucket: "edad-5odam.appspot.com",
+      messagingSenderId: "679576633778",
+      appId: "1:679576633778:web:566e6aaef9b72f71a824ab",
+      measurementId: "G-7WB1WPDLRH"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const auth = firebase.auth();
+
+    // Session verification function
+    function verifySecureSession() {
+      const user = auth.currentUser;
+      return user ? user.email : null;
+    }
+
+    // Clear session function
+    function clearSession() {
+      auth.signOut().then(() => {
+        console.log("User signed out successfully");
+      }).catch((error) => {
+        console.error("Error signing out:", error);
+      });
+    }
+
+    // Function to load user data
+    function loadUserData() {
+      const errorMessage = document.getElementById("errorMessage");
+      const retryBtn = document.getElementById("retryBtn");
+      errorMessage.style.display = "none";
+      retryBtn.style.display = "none";
+
+      auth.onAuthStateChanged((user) => {
+        const currentEmail = user ? user.email : null;
+
+        if (currentEmail) {
+          const emailKey = currentEmail.replace(/\./g, '_');
+
+          // Fetch user data from Firebase
+          database.ref("users/" + emailKey).once("value").then((snapshot) => {
+            if (!snapshot.exists()) {
+              console.error("No user data found for email:", currentEmail);
+              errorMessage.textContent = "لم يتم العثور على بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى.";
+              errorMessage.style.display = "block";
+              retryBtn.style.display = "block";
+              document.getElementById("editBtn").disabled = true;
+              document.getElementById("logoutBtn").disabled = true;
+              return;
+            }
+
+            const userData = snapshot.val();
+            if (userData) {
+              document.getElementById("username").textContent = userData.username || "غير متوفر";
+              document.getElementById("email").textContent = "📧 البريد الإلكتروني: " + (userData.email || "غير متوفر");
+              document.getElementById("phone").textContent = "📞 رقم التليفون: " + (userData.phone || "غير متوفر");
+              document.getElementById("group").textContent = "👥 اسم المجموعة: " + (userData.group || "غير متوفر");
+              document.getElementById("role").textContent = "🎓 الدور: " + (userData.role === "student" ? "طالب" : userData.role === "servant" ? "خادم" : "غير متوفر");
+
+              // Enable buttons
+              document.getElementById("editBtn").disabled = false;
+              document.getElementById("logoutBtn").disabled = false;
+
+              // Update navigation based on authentication status
+              updateNavigationBasedOnAuth(userData.role);
+            } else {
+              console.error("User data is empty");
+              errorMessage.textContent = "خطأ في تحميل بيانات المستخدم. يرجى المحاولة لاحقًا.";
+              errorMessage.style.display = "block";
+              retryBtn.style.display = "block";
+              document.getElementById("editBtn").disabled = true;
+              document.getElementById("logoutBtn").disabled = true;
+            }
+          }).catch((error) => {
+            console.error("Firebase error:", error);
+            errorMessage.textContent = "حدث خطأ أثناء تحميل البيانات: " + error.message;
+            errorMessage.style.display = "block";
+            retryBtn.style.display = "block";
+            document.getElementById("editBtn").disabled = true;
+            document.getElementById("logoutBtn").disabled = true;
+          });
+        } else {
+          console.error("No user session found");
+          errorMessage.textContent = "يرجى تسجيل الدخول لعرض الملف الشخصي.";
+          errorMessage.style.display = "block";
+          retryBtn.style.display = "block";
+          document.getElementById("editBtn").disabled = true;
+          document.getElementById("logoutBtn").disabled = true;
+        }
+      });
+    }
+
+    // Initial load
+    loadUserData();
+
+    // Retry button event listener
+    document.getElementById("retryBtn").addEventListener("click", function() {
+      loadUserData();
+    });
+
+    // Add event listeners for edit and logout buttons
+    document.getElementById("editBtn").addEventListener("click", function() {
+      window.location.href = "editprofile.html";
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", function() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        clearSession();
+        window.location.href = "login.html";
+      }
+    });
+
+    // Function to update navigation based on authentication status
+    function updateNavigationBasedOnAuth(userRole) {
+      const navRight = document.querySelector('.nav-right');
+      if (!navRight) {
+        console.warn('Navigation container not found');
+        return;
+      }
+
+      const loginLink = navRight.querySelector('a[href="login.html"]');
+      const registerLink = navRight.querySelector('a[href="register.html"]');
+      let dashboardLink = navRight.querySelector('a[data-dashboard="true"]');
+
+      if (userRole) {
+        // User is logged in
+        if (!dashboardLink && loginLink) {
+          dashboardLink = document.createElement('a');
+          dashboardLink.className = 'nav-link';
+          dashboardLink.setAttribute('data-dashboard', 'true');
+          dashboardLink.textContent = 'لوحة التحكم';
+          dashboardLink.href = userRole === 'student' ? 'studentDashboard.html' : 'teacherDashboard.html';
+          navRight.insertBefore(dashboardLink, loginLink);
+        }
+
+        if (loginLink) {
+          loginLink.href = 'javascript:void(0)';
+          loginLink.textContent = 'تسجيل الخروج';
+          loginLink.onclick = function(e) {
+            e.preventDefault();
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+              clearSession();
+              window.location.href = "login.html";
+            }
+          };
+        }
+
+        if (registerLink) {
+          registerLink.style.display = 'none';
+        }
+      } else {
+        // User is not logged in
+        if (dashboardLink) {
+          dashboardLink.remove();
+        }
+        if (loginLink) {
+          loginLink.href = 'login.html';
+          loginLink.textContent = 'تسجيل الدخول';
+          loginLink.onclick = null;
+        }
+        if (registerLink) {
+          registerLink.style.display = '';
+        }
+      }
+
+      // Close mobile menu when clicking a nav link
+      const navLinks = navRight.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          const navMenu = document.getElementById('navMenu');
+          navMenu.classList.remove('active');
+          // Scroll to profile-frame after closing menu
+          if (isMobile) {
+            setTimeout(() => {
+              const profileFrame = document.querySelector('.profile-frame');
+              const navHeight = document.querySelector('.navbar').offsetHeight;
+              console.log('Nav Height on Menu Close:', navHeight); // Debugging
+              profileFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              window.scrollBy(0, -(navHeight + 20));
+            }, 100);
+          }
+        });
+      });
+    }
+  </script>
 </body>
 </html>
