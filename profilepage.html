@@ -34,6 +34,7 @@
       background-position: center;
       padding: 20px;
       overflow-x: hidden;
+      overflow-y: auto;
     }
 
     .cross-background {
@@ -238,11 +239,11 @@
 
       .nav-link {
         padding: 10px;
-        text-align: right;
+        text-align: left;
       }
 
       .profile-frame {
-        margin-top: 80px;
+        margin-top: 100px; /* Increased margin to account for nav-right height */
       }
     }
   </style>
@@ -313,8 +314,34 @@
 
     function toggleMobileMenu() {
       const navMenu = document.getElementById('navMenu');
+      const profileFrame = document.querySelector('.profile-frame');
       navMenu.classList.toggle('active');
+
+      // Scroll to profile-frame when menu is toggled on mobile
+      if (isMobile && navMenu.classList.contains('active')) {
+        const navHeight = document.querySelector('.navbar').offsetHeight;
+        const menuHeight = navMenu.offsetHeight;
+        window.scrollTo({
+          top: navHeight + menuHeight + 20, // Scroll below navbar and menu
+          behavior: 'smooth'
+        });
+      } else if (isMobile) {
+        window.scrollTo({
+          top: document.querySelector('.navbar').offsetHeight + 20,
+          behavior: 'smooth'
+        });
+      }
     }
+
+    // Scroll to profile-frame on page load
+    window.addEventListener('load', () => {
+      const profileFrame = document.querySelector('.profile-frame');
+      const navHeight = document.querySelector('.navbar').offsetHeight;
+      window.scrollTo({
+        top: navHeight + 20, // Scroll just below navbar
+        behavior: 'smooth'
+      });
+    });
 
     // Firebase configuration
     const firebaseConfig = {
@@ -493,6 +520,13 @@
         link.addEventListener('click', () => {
           const navMenu = document.getElementById('navMenu');
           navMenu.classList.remove('active');
+          // Scroll to profile-frame after closing menu
+          if (isMobile) {
+            window.scrollTo({
+              top: document.querySelector('.navbar').offsetHeight + 20,
+              behavior: 'smooth'
+            });
+          }
         });
       });
     }
