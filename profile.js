@@ -63,6 +63,44 @@ window.addEventListener('resize', () => {
   }
 });
 
+// Close mobile menu when clicking anywhere outside the navbar or pressing Escape
+['click', 'touchstart'].forEach((evt) => {
+  document.addEventListener(evt, (e) => {
+    const body = document.body;
+    if (!body.classList.contains('menu-open')) return;
+
+    const navbar = document.querySelector('.navbar');
+    if (navbar && navbar.contains(e.target)) return; // ignore clicks inside navbar
+
+    const navMenu = document.getElementById('navMenu');
+    // Restore scroll position
+    const scrollY = body.style.top;
+    body.style.top = '';
+    window.scrollTo(0, parseInt(scrollY || '0') * -1);
+
+    navMenu.classList.remove('active');
+    navbar.classList.remove('menu-open');
+    body.classList.remove('menu-open');
+  }, { passive: true });
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const body = document.body;
+  if (!body.classList.contains('menu-open')) return;
+
+  const navbar = document.querySelector('.navbar');
+  const navMenu = document.getElementById('navMenu');
+
+  const scrollY = body.style.top;
+  body.style.top = '';
+  window.scrollTo(0, parseInt(scrollY || '0') * -1);
+
+  navMenu.classList.remove('active');
+  navbar.classList.remove('menu-open');
+  body.classList.remove('menu-open');
+});
+
 // Cross background animation
 const container = document.querySelector('.cross-background');
 
