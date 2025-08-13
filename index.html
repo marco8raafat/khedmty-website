@@ -125,9 +125,10 @@
       overflow: hidden;
       border-right: .15em solid #233B6E;
       white-space: nowrap;
-      animation: typing 4s steps(40, end) forwards, blink .75s step-end infinite;
+      animation: typing 4s linear forwards, blink .75s step-end infinite; /* smooth typing */
       font-size: 1.2em;
       margin-top: 10px;
+      will-change: width; /* performance hint */
     }
     @keyframes typing {
       from { width: 0 }
