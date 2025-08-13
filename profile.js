@@ -114,11 +114,16 @@ const database = firebase.database();
 // Verify session and get current user email
 const currentEmail = requireAuthentication();
 
+// Show loading overlay
+const loadingOverlay = document.getElementById('loadingOverlay');
+if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+
 const emailKey = currentEmail.replace(/\./g, '_');
 
 // Fetch user data from Firebase
 database.ref("users/" + emailKey).once("value").then((snapshot) => {
   if (!snapshot.exists()) {
+    if (loadingOverlay) loadingOverlay.classList.add('hidden');
     window.location.href = "login.html";
     return;
   }
@@ -140,9 +145,13 @@ database.ref("users/" + emailKey).once("value").then((snapshot) => {
     // Default to student dashboard if role is unclear
     dashboardLink.href = "studentDashboard.html";
   }
+
+  // Hide loading overlay on success
+  if (loadingOverlay) loadingOverlay.classList.add('hidden');
   
 }).catch((error) => {
   console.error("Firebase error:", error);
+  if (loadingOverlay) loadingOverlay.classList.add('hidden');
   window.location.href = "login.html";
 });
 
