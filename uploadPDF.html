@@ -95,9 +95,8 @@
           return false;
         }
 
-      // Verify user exists in Firebase
-      const emailKey = currentUser.replace(/\./g, '_');
-      try {
+        // Verify user exists in Firebase
+        const emailKey = currentUser.replace(/\./g, '_');
         const snapshot = await db.ref('users/' + emailKey).once('value');
         if (!snapshot.exists()) {
           alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
@@ -115,6 +114,7 @@
         }
         
         return true;
+        
       } catch (error) {
         console.error("Error verifying user:", error);
         alert("حدث خطأ في التحقق من المستخدم. يرجى تسجيل الدخول مرة أخرى");
@@ -123,12 +123,7 @@
       }
     }
 
-    function logout() {
-      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        clearSession();
-        window.location.href = "index.html";
-      }
-    }
+
 
     // Initialize page
     async function initializePage() {
