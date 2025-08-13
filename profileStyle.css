@@ -191,7 +191,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 15px; /* زيادة margin-top إلى 90px لإضافة مسافة أكبر أسفل الـ Navbar */
+  margin: 100 15px; /* زيادة margin-top إلى 90px لإضافة مسافة أكبر أسفل الـ Navbar */
   box-sizing: border-box;
 }
 
