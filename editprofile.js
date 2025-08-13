@@ -14,7 +14,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-const currentEmail = sessionStorage.getItem("currentUser");
+const currentEmail = verifySecureSession();
 
 if (!currentEmail) {
   window.location.href = "login.html";

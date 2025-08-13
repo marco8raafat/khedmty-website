@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Function to update navigation based on authentication status
 function updateNavigationBasedOnAuth() {
-  const currentUser = sessionStorage.getItem("currentUser");
+  const currentUser = requireAuthentication();
   const navRight = document.querySelector('.nav-right');
   
   if (!navRight) {
@@ -230,7 +230,7 @@ async function getUserRole(email) {
 // Logout function
 function logout() {
   if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-    sessionStorage.removeItem("currentUser");
+    clearSession();
     console.log('User logged out');
     
     // Remove dashboard link immediately

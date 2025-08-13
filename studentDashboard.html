@@ -730,6 +730,13 @@ label {
         <div class="card-description">اطلع على ترتيب أفضل الطلاب حسب الحضور والمشاركة</div>
         <a href="studentRank.html" class="card-btn">عرض الترتيب</a>
       </div>
+      
+      <div class="dashboard-card">
+        <div class="card-icon">🏠</div>
+        <div class="card-title">الصفحة الرئيسية</div>
+        <div class="card-description">العودة إلى الصفحة الرئيسية للتطبيق</div>
+        <a href="index.html" class="card-btn">العودة للصفحة</a>
+      </div>
     </div>
 
     <div class="study-progress">
@@ -755,6 +762,7 @@ label {
 
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="sessionUtils.js"></script>
 <script>
   // Firebase configuration (replace only if different)
   const firebaseConfig = {
@@ -841,11 +849,9 @@ label {
     };
   }
 
-  // 🔐 Get current user
-  const currentEmail = sessionStorage.getItem("currentUser");
-  if (!currentEmail) {
-    window.location.href = "login.html";
-  }
+  // 🔐 Get current user with secure session verification
+  const currentEmail = requireAuthentication();
+
 
   const emailKey = currentEmail.replace(/\./g, '_');
 
@@ -1183,7 +1189,7 @@ label {
   // 🔓 Logout
   function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }

@@ -436,6 +436,7 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="sessionUtils.js"></script>
     
     <script>
         const firebaseConfig = {
@@ -453,26 +454,7 @@
 
         // Authentication check function
         async function checkAuthentication() {
-            const currentUser = sessionStorage.getItem("currentUser");
-            
-            if (!currentUser) {
-                alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
-                window.location.href = "login.html";
-                return false;
-            }
-
-            // Verify user exists in Firebase
-            const emailKey = currentUser.replace(/\./g, '_');
-            try {
-                const snapshot = await db.ref('users/' + emailKey).once('value');
-                if (!snapshot.exists()) {
-                    alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
-                    sessionStorage.removeItem("currentUser");
-                    window.location.href = "login.html";
-                    return false;
-                }
-                
-                const userData = snapshot.val();
+            return await requireAuthentication("login.html", async (email, userData) => {
                 // Check if user is a student (only students can take exams)
                 if (userData.role !== "student") {
                     alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للطلاب فقط");
@@ -481,17 +463,12 @@
                 }
                 
                 return true;
-            } catch (error) {
-                console.error("Error verifying user:", error);
-                alert("حدث خطأ في التحقق من المستخدم. يرجى تسجيل الدخول مرة أخرى");
-                window.location.href = "login.html";
-                return false;
-            }
+            });
         }
 
         function logout() {
             if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                sessionStorage.removeItem("currentUser");
+                clearSession();
                 window.location.href = "index.html";
             }
         }

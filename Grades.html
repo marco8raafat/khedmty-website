@@ -389,6 +389,7 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="sessionUtils.js"></script>
     
     <script>
        // Mobile menu toggle function
@@ -481,7 +482,7 @@ for (let i = 0; i < crossCount; i++) {
 
   // Check authentication using sessionStorage (same as other pages)
   document.addEventListener('DOMContentLoaded', async function() {
-    const currentUser = sessionStorage.getItem("currentUser");
+    const currentUser = await requireAuthentication("login.html");
     
     if (!currentUser) {
       alert("برجاء تسجيل الدخول أولًا");
@@ -641,7 +642,7 @@ for (let i = 0; i < crossCount; i++) {
 //logout function
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }

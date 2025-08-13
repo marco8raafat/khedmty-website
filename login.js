@@ -28,8 +28,8 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
       const userData = snapshot.val();
 
       if (userData.password === password) {
-        // Save session
-        sessionStorage.setItem("currentUser", email);
+        // Generate secure session instead of storing plain email
+        generateSecureSession(email);
 
         // Redirect based on role
         if (userData.role === "student") {

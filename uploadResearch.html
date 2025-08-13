@@ -585,6 +585,7 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="sessionUtils.js"></script>
 
 <script>
   // Firebase configuration
@@ -602,24 +603,17 @@
   const db = firebase.database();
 
   // Check authentication
-  function checkAuth() {
-    const currentUser = sessionStorage.getItem("currentUser");
+  async function checkAuth() {
+    const currentUser = await requireAuthentication();
     if (!currentUser) {
       return null;
     }
     
-    try {
-      return JSON.parse(currentUser);
-    } catch (error) {
-      console.error("Error parsing user data:", error);
-      sessionStorage.removeItem("currentUser");
-      return null;
-    }
-  }
+    return currentUser;
 
   // Check if user is logged in and show appropriate message
   async function requireAuth() {
-    const currentUserEmail = sessionStorage.getItem("currentUser");
+    const currentUserEmail = await requireAuthentication();
     if (!currentUserEmail) {
       alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
       window.location.href = "login.html";
@@ -644,7 +638,7 @@
           };
         } else {
           alert("خطأ في بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى");
-          sessionStorage.removeItem("currentUser");
+          clearSession();
           window.location.href = "login.html";
           return false;
         }
@@ -656,7 +650,7 @@
     } catch (error) {
       console.error("Error getting user data:", error);
       alert("خطأ في بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى");
-      sessionStorage.removeItem("currentUser");
+      clearSession();
       window.location.href = "login.html";
       return false;
     }
@@ -767,7 +761,7 @@
   // Logout function
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }

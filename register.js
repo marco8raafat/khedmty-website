@@ -112,7 +112,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
       database.ref('users/' + emailKey).set(userData)
         .then(() => {
           alert("تم التسجيل بنجاح!");
-          sessionStorage.setItem("currentUser", email);
+          // Generate secure session instead of storing plain email
+          generateSecureSession(email);
           window.location.href = "login.html"; // ✅ change if needed
         })
         .catch((error) => {

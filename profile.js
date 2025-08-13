@@ -14,11 +14,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-const currentEmail = sessionStorage.getItem("currentUser");
-
-if (!currentEmail) {
-  window.location.href = "login.html";
-}
+// Verify session and get current user email
+const currentEmail = requireAuthentication();
 
 const emailKey = currentEmail.replace(/\./g, '_');
 
@@ -56,8 +53,8 @@ document.getElementById("editBtn").addEventListener("click", function() {
 });
 
 document.getElementById("logoutBtn").addEventListener("click", function() {
-  // Clear session storage
-  sessionStorage.removeItem("currentUser");
+  // Clear all session data
+  clearSession();
   
   // Show confirmation message
   alert("تم تسجيل الخروج بنجاح!");

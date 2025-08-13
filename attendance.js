@@ -14,7 +14,7 @@
   const db = firebase.database();
 
   function checkAuth() {
-    const currentUser = sessionStorage.getItem("currentUser");
+    const currentUser = verifySecureSession();
     if (!currentUser) {
       alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
       window.location.href = "login.html";
@@ -25,7 +25,7 @@
 
   // Check if user is authenticated and has servant role
   async function checkAuthentication() {
-    const currentEmail = sessionStorage.getItem("currentUser");
+    const currentEmail = await requireAuthentication("login.html");
     console.log("Current email from session:", currentEmail);
     
     if (!currentEmail) {
@@ -66,6 +66,7 @@
     }
   }
 
+
   function checkIfServant(userData) {
     if (!userData || !userData.role) {
       console.log("No role found in user data");
@@ -91,7 +92,7 @@
 
   function logout() {
     if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-      sessionStorage.removeItem("currentUser");
+       clearSession();
       alert("تم تسجيل الخروج بنجاح!");
       window.location.href = "login.html";
     }

@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (uploadForm && titleInput && subjectInput && linkInput && messageDiv) {
-    uploadForm.addEventListener('submit', (e) => {
+    uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault(); // Prevent form from submitting to a server
       console.log('Form submission intercepted');
 
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         // Get current user email for Firebase path
-        const currentUser = sessionStorage.getItem("currentUser");
+        const currentUser = await requireAuthentication();
         if (!currentUser) {
           showMessage('خطأ: لم يتم العثور على بيانات المستخدم', 'error');
           return;
@@ -237,19 +237,19 @@ for (let i = 0; i < crossCount; i++) {
 
   // Check if user is authenticated and has servant role
   async function checkAuthentication() {
-    const currentEmail = sessionStorage.getItem("currentUser");
-    console.log("Current email from session:", currentEmail);
-    
-    if (!currentEmail) {
-      alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
-      window.location.href = "login.html";
-      return false;
-    }
-
-    const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
-    
     try {
-      const userSnapshot = await db.ref(`users/${emailKey}`).once('value');
+      const currentEmail = await requireAuthentication();
+      console.log("Current email from session:", currentEmail);
+      
+      if (!currentEmail) {
+        alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+        window.location.href = "login.html";
+        return false;
+      }
+
+      const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
+      
+      const userSnapshot = await firebase.database().ref(`users/${emailKey}`).once('value');
       const userData = userSnapshot.val();
       
       if (!userData || Object.keys(userData).length === 0) {

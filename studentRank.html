@@ -540,6 +540,7 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="sessionUtils.js"></script>
 
 <script>
   // Firebase configuration
@@ -560,7 +561,7 @@
 
   // Check authentication
   function checkAuth() {
-    const currentUser = sessionStorage.getItem("currentUser");
+    const currentUser = verifySecureSession();
     if (!currentUser) {
       alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
       window.location.href = "login.html";
@@ -579,7 +580,7 @@
   async function goToDashboard() {
     console.log("[Student Ranking] Checking user role for dashboard navigation...");
     
-    const currentUser = sessionStorage.getItem("currentUser");
+    const currentUser = verifySecureSession();
     if (!currentUser) {
       console.log("[Student Ranking] No current user found, redirecting to login");
       window.location.href = "login.html";
@@ -598,7 +599,7 @@
       if (!userData) {
         console.log("[Student Ranking] No user data found, redirecting to login");
         alert("لم يتم العثور على بيانات المستخدم. سيتم إعادة توجيهك لتسجيل الدخول.");
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "login.html";
         return;
       }
@@ -628,7 +629,7 @@
   // Logout function
   function logout() {
     if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-      sessionStorage.removeItem("currentUser");
+      clearSession();
       window.location.href = "index.html";
     }
   }

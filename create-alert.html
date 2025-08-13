@@ -344,6 +344,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="sessionUtils.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -361,21 +362,21 @@
 
     // Authentication check function
     async function checkAuthentication() {
-      const currentUser = sessionStorage.getItem("currentUser");
+      const currentEmail = await requireAuthentication("login.html");
       
-      if (!currentUser) {
+      if (!currentEmail) {
         alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
         window.location.href = "login.html";
         return false;
       }
 
-      // Verify user exists in Firebase
-      const emailKey = currentUser.replace(/\./g, '_');
+      const emailKey = currentEmail.replace(/\./g, '_');
+      
       try {
         const snapshot = await db.ref('users/' + emailKey).once('value');
         if (!snapshot.exists()) {
           alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
-          sessionStorage.removeItem("currentUser");
+          clearSession();
           window.location.href = "login.html";
           return false;
         }
@@ -421,7 +422,7 @@
         if (title && message) {
           try {
             // Get current user's data to include their name
-            const currentUser = sessionStorage.getItem("currentUser");
+            const currentUser = verifySecureSession();
             const emailKey = currentUser.replace(/\./g, '_');
             const userSnapshot = await db.ref('users/' + emailKey).once('value');
             const userData = userSnapshot.val();
@@ -497,7 +498,7 @@
     // Logout function
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }
@@ -521,66 +522,6 @@
     // Initialize the page when DOM is loaded
     window.onload = initializePage;
     
-      // Check if user is authenticated and has servant role
-  async function checkAuthentication() {
-    const currentEmail = sessionStorage.getItem("currentUser");
-    console.log("Current email from session:", currentEmail);
-    
-    if (!currentEmail) {
-      alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
-      window.location.href = "login.html";
-      return false;
-    }
-
-    const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
-    
-    try {
-      const userSnapshot = await db.ref(`users/${emailKey}`).once('value');
-      const userData = userSnapshot.val();
-      
-      if (!userData || Object.keys(userData).length === 0) {
-        console.log("No user data found, redirecting to login");
-        alert("لم يتم العثور على بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى");
-        window.location.href = "login.html";
-        return false;
-      }
-
-      // Check if user is a servant/teacher
-      if (!checkIfServant(userData)) {
-        console.log("User is not a servant, access denied");
-        alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للخدام فقط");
-        window.location.href = "login.html";
-        return false;
-      }
-
-      console.log("User authenticated successfully as servant");
-      return true;
-      
-    } catch (error) {
-      console.error("Error checking authentication:", error);
-      alert("حدث خطأ أثناء التحقق من الصلاحيات. يرجى المحاولة مرة أخرى");
-      window.location.href = "login.html";
-      return false;
-    }
-  }
-
-  function checkIfServant(userData) {
-    if (!userData || !userData.role) {
-      console.log("No role found in user data");
-      return false;
-    }
-    
-    const userRole = userData.role.toLowerCase();
-    const allowedRoles = ['teacher', 'servant', 'admin', 'خادم', 'معلم', 'مدير'];
-    
-    console.log("User role:", userRole);
-    console.log("Checking against allowed roles:", allowedRoles);
-    
-    const isServant = allowedRoles.includes(userRole);
-    console.log("Is servant:", isServant);
-    
-    return isServant;
-  }
   </script>
 </body>
 </html>
