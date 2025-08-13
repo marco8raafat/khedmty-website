@@ -1,3 +1,31 @@
+// دالة الـ Toggle Menu
+function toggleMobileMenu() {
+  // نتأكد إن الشاشة موبايل (أقل من 768px)
+  if (window.innerWidth < 768) {
+    const navMenu = document.getElementById('navMenu');
+    navMenu.classList.toggle('active');
+  }
+}
+
+// إغلاق القائمة عند النقر على رابط
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth < 768) {
+      const navMenu = document.getElementById('navMenu');
+      navMenu.classList.remove('active');
+    }
+  });
+});
+
+// التعامل مع تغيير حجم الشاشة
+window.addEventListener('resize', () => {
+  const navMenu = document.getElementById('navMenu');
+  if (window.innerWidth >= 768) {
+    navMenu.classList.remove('active'); // إغلاق القائمة لو الشاشة كبرت
+  }
+});
+
+// باقي الكود (مثل الصلبان المتحركة و Firebase) هيفضل زي ما هو
 const container = document.querySelector('.cross-background');
 
 const svgCross = `
@@ -28,6 +56,8 @@ for (let i = 0; i < crossCount; i++) {
   cross.style.animationDuration = (12 + Math.random() * 11) + 's';
   container.appendChild(cross);
 }
+
+// Firebase configuration والباقي زي ما هو
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
@@ -63,15 +93,7 @@ database.ref("users/" + emailKey).once("value").then((snapshot) => {
   document.getElementById("group").textContent = "👥 اسم المجموعة: " + userData.group;
   document.getElementById("role").textContent = "🎓 الدور: " + (userData.role === "student" ? "طالب" : "خادم");
   
-  // Set back button based on user role
-  const backBtn = document.getElementById("backBtn");
-  if (userData.role === "student") {
-    backBtn.href = "studentDashboard.html"; 
-  } else if (userData.role === "servant") {
-    backBtn.href = "teacherDashboard.html"; 
-  } else {
-    backBtn.href = "index.html";
-  }
+  
 }).catch((error) => {
   console.error("Firebase error:", error);
   window.location.href = "login.html";
