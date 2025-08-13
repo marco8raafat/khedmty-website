@@ -497,4 +497,4 @@ You now have a detailed technical reference for your Khedmty church management s
 
 ---
 
-**For any code-specific questions, file-specific UX, or further Mermaid diagrams, just ask!**
+**For any code-specific questions, file-specific UX, or further Mermaid diagrams, just ask.!**
