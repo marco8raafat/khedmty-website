@@ -23,7 +23,8 @@ function toggleMobileMenu() {
 // Close menu when clicking on nav links
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
+      // Don't prevent default navigation for dashboard link since it's dynamically set
       const navMenu = document.getElementById('navMenu');
       const navbar = document.querySelector('.navbar');
       const body = document.body;
@@ -129,6 +130,16 @@ database.ref("users/" + emailKey).once("value").then((snapshot) => {
   document.getElementById("group").textContent = "👥 اسم المجموعة: " + userData.group;
   document.getElementById("role").textContent = "🎓 الدور: " + (userData.role === "student" ? "طالب" : "خادم");
   
+  // Set up dashboard link based on user role
+  const dashboardLink = document.getElementById("dashboardLink");
+  if (userData.role === "student") {
+    dashboardLink.href = "studentDashboard.html";
+  } else if (userData.role === "teacher" || userData.role === "servant") {
+    dashboardLink.href = "teacherDashboard.html";
+  } else {
+    // Default to student dashboard if role is unclear
+    dashboardLink.href = "studentDashboard.html";
+  }
   
 }).catch((error) => {
   console.error("Firebase error:", error);
