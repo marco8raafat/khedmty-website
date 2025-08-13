@@ -10,19 +10,19 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh; /* تغيير من height إلى min-height */
+  min-height: 100vh;
   background-image: url('knesa.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center;
-  padding: 80px 20px 20px 20px; /* إضافة padding-top لتجنب تداخل الـ navbar */
+  padding: 80px 20px 20px 20px;
   position: relative;
   margin: 0;
   transition: padding-top 0.3s ease;
 }
 
-/* أنماط الـ Navbar */
+/* Navbar Styles */
 .navbar {
   background-color: #233B6E;
   color: white;
@@ -37,7 +37,6 @@ body {
   z-index: 1000;
 }
 
-/* باقي أنماط الـ navbar كما هي */
 .nav-left {
   display: flex;
   align-items: center;
@@ -93,11 +92,61 @@ body {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Media Query للموبايلات فقط (شاشات أقل من 768px) */
-@media (max-width: 767px) {
+/* Mobile responsive styles - matches teacherDashboard.html exactly */
+@media (max-width: 768px) {
   .navbar {
     flex-direction: column;
     padding: 10px;
+  }
+
+  .nav-left {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .nav-left .church-logo {
+    height: 60px;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-right {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .nav-right.active {
+    max-height: 300px;
+  }
+
+  .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+
+  /* Body padding adjustment when menu is open - THIS IS THE KEY PART */
+  body.menu-open {
+    padding-top: 240px;
+    overflow: hidden; /* Prevent scrolling when menu is open */
+    position: fixed; /* Lock the body position */
+    width: 100%;
   }
 
   .navbar.menu-open {
@@ -107,88 +156,9 @@ body {
     right: 0;
     z-index: 1000;
   }
-
-  body.menu-open {
-    padding-top: 240px;
-  }
-
-  .nav-left {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .nav-left .church-logo {
-    height: 50px;
-  }
-
-  .nav-right {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    background-color: #233B6E;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
-
-  .nav-right.active {
-    max-height: 200px;
-  }
-
-  .nav-link {
-    width: 100%;
-    text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0;
-    padding: 12px;
-  }
-
-  .nav-link:last-child {
-    border-bottom: none;
-  }
-
-  .menu-toggle {
-    display: block;
-  }
 }
 
-/* إزالة الـ toggle في الـ landscape mode للشاشات الكبيرة */
-@media (min-width: 768px) {
-  .nav-right {
-    display: flex !important;
-    position: static;
-    background: none;
-    box-shadow: none;
-    width: auto;
-    max-height: none;
-    overflow-y: visible;
-  }
-
-  .menu-toggle {
-    display: none !important;
-  }
-
-  .nav-link {
-    width: auto;
-    border-bottom: none;
-    border-radius: 6px;
-  }
-}
-
-/* تحسينات للأجهزة التي تعمل باللمس */
-@media (hover: none) {
-  .nav-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .nav-link:hover {
-    transform: none;
-  }
-}
-
-/* بقية الأنماط */
+/* Rest of the existing styles remain the same */
 .profile-frame {
   width: 100%;
   max-width: 360px;
@@ -201,12 +171,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px auto; /* تقليل الـ margin-top */
+  margin: 20px auto;
   box-sizing: border-box;
   overflow-y: auto;
 }
 
-/* باقي الأنماط كما هي */
 .avatar-image {
   width: 110px;
   height: 110px;
@@ -305,7 +274,7 @@ h2 {
   }
 }
 
-/* متغيرات الألوان */
+/* Color variables */
 :root {
   --primary: #233B6E;
   --secondary: #314d9f;

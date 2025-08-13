@@ -1,21 +1,39 @@
-// دالة الـ Toggle Menu
+// Enhanced Mobile Menu Toggle Function - matches teacherDashboard behavior
 function toggleMobileMenu() {
   const navMenu = document.getElementById('navMenu');
   const navbar = document.querySelector('.navbar');
   const body = document.body;
+  
+  // Store current scroll position
+  if (!body.classList.contains('menu-open')) {
+    const scrollY = window.scrollY;
+    body.style.top = `-${scrollY}px`;
+  } else {
+    // Restore scroll position when closing menu
+    const scrollY = body.style.top;
+    body.style.top = '';
+    window.scrollTo(0, parseInt(scrollY || '0') * -1);
+  }
   
   navMenu.classList.toggle('active');
   navbar.classList.toggle('menu-open');
   body.classList.toggle('menu-open');
 }
 
-// إغلاق القائمة عند النقر على رابط
+// Close menu when clicking on nav links
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
       const navMenu = document.getElementById('navMenu');
       const navbar = document.querySelector('.navbar');
       const body = document.body;
+      
+      // Restore scroll position when closing menu
+      if (body.classList.contains('menu-open')) {
+        const scrollY = body.style.top;
+        body.style.top = '';
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
       
       navMenu.classList.remove('active');
       navbar.classList.remove('menu-open');
@@ -24,20 +42,27 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// التعامل مع تغيير حجم الشاشة
+// Handle screen resize - close menu if screen gets larger
 window.addEventListener('resize', () => {
   const navMenu = document.getElementById('navMenu');
   const navbar = document.querySelector('.navbar');
   const body = document.body;
   
   if (window.innerWidth >= 768) {
-    navMenu.classList.remove('active'); // إغلاق القائمة لو الشاشة كبرت
+    // Restore scroll position when closing menu due to resize
+    if (body.classList.contains('menu-open')) {
+      const scrollY = body.style.top;
+      body.style.top = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
+    
+    navMenu.classList.remove('active');
     navbar.classList.remove('menu-open');
     body.classList.remove('menu-open');
   }
 });
 
-// باقي الكود (مثل الصلبان المتحركة و Firebase) هيفضل زي ما هو
+// Cross background animation
 const container = document.querySelector('.cross-background');
 
 const svgCross = `
@@ -68,6 +93,7 @@ for (let i = 0; i < crossCount; i++) {
   cross.style.animationDuration = (12 + Math.random() * 11) + 's';
   container.appendChild(cross);
 }
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
