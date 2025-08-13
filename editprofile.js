@@ -28,6 +28,7 @@ for (let i = 0; i < crossCount; i++) {
   cross.style.animationDuration = (12 + Math.random() * 11) + 's';
   container.appendChild(cross);
 }
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
@@ -64,9 +65,77 @@ database.ref("users/" + emailKey).once("value").then((snapshot) => {
   document.getElementById("edit-email").value = userData.email;
   document.getElementById("edit-phone").value = userData.phone;
   document.getElementById("edit-group").value = userData.group;
+
+  // Set dashboard link like profile page
+  const dashboardLink = document.getElementById('dashboardLink');
+  if (dashboardLink) {
+    if (userData.role === 'student') {
+      dashboardLink.href = 'studentDashboard.html';
+    } else if (userData.role === 'teacher' || userData.role === 'servant') {
+      dashboardLink.href = 'teacherDashboard.html';
+    } else {
+      dashboardLink.href = 'studentDashboard.html';
+    }
+  }
 }).catch((error) => {
   console.error("Firebase error:", error);
   window.location.href = "login.html";
+});
+
+// Mobile menu toggle (same behavior as profile page)
+function toggleMobileMenu() {
+  const navMenu = document.getElementById('navMenu');
+  const navbar = document.querySelector('.navbar');
+  const body = document.body;
+  
+  if (!body.classList.contains('menu-open')) {
+    const scrollY = window.scrollY;
+    body.style.top = `-${scrollY}px`;
+  } else {
+    const scrollY = body.style.top;
+    body.style.top = '';
+    window.scrollTo(0, parseInt(scrollY || '0') * -1);
+  }
+  
+  navMenu.classList.toggle('active');
+  navbar.classList.toggle('menu-open');
+  body.classList.toggle('menu-open');
+}
+
+// Close menu on link click
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      const navMenu = document.getElementById('navMenu');
+      const navbar = document.querySelector('.navbar');
+      const body = document.body;
+      if (body.classList.contains('menu-open')) {
+        const scrollY = body.style.top;
+        body.style.top = '';
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+      navMenu.classList.remove('active');
+      navbar.classList.remove('menu-open');
+      body.classList.remove('menu-open');
+    });
+  });
+});
+
+// Close menu on resize up
+window.addEventListener('resize', () => {
+  const navMenu = document.getElementById('navMenu');
+  const navbar = document.querySelector('.navbar');
+  const body = document.body;
+  if (window.innerWidth >= 768) {
+    if (body.classList.contains('menu-open')) {
+      const scrollY = body.style.top;
+      body.style.top = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
+    navMenu.classList.remove('active');
+    navbar.classList.remove('menu-open');
+    body.classList.remove('menu-open');
+  }
 });
 
 document.getElementById("editForm").addEventListener("submit", function(e) {
