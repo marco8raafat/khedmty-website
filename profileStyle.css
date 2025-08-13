@@ -91,7 +91,7 @@ body {
 }
 
 /* Media Query للموبايلات فقط (شاشات أقل من 768px) */
-@media (max-width: 767px) and (pointer: coarse) {
+@media (max-width: 767px) {
   .navbar {
     flex-direction: column;
     padding: 10px;
@@ -128,6 +128,7 @@ body {
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0;
+    padding: 12px
   }
 
   .nav-link:last-child {
@@ -138,19 +139,16 @@ body {
     display: block;
   }
 }
-@media (max-width: 480px) {
-  .nav-left .church-logo {
-    height: 45px;
-  }
-}
 /* إزالة الـ toggle في الـ landscape mode للشاشات الكبيرة */
-@media (min-width: 768px) or (orientation: landscape) {
+@media (min-width: 768px) {
   .nav-right {
     display: flex !important;
     position: static;
     background: none;
     box-shadow: none;
     width: auto;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .menu-toggle {
@@ -165,7 +163,7 @@ body {
 }
 
 /* تحسينات للأجهزة التي تعمل باللمس */
-@media (hover: none) and (pointer: coarse) {
+@media (hover: none) {
   .nav-link {
     display: flex;
     align-items: center;
@@ -241,22 +239,6 @@ h2 {
   background: #0056b3;
 }
 
-.back-icon {
-  position: absolute;
-  top: 15px; /* تعديل الموقع ليتجنب التداخل مع الـ Navbar */
-  left: 20px;
-  font-size: 1.8em;
-  color: #233B6E;
-  text-decoration: none;
-  z-index: 999;
-  transition: 0.3s ease;
-}
-
-.back-icon:hover {
-  color: #1a2d59;
-  transform: scale(1.2);
-}
-
 .cross-background {
   position: fixed;
   top: 0;
@@ -266,17 +248,6 @@ h2 {
   pointer-events: none;
   z-index: 1;
   overflow: hidden;
-}
-
-.glowing-cross {
-  font-size: 50px;
-  color: white;
-  opacity: 0.6;
-  filter: drop-shadow(0 0 8px rgba(173, 216, 230, 0.4));
-  transition: all 0.3s ease;
-  position: absolute;
-  top: 40px;
-  left: 40px;
 }
 
 .cross {

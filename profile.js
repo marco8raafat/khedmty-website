@@ -56,8 +56,6 @@ for (let i = 0; i < crossCount; i++) {
   cross.style.animationDuration = (12 + Math.random() * 11) + 's';
   container.appendChild(cross);
 }
-
-// Firebase configuration والباقي زي ما هو
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
