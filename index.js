@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Function to update navigation based on authentication status
 function updateNavigationBasedOnAuth() {
-  const currentUser = requireAuthentication();
+  const currentUser = verifySecureSession();
   const navRight = document.querySelector('.nav-right');
   
   if (!navRight) {
