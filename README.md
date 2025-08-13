@@ -174,17 +174,6 @@ sequenceDiagram
   - **AttendanceData.html**: For servants to take attendance for a date. Lists all students, by group, allows marking as present/absent, filtering, export to Excel.
   - **AttendanceRegistration.html**: Historical attendance record viewing, export, print, date selection.
   - **attendance.js**: Handles authentication, data fetching, attendance marking, exporting (with right-to-left support), and filtering.
-
-**Mermaid - Attendance Data Saving:**
-```mermaid
-flowchart LR
-    Start([Servant logs in])
-    LoadStudents --> MarkAttendance
-    MarkAttendance --> SaveAttendance
-    SaveAttendance -->|writes| FirebaseAttendance[(Firebase: attendance/<date>/<studentId>)]
-    FirebaseAttendance --> Success[Show "Saved" message]
-```
-
 ---
 
 ### Alerts & Notifications
