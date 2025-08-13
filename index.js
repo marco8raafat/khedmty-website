@@ -10,6 +10,41 @@ const firebaseConfig = {
     
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+// Clickjacking Protection - Frame Busting
+(function() {
+  'use strict';
+  
+  // Check if we're in an iframe
+  if (window.self !== window.top) {
+    // Attempt to break out of iframe
+    try {
+      window.top.location = window.self.location;
+    } catch(e) {
+      // If we can't break out (cross-origin), hide the content and show warning
+      document.body.style.display = 'none';
+      alert('تحذير أمني: هذه الصفحة لا يمكن عرضها داخل إطار آخر لحمايتك من الهجمات الإلكترونية.');
+      
+      // Create and show warning message
+      const warningDiv = document.createElement('div');
+      warningDiv.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                    background: #ff0000; color: white; display: flex; 
+                    align-items: center; justify-content: center; 
+                    font-size: 24px; font-weight: bold; z-index: 999999;
+                    text-align: center; padding: 20px; box-sizing: border-box;">
+          <div>
+            <h2>⚠️ تحذير أمني</h2>
+            <p>لا يمكن عرض هذه الصفحة داخل إطار آخر لحمايتك من الهجمات الإلكترونية</p>
+            <p>يرجى زيارة الموقع مباشرة</p>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(warningDiv);
+    }
+  }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   // Check user authentication status and update navigation
   updateNavigationBasedOnAuth();
