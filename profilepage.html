@@ -33,6 +33,7 @@
       background-attachment: fixed;
       background-position: center;
       padding: 20px;
+      padding-top: 80px; /* Space for navbar */
       overflow-x: hidden;
       overflow-y: auto;
     }
@@ -141,7 +142,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 80px 15px 20px;
+      margin: 20px 15px; /* Reduced margin-top, handled by body padding */
       box-sizing: border-box;
       opacity: 1;
       z-index: 2;
@@ -239,11 +240,11 @@
 
       .nav-link {
         padding: 10px;
-        text-align: left;
+        text-align: right;
       }
 
       .profile-frame {
-        margin-top: 100px; /* Increased margin to account for nav-right height */
+        margin-top: 120px; /* Extra space for nav-right on mobile */
       }
     }
   </style>
@@ -318,29 +319,26 @@
       navMenu.classList.toggle('active');
 
       // Scroll to profile-frame when menu is toggled on mobile
-      if (isMobile && navMenu.classList.contains('active')) {
-        const navHeight = document.querySelector('.navbar').offsetHeight;
-        const menuHeight = navMenu.offsetHeight;
-        window.scrollTo({
-          top: navHeight + menuHeight + 20, // Scroll below navbar and menu
-          behavior: 'smooth'
-        });
-      } else if (isMobile) {
-        window.scrollTo({
-          top: document.querySelector('.navbar').offsetHeight + 20,
-          behavior: 'smooth'
-        });
+      if (isMobile) {
+        setTimeout(() => {
+          const navHeight = document.querySelector('.navbar').offsetHeight;
+          const menuHeight = navMenu.classList.contains('active') ? navMenu.offsetHeight : 0;
+          console.log('Nav Height:', navHeight, 'Menu Height:', menuHeight); // Debugging
+          profileFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          window.scrollBy(0, -(navHeight + menuHeight + 20));
+        }, 100); // Small delay to ensure menu is rendered
       }
     }
 
     // Scroll to profile-frame on page load
     window.addEventListener('load', () => {
-      const profileFrame = document.querySelector('.profile-frame');
-      const navHeight = document.querySelector('.navbar').offsetHeight;
-      window.scrollTo({
-        top: navHeight + 20, // Scroll just below navbar
-        behavior: 'smooth'
-      });
+      setTimeout(() => {
+        const profileFrame = document.querySelector('.profile-frame');
+        const navHeight = document.querySelector('.navbar').offsetHeight;
+        console.log('Nav Height on Load:', navHeight); // Debugging
+        profileFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.scrollBy(0, -(navHeight + 20));
+      }, 100); // Small delay to ensure elements are rendered
     });
 
     // Firebase configuration
@@ -522,10 +520,13 @@
           navMenu.classList.remove('active');
           // Scroll to profile-frame after closing menu
           if (isMobile) {
-            window.scrollTo({
-              top: document.querySelector('.navbar').offsetHeight + 20,
-              behavior: 'smooth'
-            });
+            setTimeout(() => {
+              const profileFrame = document.querySelector('.profile-frame');
+              const navHeight = document.querySelector('.navbar').offsetHeight;
+              console.log('Nav Height on Menu Close:', navHeight); // Debugging
+              profileFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              window.scrollBy(0, -(navHeight + 20));
+            }, 100);
           }
         });
       });
