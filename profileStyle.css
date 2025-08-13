@@ -191,8 +191,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
- margin: 100px auto 20px auto; 
+  margin: 100px auto 20px auto; 
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .avatar-image {
