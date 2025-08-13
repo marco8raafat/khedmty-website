@@ -17,20 +17,25 @@
       background-attachment: fixed;  /* Keeps background fixed when scrolling */
       background-position: center;   /* Center the image */
       font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      padding: 20px;           
     }
 
-    .phone-frame {
-      width: 360px;
-      height: 640px;
-      background: #fff;
-      border-radius: 30px;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+.profile-frame {
+  width: 100%;
+  max-width: 360px; /* الحد الأقصى للعرض */
+  height: auto; /* يسيب الارتفاع يتظبط حسب المحتوى */
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 15px; /* مسافة متساوية من الجانبين */
+  box-sizing: border-box; /* padding والمارجن يتحسبوا صح */
+}
 
     .avatar-image {
       width: 110px;
@@ -79,11 +84,68 @@
       background: #0056b3;
     }
 
-    .back-icon {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 24px;
-      color: #333;
-      text-decoration: none;
-    }
+.back-icon {
+  position: absolute;
+  top: 5px;
+  left: 20px;
+  font-size: 1.8em;
+  color: #233B6E;
+  text-decoration: none;
+  z-index: 999;
+  transition: 0.3s ease;
+}
+
+.back-icon:hover {
+  color: #1a2d59;
+  transform: scale(1.2);
+}
+.cross-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.glowing-cross {
+    font-size: 50px;
+    color: white;
+    opacity: 0.6;
+    filter: drop-shadow(0 0 8px rgba(173, 216, 230, 0.4));
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 40px;
+    left: 40px;
+  }
+
+ 
+.cross {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  animation: float 12s linear  infinite;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
+.cross svg {
+  width: 100%;
+  height: 100%;
+  fill: rgba(255, 255, 255, 0.265);
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20vh) scale(1.3);
+    opacity: 0;
+  }
+}  

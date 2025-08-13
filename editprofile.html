@@ -8,18 +8,23 @@
   <link rel="stylesheet" href="registeration.css">
 </head>
 <body>
+  <div class="cross-background"></div>
+
   <div class="phone-frame">
     <h2>تعديل البيانات</h2>
-    
+     <a href="index.html" class="back-icon" title="العودة للصفحة الرئيسية">
+      <i class="fas fa-arrow-left"></i>
+    </a>
+
     <form id="editForm">
       <input type="text" id="edit-name" placeholder="الاسم"><br>
       <input type="email" id="edit-email" placeholder="البريد الإلكتروني" disabled><br>
       <input type="text" id="edit-phone" placeholder="رقم التليفون"><br>
       <input type="text" id="edit-group" placeholder="اسم المجموعة"><br>
-      <button type="submit">💾 حفظ التعديلات</button>
+      <button type="submit" class="btn">💾 حفظ التعديلات</button>
     </form>
     <br>
-    <button onclick="window.location.href='profilepage.html'">🔙 الرجوع للبروفايل</button>
+    <button onclick="window.location.href='profilepage.html'" class="btn">🔙 الرجوع للبروفايل</button>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
