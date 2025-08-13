@@ -1,55 +1,39 @@
 // دالة الـ Toggle Menu
 function toggleMobileMenu() {
-  // نتأكد إن الشاشة موبايل (أقل من 768px)
-  if (window.innerWidth < 768) {
-    const navMenu = document.getElementById('navMenu');
-    navMenu.classList.toggle('active');
-  }
-}
-// Updated toggleMobileMenu function
-function toggleMobileMenu() {
-  // نتأكد إن الشاشة موبايل (أقل من 768px)
-  if (window.innerWidth < 768) {
-    const navMenu = document.getElementById('navMenu');
-    const body = document.body;
-    
-    navMenu.classList.toggle('active');
-    // Add or remove class to body to push content down
-    body.classList.toggle('menu-active');
-  }
-}
-
-// التعامل مع تغيير حجم الشاشة
-window.addEventListener('resize', () => {
   const navMenu = document.getElementById('navMenu');
+  const navbar = document.querySelector('.navbar');
   const body = document.body;
   
-  if (window.innerWidth >= 768) {
-    navMenu.classList.remove('active'); // إغلاق القائمة لو الشاشة كبرت
-    body.classList.remove('menu-active'); // Remove body class on resize
-  }
-});
+  navMenu.classList.toggle('active');
+  navbar.classList.toggle('menu-open');
+  body.classList.toggle('menu-open');
+}
+
 // إغلاق القائمة عند النقر على رابط
-document.querySelectorAll('.nav-link').forEach(link => {
-  link.addEventListener('click', () => {
-    if (window.innerWidth < 768) {
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
       const navMenu = document.getElementById('navMenu');
-      navMenu.classList.remove('active');
-       const body = document.body;
+      const navbar = document.querySelector('.navbar');
+      const body = document.body;
       
       navMenu.classList.remove('active');
-      // Remove body class when menu closes
-      body.classList.remove('menu-active');
-      body.style.paddingTop = '80px'; // إعادة تعيين الـ padding
-    }
+      navbar.classList.remove('menu-open');
+      body.classList.remove('menu-open');
+    });
   });
 });
 
 // التعامل مع تغيير حجم الشاشة
 window.addEventListener('resize', () => {
   const navMenu = document.getElementById('navMenu');
+  const navbar = document.querySelector('.navbar');
+  const body = document.body;
+  
   if (window.innerWidth >= 768) {
     navMenu.classList.remove('active'); // إغلاق القائمة لو الشاشة كبرت
+    navbar.classList.remove('menu-open');
+    body.classList.remove('menu-open');
   }
 });
 

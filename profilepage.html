@@ -42,25 +42,5 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="sessionUtils.js"></script>
   <script src="profile.js"></script>
-  <script>
-    function toggleMobileMenu() {
-      const navMenu = document.getElementById('navMenu');
-      navMenu.classList.toggle('active');
-    }
-
-    // إغلاق القائمة عند النقر على رابط
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', () => {
-        const navMenu = document.getElementById('navMenu');
-        navMenu.classList.remove('active');
-      });
-    });
-
-    function logout() {
-      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        window.location.href = "index.html";
-      }
-    }
-  </script>
 </body>
 </html>

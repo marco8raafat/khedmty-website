@@ -19,6 +19,7 @@ body {
   padding: 80px 20px 20px 20px; /* إضافة padding-top لتجنب تداخل الـ navbar */
   position: relative;
   margin: 0;
+  transition: padding-top 0.3s ease;
 }
 
 /* أنماط الـ Navbar */
@@ -99,6 +100,18 @@ body {
     padding: 10px;
   }
 
+  .navbar.menu-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  body.menu-open {
+    padding-top: 240px;
+  }
+
   .nav-left {
     width: 100%;
     justify-content: space-between;
@@ -109,20 +122,17 @@ body {
   }
 
   .nav-right {
-    display: none;
-    flex-direction: column;
     width: 100%;
-    position: absolute;
-    top: 60px;
-    left: 0;
+    display: flex;
+    flex-direction: column;
     background-color: #233B6E;
-    padding: 10px 0;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
   }
 
   .nav-right.active {
-    display: flex; /* تغيير من max-height إلى display: flex */
+    max-height: 200px;
   }
 
   .nav-link {
