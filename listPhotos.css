@@ -34,6 +34,36 @@
     background-attachment: fixed;  /* Keeps background fixed when scrolling */
     background-position: center;   /* Center the image */
   }
+
+  /* Loading overlay */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 9999;
+  }
+  .loading-overlay.hidden { display: none !important; }
+  .loading-spinner {
+    width: 56px;
+    height: 56px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #233B6E;
+    border-radius: 50%;
+    animation: dash-spin 0.9s linear infinite;
+  }
+  .loading-text { 
+    margin-top: 12px; 
+    color: #fff; 
+    font-weight: 600; 
+    letter-spacing: 0.5px; 
+  }
+  @keyframes dash-spin { 
+    to { transform: rotate(360deg); } 
+  }
   
   .container {
     max-width: 1280px;

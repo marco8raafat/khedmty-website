@@ -13,6 +13,11 @@
 </head>
 <body>
 <div class="cross-background"></div>
+  <!-- Loading overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">جاري تحميل الصور...</div>
+  </div>
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
@@ -73,14 +78,19 @@
   document.addEventListener('DOMContentLoaded', () => {
     const photoList = document.getElementById('photoList');
     const titleFilter = document.getElementById('titleFilter');
+    const loadingOverlay = document.getElementById('loadingOverlay');
   
-    if (!photoList || !titleFilter) {
+    if (!photoList || !titleFilter || !loadingOverlay) {
       console.error('Required elements missing:', {
         photoList: !!photoList,
-        titleFilter: !!titleFilter
+        titleFilter: !!titleFilter,
+        loadingOverlay: !!loadingOverlay
       });
       return;
     }
+
+    // Show loading overlay initially
+    loadingOverlay.classList.remove('hidden');
   
     let allPhotos = []; // Store all photos for filtering
   
@@ -92,6 +102,8 @@
         if (!snapshot.exists()) {
           console.log('No photos found in Firebase');
           displayEmptyState();
+          // Hide loading overlay
+          loadingOverlay.classList.add('hidden');
           return;
         }
   
@@ -108,9 +120,13 @@
         
         console.log('Loaded photos from Firebase:', allPhotos.length);
         renderPhotos(); // Render all photos initially
+        // Hide loading overlay after data is loaded
+        loadingOverlay.classList.add('hidden');
       }, (error) => {
         console.error('Error loading photos from Firebase:', error);
         displayEmptyState();
+        // Hide loading overlay even on error
+        loadingOverlay.classList.add('hidden');
       });
     }
   
