@@ -622,9 +622,45 @@ footer {
   }
 }   
 
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+}
+.loading-overlay.hidden {
+  display: none !important;
+}
+.loading-spinner {
+  width: 56px;
+  height: 56px;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #233B6E;
+  border-radius: 50%;
+  animation: dash-spin 0.9s linear infinite;
+}
+.loading-text {
+  margin-top: 12px;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+@keyframes dash-spin {
+  to { transform: rotate(360deg); }
+}
+
   </style>
 </head>
 <body>
+<div id="loadingOverlay" class="loading-overlay hidden" role="status" aria-live="polite" aria-busy="true">
+  <div class="loading-spinner" aria-hidden="true"></div>
+  <div class="loading-text">جارٍ التحميل...</div>
+</div>
 <div class="cross-background"></div>
   <nav class="navbar">
     <div class="nav-left">
@@ -1115,28 +1151,34 @@ footer {
     }
 
     document.addEventListener('DOMContentLoaded', async function () {
-      const isAuthenticated = await checkAuthentication();
-      if (isAuthenticated) {
-        console.log('User authenticated, setting up dashboard...');
-        
-        // Setup real-time listeners and initial data load
-        await setupRealTimeUpdates();
-        await loadLatestNotifications();
-        
-        // Initial stats update
-        await updateStats();
-        
-        console.log('Dashboard setup complete with real-time caching');
-      }
+      const overlay = document.getElementById('loadingOverlay');
+      try {
+        if (overlay) overlay.classList.remove('hidden');
 
-      // Close mobile menu when clicking on a link
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-          const navMenu = document.getElementById('navMenu');
-          navMenu.classList.remove('active');
+        const isAuthenticated = await checkAuthentication();
+        if (isAuthenticated) {
+          console.log('User authenticated, setting up dashboard...');
+          // Setup real-time listeners and initial data load
+          await setupRealTimeUpdates();
+          await loadLatestNotifications();
+          // Initial stats update
+          await updateStats();
+          console.log('Dashboard setup complete with real-time caching');
+        }
+
+        // Close mobile menu when clicking on a link
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.remove('active');
+          });
         });
-      });
+      } catch (error) {
+        console.error('Error during dashboard initialization:', error);
+      } finally {
+        if (overlay) overlay.classList.add('hidden');
+      }
     });
 
     // Clean up listeners when page is unloaded

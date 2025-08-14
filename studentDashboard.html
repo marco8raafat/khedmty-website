@@ -613,9 +613,36 @@ label {
     opacity: 0;
   }
 }   
+
+  /* Loading overlay */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 9999;
+  }
+  .loading-overlay.hidden { display: none !important; }
+  .loading-spinner {
+    width: 56px;
+    height: 56px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #233B6E;
+    border-radius: 50%;
+    animation: dash-spin 0.9s linear infinite;
+  }
+  .loading-text { margin-top: 12px; color: #fff; font-weight: 600; letter-spacing: 0.5px; }
+  @keyframes dash-spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
+<div id="loadingOverlay" class="loading-overlay hidden" role="status" aria-live="polite" aria-busy="true">
+  <div class="loading-spinner" aria-hidden="true"></div>
+  <div class="loading-text">جارٍ التحميل...</div>
+</div>
 <div class="cross-background"></div>
   <nav class="navbar">
     <div class="nav-left">
@@ -890,46 +917,67 @@ label {
 
   // 🔔 Load latest notifications
   document.addEventListener('DOMContentLoaded', async function() {
-    console.log("[Student Dashboard] Initializing dashboard...");
-    
-    // Check authentication first
-    const isAuthenticated = await checkAuthentication();
-    if (!isAuthenticated) {
-      return; // Exit if not authenticated
+    const overlay = document.getElementById('loadingOverlay');
+    try {
+      if (overlay) overlay.classList.remove('hidden');
+
+      console.log("[Student Dashboard] Initializing dashboard...");
+      // Check authentication first
+      const isAuthenticated = await checkAuthentication();
+      if (!isAuthenticated) {
+        return; // Exit if not authenticated (redirect handled elsewhere)
+      }
+
+      console.log("[Student Dashboard] User authenticated, setting up real-time updates...");
+      // Setup real-time notifications listener
+      loadLatestNotifications();
+
+      // Calculate and display initial progress
+      await updateProgressDisplay();
+
+      // Real-time listener for alerts (auto-update notifications)
+      dataCache.getData('alerts', () => {
+        console.log("[Student Dashboard] Alerts updated, refreshing notifications...");
+        if (typeof debouncedLoadNotifications === 'function') {
+          debouncedLoadNotifications();
+        } else {
+          loadLatestNotifications();
+        }
+      });
+
+      // Real-time listeners for attendance and research data (update progress)
+      dataCache.getData('attendance', () => {
+        console.log("[Student Dashboard] Attendance data updated, recalculating progress...");
+        if (typeof debouncedUpdateProgress === 'function') {
+          debouncedUpdateProgress();
+        } else if (typeof updateProgressDisplay === 'function') {
+          updateProgressDisplay();
+        }
+      });
+
+      dataCache.getData('researches', () => {
+        console.log("[Student Dashboard] Research data updated, recalculating progress...");
+        if (typeof debouncedUpdateProgress === 'function') {
+          debouncedUpdateProgress();
+        } else if (typeof updateProgressDisplay === 'function') {
+          updateProgressDisplay();
+        }
+      });
+
+      console.log("[Student Dashboard] Dashboard setup complete with smart caching and progress tracking");
+
+      // Periodic progress updates every 5 minutes
+      setInterval(() => {
+        console.log("[Student Dashboard] Periodic progress update");
+        if (typeof updateProgressDisplay === 'function') {
+          updateProgressDisplay();
+        }
+      }, 5 * 60 * 1000);
+    } catch (e) {
+      console.error("[Student Dashboard] Error during initialization:", e);
+    } finally {
+      if (overlay) overlay.classList.add('hidden');
     }
-
-    console.log("[Student Dashboard] User authenticated, setting up real-time updates...");
-    
-    // Setup real-time notifications listener
-    loadLatestNotifications();
-    
-    // Calculate and display initial progress
-    await updateProgressDisplay();
-    
-    // Set up real-time listener for alerts that will auto-update notifications
-    dataCache.getData('alerts', () => {
-      console.log("[Student Dashboard] Alerts updated, refreshing notifications...");
-      debouncedLoadNotifications();
-    });
-
-    // Set up real-time listeners for attendance and research data to update progress
-    dataCache.getData('attendance', () => {
-      console.log("[Student Dashboard] Attendance data updated, recalculating progress...");
-      debouncedUpdateProgress();
-    });
-
-    dataCache.getData('researches', () => {
-      console.log("[Student Dashboard] Research data updated, recalculating progress...");
-      debouncedUpdateProgress();
-    });
-
-    console.log("[Student Dashboard] Dashboard setup complete with smart caching and progress tracking");
-    
-    // Set up periodic progress updates every 5 minutes
-    setInterval(() => {
-      console.log("[Student Dashboard] Periodic progress update");
-      updateProgressDisplay();
-    }, 5 * 60 * 1000); // 5 minutes
   });
 
   // 🔔 Enhanced notifications with smart caching
