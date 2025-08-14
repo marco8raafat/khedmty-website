@@ -76,6 +76,6 @@ async function sendMessage() {
     appendMessage((data && data.reply) ? data.reply : "No response", "bot");
   } catch (err) {
     hideTyping();
-    appendMessage("Error contacting bot", "bot");
+    appendMessage("حدث خطأ في الاتصال", "bot");
   }
 }
