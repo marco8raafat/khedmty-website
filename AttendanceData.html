@@ -476,6 +476,25 @@ async function loadStudents() {
           document.getElementById('presentCount').textContent = presentCount;
           document.getElementById('absentCount').textContent = absentCount;
           document.getElementById('notMarkedCount').textContent = notMarkedCount;
+
+          // Update save button appearance based on completion
+          const saveButton = document.querySelector('.btn-success');
+          if (notMarkedCount === 0 && totalStudents > 0) {
+              // All students marked - enable and highlight button
+              saveButton.style.background = '#28a745';
+              saveButton.innerHTML = '💾 حفظ الحضور (مكتمل ✅)';
+              saveButton.disabled = false;
+          } else if (presentCount + absentCount > 0) {
+              // Partially marked - warning style
+              saveButton.style.background = '#fd7e14';
+              saveButton.innerHTML = `💾 حفظ الحضور (${notMarkedCount} غير مسجل ⚠️)`;
+              saveButton.disabled = false;
+          } else {
+              // Nothing marked - default style
+              saveButton.style.background = '#6c757d';
+              saveButton.innerHTML = '💾 حفظ الحضور';
+              saveButton.disabled = true;
+          }
       }
 
       function filterStudents() {
@@ -516,6 +535,20 @@ async function loadStudents() {
               if (Object.keys(attendanceData).length === 0) {
                   alert('يرجى تسجيل حضور الطلاب أولاً');
                   return;
+              }
+
+              // Check if all students have attendance marked
+              const totalStudents = students.length;
+              const markedStudents = Object.keys(attendanceData).length;
+              
+              if (markedStudents < totalStudents) {
+                  const unmarkedCount = totalStudents - markedStudents;
+                  const confirmMessage = `تحذير: لم يتم تسجيل حضور ${unmarkedCount} من الطلاب.\n\nهل تريد المتابعة والحفظ للطلاب المسجلين فقط؟\n\nأم تريد العودة لتسجيل حضور جميع الطلاب؟`;
+                  
+                  if (!confirm(confirmMessage)) {
+                      // User chose to go back and mark all students
+                      return;
+                  }
               }
 
               const attendanceRef = database.ref('attendance/' + selectedDate);
