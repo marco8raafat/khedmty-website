@@ -300,6 +300,130 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // Smart Cache System for Alerts
+    class AlertsCache {
+      constructor() {
+        this.cache = new Map();
+        this.listeners = new Map();
+        this.lastUpdated = new Map();
+        this.cacheTimeout = 5 * 60 * 1000; // 5 minutes cache timeout
+        this.alertsCallbacks = new Set();
+      }
+
+      // Check if cached data is still valid
+      isCacheValid(path) {
+        const lastUpdate = this.lastUpdated.get(path);
+        if (!lastUpdate) return false;
+        return (Date.now() - lastUpdate) < this.cacheTimeout;
+      }
+
+      // Get data from cache or Firebase with real-time listener
+      async getData(path, callback) {
+        // Add callback to set for updates
+        this.alertsCallbacks.add(callback);
+
+        // Return cached data if valid
+        if (this.isCacheValid(path) && this.cache.has(path)) {
+          const cachedData = this.cache.get(path);
+          callback(cachedData);
+          return cachedData;
+        }
+
+        // Set up real-time listener if not exists
+        if (!this.listeners.has(path)) {
+          const listener = db.ref(path).on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            
+            // Update cache
+            this.cache.set(path, data);
+            this.lastUpdated.set(path, Date.now());
+            
+            // Notify all callbacks
+            this.alertsCallbacks.forEach(cb => {
+              try {
+                cb(data);
+              } catch (error) {
+                console.error('Error in cache callback:', error);
+              }
+            });
+          }, (error) => {
+            console.error('Firebase listener error:', error);
+            // Notify callbacks about error
+            this.alertsCallbacks.forEach(cb => {
+              try {
+                cb(null, error);
+              } catch (err) {
+                console.error('Error in error callback:', err);
+              }
+            });
+          });
+
+          this.listeners.set(path, listener);
+        }
+
+        // Return existing cached data while waiting for update
+        if (this.cache.has(path)) {
+          return this.cache.get(path);
+        }
+
+        // For initial load, wait for first data
+        return new Promise((resolve, reject) => {
+          const tempCallback = (data, error) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(data);
+            }
+            this.alertsCallbacks.delete(tempCallback);
+          };
+          this.alertsCallbacks.add(tempCallback);
+        });
+      }
+
+      // Clean up listeners when not needed
+      cleanup() {
+        this.listeners.forEach((listener, path) => {
+          db.ref(path).off('value', listener);
+        });
+        this.listeners.clear();
+        this.cache.clear();
+        this.lastUpdated.clear();
+        this.alertsCallbacks.clear();
+      }
+
+      // Force refresh cache
+      invalidateCache(path) {
+        this.cache.delete(path);
+        this.lastUpdated.delete(path);
+      }
+
+      // Get cache stats for debugging
+      getCacheStats() {
+        return {
+          cacheSize: this.cache.size,
+          listenersCount: this.listeners.size,
+          callbacksCount: this.alertsCallbacks.size,
+          cachedPaths: Array.from(this.cache.keys())
+        };
+      }
+    }
+
+    // Initialize cache instance
+    const alertsCache = new AlertsCache();
+
+    // Debounce function to prevent rapid successive updates
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
     // Authentication check function
     async function checkAuthentication() {
       const currentEmail = await requireAuthentication("login.html");
@@ -348,7 +472,7 @@
       const isAuthenticated = await checkAuthentication();
       if (isAuthenticated) {
         setupFormHandler();
-        renderAlerts();
+        debouncedRenderAlerts();
       }
     }
 
@@ -379,7 +503,9 @@
             db.ref('alerts').push(alert).then(() => {
               titleInput.value = '';
               messageInput.value = '';
-              renderAlerts();
+              // Invalidate cache to force refresh with new data
+              alertsCache.invalidateCache('alerts');
+              debouncedRenderAlerts();
               window.alert('✅ تم إضافة التنبيه بنجاح!');
             }).catch((error) => {
               console.error('Database write error:', error);
@@ -396,11 +522,30 @@
     }
 
     function renderAlerts() {
-      alertsList.innerHTML = '';
-      db.ref('alerts').once('value', (snapshot) => {
-        const alerts = snapshot.val();
-        if (alerts) {
-          Object.entries(alerts).forEach(([key, alert]) => {
+      alertsCache.getData('alerts', (alerts, error) => {
+        if (error) {
+          console.error('Error loading alerts:', error);
+          alertsList.innerHTML = '<p style="color: #ff4444;">حدث خطأ في تحميل التنبيهات.</p>';
+          return;
+        }
+
+        alertsList.innerHTML = '';
+        
+        if (alerts && Object.keys(alerts).length > 0) {
+          // Convert to array and sort by timestamp (newest first)
+          const alertsArray = Object.entries(alerts).map(([key, alert]) => ({
+            id: key,
+            ...alert
+          }));
+          
+          // Sort by creation time (newest first)
+          alertsArray.sort((a, b) => {
+            const timeA = a.timestamp || new Date(a.time).getTime() || 0;
+            const timeB = b.timestamp || new Date(b.time).getTime() || 0;
+            return timeB - timeA;
+          });
+          
+          alertsArray.forEach((alert) => {
             const div = document.createElement('div');
             div.className = 'alert-box';
             
@@ -408,26 +553,34 @@
             const creatorInfo = alert.createdByName || alert.createdBy || 'غير معروف';
             
             div.innerHTML = `
-              <strong>${alert.title}</strong><br>
-              ${alert.message}<br>
-              <small>${alert.time}</small>
+              <strong>${alert.title || 'بدون عنوان'}</strong><br>
+              ${alert.message || 'لا يوجد محتوى'}<br>
+              <small>${alert.time || 'غير محدد'}</small>
               <small style="display: block; margin-top: 5px; color: #555; font-style: italic;">
                 أضيف بواسطة: ${creatorInfo}
               </small>
-              <button class="delete-btn" onclick="deleteAlert('${key}')">🗑 حذف</button>
+              <button class="delete-btn" onclick="deleteAlert('${alert.id}')">🗑 حذف</button>
             `;
             alertsList.appendChild(div);
           });
+
+          // Log cache stats for debugging
+          console.log('Cache Stats:', alertsCache.getCacheStats());
         } else {
           alertsList.innerHTML = '<p>لا توجد تنبيهات مضافة حتى الآن.</p>';
         }
       });
     }
 
+    // Debounced version of renderAlerts
+    const debouncedRenderAlerts = debounce(renderAlerts, 300);
+
     function deleteAlert(id) {
       if (confirm('هل أنت متأكد من حذف هذا التنبيه؟')) {
         db.ref('alerts/' + id).remove().then(() => {
-          renderAlerts();
+          // Invalidate cache to force refresh after deletion
+          alertsCache.invalidateCache('alerts');
+          debouncedRenderAlerts();
         }).catch((error) => {
           console.error('Error deleting alert:', error);
           alert('⚠️ حدث خطأ أثناء حذف التنبيه');
@@ -461,6 +614,22 @@
 
     // Initialize the page when DOM is loaded
     window.onload = initializePage;
+
+    // Clean up listeners when page is unloaded
+    window.addEventListener('beforeunload', function() {
+      alertsCache.cleanup();
+    });
+
+    // Handle page visibility changes for better resource management
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') {
+        // Page became visible, refresh if cache is stale
+        if (!alertsCache.isCacheValid('alerts')) {
+          alertsCache.invalidateCache('alerts');
+          debouncedRenderAlerts();
+        }
+      }
+    });
     
   </script>
 </body>
