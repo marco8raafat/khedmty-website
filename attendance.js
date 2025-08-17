@@ -141,10 +141,12 @@
 
     const date = document.getElementById('dateSelect').value;
     const tbody = document.getElementById('attendanceBody');
+    const editButton = document.getElementById('editButton');
     tbody.innerHTML = '';
 
     if (!date) {
       tbody.innerHTML = '<tr><td colspan="3" class="empty-state">❌ الرجاء اختيار تاريخ</td></tr>';
+      editButton.style.display = 'none'; // Hide edit button when no date is selected
       return;
     }
 
@@ -154,12 +156,21 @@
 
       if (!data) {
         tbody.innerHTML = '<tr><td colspan="3">📭 لا توجد بيانات لهذا اليوم</td></tr>';
+        editButton.style.display = 'none'; // Hide edit button when no data
         return;
       }
+
+      // Show edit button when data is loaded
+      editButton.style.display = 'inline-block';
+      
+      // Store current data for editing
+      window.currentAttendanceData = data;
+      window.currentDate = date;
 
       Object.keys(data).forEach(studentId => {
         const record = data[studentId];
         const row = document.createElement('tr');
+        row.setAttribute('data-student-id', studentId);
 
         const nameCell = document.createElement('td');
         nameCell.textContent = record.studentName || 'غير معروف';
@@ -168,8 +179,16 @@
         teamCell.textContent = record.team || 'غير محدد';
 
         const statusCell = document.createElement('td');
-        statusCell.textContent = record.status === 'present' ? 'حاضر ✅' : 'غائب ❌';
-        statusCell.className = record.status === 'present' ? 'status-present' : 'status-absent';
+        statusCell.className = 'status-cell';
+        statusCell.innerHTML = `
+          <span class="status-display ${record.status === 'present' ? 'status-present' : 'status-absent'}">
+            ${record.status === 'present' ? 'حاضر ✅' : 'غائب ❌'}
+          </span>
+          <select class="status-select" style="display: none;" data-student-id="${studentId}">
+            <option value="present" ${record.status === 'present' ? 'selected' : ''}>حاضر ✅</option>
+            <option value="absent" ${record.status === 'absent' ? 'selected' : ''}>غائب ❌</option>
+          </select>
+        `;
 
         row.appendChild(nameCell);
         row.appendChild(teamCell);
@@ -180,6 +199,7 @@
     } catch (error) {
       console.error('Error fetching data:', error);
       tbody.innerHTML = '<tr><td colspan="3">❌ حدث خطأ أثناء تحميل البيانات</td></tr>';
+      editButton.style.display = 'none';
     }
   }
 
@@ -315,6 +335,116 @@ for (let i = 0; i < crossCount; i++) {
   cross.style.top = Math.random() * 100 + 'vh';
   cross.style.animationDuration = (12 + Math.random() * 11) + 's';
   container.appendChild(cross);
+}
+
+// Edit attendance functionality
+let isEditMode = false;
+window.attendanceChanges = {};
+
+function toggleEditMode() {
+  const editButton = document.getElementById('editButton');
+  const saveButton = document.getElementById('saveChangesBtn');
+  const table = document.getElementById('historyTable');
+  
+  isEditMode = !isEditMode;
+  
+  if (isEditMode) {
+    // Enter edit mode
+    editButton.textContent = '❌ إلغاء التعديل';
+    editButton.className = 'btn-edit editing';
+    table.classList.add('edit-mode');
+    saveButton.classList.add('show');
+    
+    // Show select dropdowns, hide text
+    document.querySelectorAll('.status-display').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.status-select').forEach(el => el.style.display = 'block');
+    
+    // Reset changes
+    window.attendanceChanges = {};
+    
+    // Add change listeners
+    document.querySelectorAll('.status-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const studentId = this.getAttribute('data-student-id');
+        const newStatus = this.value;
+        const originalStatus = window.currentAttendanceData[studentId].status;
+        
+        if (newStatus !== originalStatus) {
+          window.attendanceChanges[studentId] = {
+            ...window.currentAttendanceData[studentId],
+            status: newStatus
+          };
+        } else {
+          delete window.attendanceChanges[studentId];
+        }
+        
+        // Update save button state
+        const hasChanges = Object.keys(window.attendanceChanges).length > 0;
+        saveButton.style.opacity = hasChanges ? '1' : '0.6';
+        saveButton.disabled = !hasChanges;
+      });
+    });
+    
+  } else {
+    // Exit edit mode
+    exitEditMode();
+  }
+}
+
+function exitEditMode() {
+  const editButton = document.getElementById('editButton');
+  const saveButton = document.getElementById('saveChangesBtn');
+  const table = document.getElementById('historyTable');
+  
+  isEditMode = false;
+  editButton.textContent = '✏️ تعديل الحضور';
+  editButton.className = 'btn-edit';
+  table.classList.remove('edit-mode');
+  saveButton.classList.remove('show');
+  
+  // Show text, hide select dropdowns
+  document.querySelectorAll('.status-display').forEach(el => el.style.display = 'inline');
+  document.querySelectorAll('.status-select').forEach(el => el.style.display = 'none');
+  
+  // Reset changes
+  window.attendanceChanges = {};
+}
+
+async function saveAttendanceChanges() {
+  if (Object.keys(window.attendanceChanges).length === 0) {
+    alert('لا توجد تغييرات للحفظ');
+    return;
+  }
+  
+  const saveButton = document.getElementById('saveChangesBtn');
+  const originalText = saveButton.textContent;
+  
+  try {
+    saveButton.textContent = '⏳ جاري الحفظ...';
+    saveButton.disabled = true;
+    
+    const updates = {};
+    Object.keys(window.attendanceChanges).forEach(studentId => {
+      updates[`attendance/${window.currentDate}/${studentId}`] = window.attendanceChanges[studentId];
+    });
+    
+    await db.ref().update(updates);
+    
+    alert('✅ تم حفظ التعديلات بنجاح!');
+    
+    // Refresh the data
+    await fetchAttendanceByDate();
+    
+    // Exit edit mode
+    exitEditMode();
+    
+  } catch (error) {
+    console.error('Error saving changes:', error);
+    alert('❌ حدث خطأ أثناء حفظ التعديلات. يرجى المحاولة مرة أخرى.');
+  } finally {
+    saveButton.textContent = originalText;
+    saveButton.disabled = false;
+  }
 }
 
 
