@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="logoCircle1.png">
+    <title>فريق التطوير - خدمتي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Cairo", sans-serif;
+            color: #222;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+            min-height: 100vh;
+  background-image: url('knesa.jpg'); /* Change path to your image */
+  background-size: cover;        /* Make image cover the whole page */
+  background-repeat: no-repeat;  /* Prevent repeating */
+  /* background-attachment: fixed;  Keeps background fixed when scrolling */
+  background-position: center;   /* Center the image */
+        }
+
+        body::before {
+            content: "";
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(2px);
+            z-index: -1;
+        }
+
+        .navbar {
+            background-color: #233B6E;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .nav-left .church-logo {
+            height: 60px;
+            border: 3px solid #fff;
+            border-radius: 12px;
+            padding: 4px;
+            background-color: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-right .nav-link {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .nav-right .nav-link:hover,
+        .nav-right .nav-link:focus,
+        .nav-right .nav-link:active {
+            background-color: #1a2d59;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* Mobile menu toggle button */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .menu-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #233B6E, #314d9f);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+
+        }
+
+        @keyframes float-pattern {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-60px) translateX(60px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-section p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .intro-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 50px 30px;
+            border-radius: 20px;
+            margin-bottom: 50px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .intro-section h2 {
+            color: #233B6E;
+            font-size: 2.5em;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .intro-section p {
+            font-size: 1.2em;
+            line-height: 2;
+            color: #444;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .team-member {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .team-member::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #233B6E, #314d9f, #4a6bc7);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .member-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .member-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #233B6E, #314d9f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: white;
+            font-weight: bold;
+            margin-left: 20px;
+            box-shadow: 0 5px 15px rgba(35, 59, 110, 0.3);
+        }
+
+        .member-info h3 {
+            color: #233B6E;
+            font-size: 1.5em;
+            margin: 0 0 5px 0;
+            font-weight: 700;
+        }
+
+        .member-role {
+            color: #666;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .contributions {
+            margin-top: 20px;
+        }
+
+        .contributions h4 {
+            color: #233B6E;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .contribution-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .contribution-item {
+            background: #f8f9ff;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-right: 4px solid #233B6E;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .contribution-item:hover {
+            background: #233B6E;
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .member-social {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .linkedin-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #0077B5;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .linkedin-btn:hover {
+            background: #005885;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 119, 181, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .linkedin-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 50px 30px;
+            border-radius: 20px;
+            margin: 50px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #233B6E, #314d9f);
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        footer {
+            background-color: #233B6E;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 50px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .nav-left {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-right {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+
+            .nav-right.active {
+                max-height: 300px;
+            }
+
+            .nav-link {
+                width: 100%;
+                text-align: center;
+                padding: 12px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 0;
+            }
+
+            .nav-link:last-child {
+                border-bottom: none;
+            }
+
+            .hero-section h1 {
+                font-size: 2.5em;
+            }
+
+            .intro-section h2 {
+                font-size: 2em;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .member-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .member-avatar {
+                margin-left: 0;
+                margin-bottom: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .stat-number {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section {
+                padding: 40px 15px;
+            }
+
+            .hero-section h1 {
+                font-size: 2em;
+            }
+
+            .team-member {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cross background animation */
+        .cross-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .cross {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            animation: float 15s linear infinite;
+            opacity: 0.3;
+        }
+
+        .cross svg {
+            width: 100%;
+            height: 100%;
+            fill: rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(1);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-20vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cross-background"></div>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <img src="church-logo.png" alt="شعار الكنيسة" class="church-logo">
+            <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        </div>
+        <div class="nav-right" id="navMenu">
+            <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+            <a href="aboutUs.html" class="nav-link">عن الفريق</a>
+            <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+            <a href="login.html" class="nav-link">تسجيل الدخول</a>
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1>🚀 فريق التطوير</h1>
+            <p>مطورو موقع خدمتي - كنيسة السيدة العذراء مريم عزبة النخل</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="intro-section">
+            <h2>💡 عن مشروع خدمتي</h2>
+            <p>
+                نظام إدارة شامل لخدمات الكنيسة تم تطويره بأيدي فريق من الشباب المتخصصين لخدمة مجتمع الكنيسة الرقمي. 
+                يهدف المشروع إلى تسهيل إدارة الحضور والامتحانات والأبحاث والموارد التعليمية بطريقة حديثة ومبتكرة.
+                <br><br>
+                <strong>تم تطوير هذا النظام بالكامل بواسطة فريق من ستة مطورين موهوبين يجمعهم حب الخدمة والابتكار التقني.</strong>
+            </p>
+        </div>
+
+        <div class="stats-section">
+            <h2>📊 إحصائيات المشروع</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">6</span>
+                    <span class="stat-label">مطورين</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">20+</span>
+                    <span class="stat-label">صفحة ومميزة</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">متجاوب مع الجوال</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">∞</span>
+                    <span class="stat-label">حب للخدمة</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="member-header">
+                    <div class="member-avatar">م</div>
+                    <div class="member-info">
+                        <h3>ماركو رأفت</h3>
+                        <div class="member-role">مطور لوحات التحكم والذكاء الاصطناعي</div>
+                    </div>
+                </div>
+                <div class="contributions">
+                    <h4>🤖 المساهمات:</h4>
+                    <ul class="contribution-list">
+                        <li class="contribution-item">إضافة لوحة تحكم للخادم والمخدوم</li>
+                        <li class="contribution-item">صفحة عرض الصور</li>
+                        <li class="contribution-item">صفحة عرض المصادر</li>
+                        <li class="contribution-item">إضافة ذكاء اصطناعي مساعد للخادم</li>
+                    </ul>
+                </div>
+                <div class="member-social">
+                    <a href="https://www.linkedin.com/in/marco8raafat" target="_blank" class="linkedin-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn Profile
+                    </a>
+                </div>
+            </div>
+            <div class="team-member">
+                <div class="member-header">
+                    <div class="member-avatar">ي</div>
+                    <div class="member-info">
+                        <h3>يوليانا عادل</h3>
+                        <div class="member-role">مطورة أنظمة المصادقة والملفات الشخصية</div>
+                    </div>
+                </div>
+                <div class="contributions">
+                    <h4>🔐 المساهمات:</h4>
+                    <ul class="contribution-list">
+                        <li class="contribution-item">إضافة صفحة تسجيل الدخول</li>
+                        <li class="contribution-item">صفحة إنشاء حساب</li>
+                        <li class="contribution-item">صفحة الملف الشخصي</li>
+                        <li class="contribution-item">صفحة تعديل البيانات</li>
+                    </ul>
+                </div>
+                <div class="member-social">
+                    <a href="https://www.linkedin.com/in/yuliana-adel" target="_blank" class="linkedin-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn Profile
+                    </a>
+                </div>
+            </div>
+
+            <div class="team-member">
+                <div class="member-header">
+                    <div class="member-avatar">م</div>
+                    <div class="member-info">
+                        <h3>ماريا سامح</h3>
+                        <div class="member-role">مطورة أنظمة الأبحاث والدرجات</div>
+                    </div>
+                </div>
+                <div class="contributions">
+                    <h4>📚 المساهمات:</h4>
+                    <ul class="contribution-list">
+                        <li class="contribution-item">إضافة صفحة رفع الأبحاث</li>
+                        <li class="contribution-item">صفحة لاستلام الأبحاث</li>
+                        <li class="contribution-item">صفحة لعرض درجات المخدوم (أبحاث وامتحانات)</li>
+                    </ul>
+                </div>
+                <div class="member-social">
+                    <a href="https://www.linkedin.com/in/maria-sameh" target="_blank" class="linkedin-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn Profile
+                    </a>
+                </div>
+            </div>
+
+            <div class="team-member">
+                <div class="member-header">
+                    <div class="member-avatar">ب</div>
+                    <div class="member-info">
+                        <h3>بيشوي اسحق</h3>
+                        <div class="member-role">مطور أنظمة الحضور والتقارير</div>
+                    </div>
+                </div>
+                <div class="contributions">
+                    <h4>📋 المساهمات:</h4>
+                    <ul class="contribution-list">
+                        <li class="contribution-item">إضافة صفحة تسجيل الحضور</li>
+                        <li class="contribution-item">صفحة عرض تسجيل الحضور</li>
+                        <li class="contribution-item">صفحة عرض تقارير الحضور مع عرض نسب الكسل أو الغياب</li>
+                    </ul>
+                </div>
+                <div class="member-social">
+                    <a href="https://www.linkedin.com/in/bishoy-ishaq" target="_blank" class="linkedin-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn Profile
+                    </a>
+                </div>
+            </div>
+
+            <div class="team-member">
+                <div class="member-header">
+                    <div class="member-avatar">ي</div>
+                    <div class="member-info">
+                        <h3>يوسف وفيق</h3>
+                        <div class="member-role">مطور أنظمة الامتحانات</div>
+                    </div>
+                </div>
+                <div class="contributions">
+                    <h4>📝 المساهمات:</h4>
+                    <ul class="contribution-list">
+                        <li class="contribution-item">إضافة صفحة لرفع الامتحانات</li>
+                        <li class="contribution-item">صفحة لاستلام الامتحانات</li>
+                        <li class="contribution-item">صفحة تعديل وحذف الامتحانات</li>
+                    </ul>
+                </div>
+                <div class="member-social">
+                    <a href="https://www.linkedin.com/in/youssef-wafik" target="_blank" class="linkedin-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn Profile
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="team-member">
+                <div class="member-header">
+                    <div class="member-avatar">م</div>
+                    <div class="member-info">
+                        <h3>مريم نعيم</h3>
+                        <div class="member-role">مطورة أنظمة التنبيهات والصفحة الرئيسية</div>
+                    </div>
+                </div>
+                <div class="contributions">
+                    <h4>🔔 المساهمات:</h4>
+                    <ul class="contribution-list">
+                        <li class="contribution-item">إضافة صفحة إنشاء تنبيه</li>
+                        <li class="contribution-item">صفحة عرض التنبيهات</li>
+                        <li class="contribution-item">الصفحة الرئيسية</li>
+                    </ul>
+                </div>
+                <div class="member-social">
+                    <a href="https://www.linkedin.com/in/maryam-naeem" target="_blank" class="linkedin-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 كنيسة السيدة العذراء - عزبة النخل | تطبيق خدمتي</p>
+    </footer>
+
+    <script>
+        // Mobile menu toggle function
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Cross background animation
+        function createCrossBackground() {
+            const container = document.querySelector('.cross-background');
+            const svgCross = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+                    <path d="M52.247,19.665c-0.396,0-0.785,0.049-1.162,0.145c-0.403-2.214-2.347-3.897-4.675-3.897c-2.396,0-4.382,1.781-4.707,4.087H35v-4.811c2.077-0.517,3.594-2.381,3.594-4.599c0-2.188-1.486-4.036-3.503-4.586c0.11-0.404,0.167-0.824,0.167-1.251C35.258,2.132,33.126,0,30.506,0c-2.621,0-4.753,2.132-4.753,4.753c0,0.395,0.049,0.785,0.145,1.162C23.684,6.318,22,8.262,22,10.59c0,2.364,1.735,4.331,4,4.693V20h-7.812c-0.516-2.077-2.38-3.594-4.599-3.594c-2.188,0-4.035,1.486-4.585,3.503c-0.405-0.11-0.825-0.167-1.252-0.167C5.132,19.742,3,21.874,3,24.495s2.132,4.753,4.753,4.753c0.396,0,0.785-0.049,1.162-0.145C9.318,31.316,11.262,33,13.59,33c2.365,0,4.332-1.736,4.693-4H26v15.84c-2.026,0.551-3.506,2.405-3.506,4.569c0,2.188,1.486,4.036,3.502,4.586c-0.11,0.405-0.167,0.825-0.167,1.252c0,2.621,2.132,4.752,4.753,4.752s4.753-2.132,4.753-4.752c0-0.395-0.049-0.785-0.146-1.162c2.215-0.404,3.898-2.347,3.898-4.676c0-2.395-1.781-4.382-4.088-4.706V29h6.84c0.552,2.027,2.406,3.506,4.57,3.506c2.188,0,4.035-1.486,4.585-3.503c0.405,0.11,0.825,0.167,1.252,0.167c2.621,0,4.753-2.132,4.753-4.752S54.868,19.665,52.247,19.665z"/>
+                </svg>
+            `;
+
+            const isMobile = window.innerWidth < 768;
+            const crossCount = isMobile ? 8 : 15;
+
+            for (let i = 0; i < crossCount; i++) {
+                const cross = document.createElement('div');
+                cross.className = 'cross';
+                cross.innerHTML = svgCross;
+                cross.style.left = Math.random() * 100 + 'vw';
+                cross.style.top = Math.random() * 100 + 'vh';
+                cross.style.animationDuration = (10 + Math.random() * 10) + 's';
+                cross.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(cross);
+            }
+        }
+
+        // Initialize animations when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createCrossBackground();
+
+            // Add scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all team members
+            document.querySelectorAll('.team-member').forEach(member => {
+                member.style.opacity = '0';
+                member.style.transform = 'translateY(30px)';
+                member.style.transition = 'all 0.6s ease';
+                observer.observe(member);
+            });
+        });
+
+        // Add hover effects to stat items
+        document.querySelectorAll('.stat-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05) rotate(2deg)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+    </script>
+</body>
+</html>
