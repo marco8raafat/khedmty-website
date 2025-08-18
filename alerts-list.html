@@ -36,10 +36,10 @@
       <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
     </div>
     <div class="nav-right" id="navMenu">
-      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
-      <a href="studentDashboard.html" class="nav-link">لوحة التحكم</a>
-      <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
-      <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
+  <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+  <a href="javascript:void(0)" onclick="goToDashboard()" class="nav-link">لوحة التحكم</a>
+  <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+  <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
   </nav>
   <header>
@@ -66,6 +66,34 @@
   <script src="sessionUtils.js"></script>
 
   <script>
+    // Go to appropriate dashboard based on user role
+    async function goToDashboard() {
+      const currentUser = verifySecureSession();
+      if (!currentUser) {
+        window.location.href = "login.html";
+        return;
+      }
+      try {
+        const emailKey = currentUser.replace(/\./g, '_');
+        const userSnapshot = await db.ref('users/' + emailKey).once('value');
+        const userData = userSnapshot.val();
+        if (!userData) {
+          clearSession();
+          window.location.href = "login.html";
+          return;
+        }
+        const userRole = userData.role ? userData.role.toLowerCase().trim() : 'student';
+        if (userRole === "student") {
+          window.location.href = "studentDashboard.html";
+        } else if (userRole === "servant") {
+          window.location.href = "teacherDashboard.html";
+        } else {
+          window.location.href = "studentDashboard.html";
+        }
+      } catch (error) {
+        window.location.href = "studentDashboard.html";
+      }
+    }
     const firebaseConfig = {
       apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
       authDomain: "edad-5odam.firebaseapp.com",
