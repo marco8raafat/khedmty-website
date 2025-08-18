@@ -6,7 +6,7 @@
   <link rel="icon" href="logoCircle1.png" type="image/png"/>
   <title>إضافة تنبيه</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
+ <style>
     /* Your existing styles */
     textarea#message {
       padding: 15px;
@@ -23,6 +23,7 @@
       background-color: #fff;
       box-shadow: 0 0 8px rgba(35, 59, 110, 0.2);
     }
+
     .alert-box {
       background-color: #fdfdfd;
       padding: 15px 20px;
@@ -32,36 +33,58 @@
       position: relative;
       line-height: 1.6;
     }
+
     .alert-box strong {
       font-size: 1.1em;
       display: block;
       color: #233B6E;
       margin-bottom: 5px;
     }
+
     .alert-box small {
       display: block;
       margin-top: 8px;
       color: #777;
       font-size: 0.85em;
     }
+
+    /* زر الحذف */
     .delete-btn {
       background-color: #ff4d4d;
       border: none;
       color: white;
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 0.85em;
+      font-size: 0.9rem;
       cursor: pointer;
-      position: absolute;
-      left: 10px;
-      top: 10px;
       transition: 0.3s;
     }
     .delete-btn:hover {
       background-color: #e60000;
     }
 
+    /* زر التعديل */
+    .edit-btn {
+      background-color: #007bff;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .edit-btn:hover {
+      background-color: #0056b3;
+    }
 
+    /* نخلي الزرارين في سطر واحد */
+    .alert-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 6px;
+      justify-content: flex-start;
+    }
 
     /* Mobile responsive styles */
     @media (max-width: 768px) {
@@ -96,15 +119,20 @@
         padding-top: 45px; /* Make room for delete button */
       }
 
-      .delete-btn {
-        padding: 8px 12px;
-        font-size: 0.9rem;
+      /* نخلي زر الحذف وزر التعديل قد بعض */
+      .delete-btn,
+      .edit-btn {
+        flex: 1;               
+        padding: 10px;
+        font-size: 1rem;
         min-width: 44px;
         min-height: 44px;
-        top: 8px;
-        left: 8px;
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: transparent;
+        text-align: center;
+      }
+
+      .alert-actions {
+        flex-direction: row;    
+        justify-content: center;
       }
 
       header {
@@ -175,9 +203,11 @@
         padding-top: 40px;
       }
 
-      .delete-btn {
-        padding: 6px 10px;
-        font-size: 0.85rem;
+      .delete-btn,
+      .edit-btn {
+        flex: 1;               
+        padding: 8px;
+        font-size: 0.9rem;
         min-width: 40px;
         min-height: 40px;
       }
@@ -205,40 +235,41 @@
         font-size: 1.4rem;
       }
     }
+
    @media (max-width: 480px) {
-  main {
-    padding: 15px;
-  }
+      main {
+        padding: 15px;
+      }
 
-  .alert-form {
-    gap: 12px;
-  }
+      .alert-form {
+        gap: 12px;
+      }
 
-  .alert-form input,
-  .alert-form textarea {
-    padding: 14px;
-    font-size: 1rem;
-    width: 100%;
-    border-radius: 10px;
-    box-sizing: border-box;
-  }
+      .alert-form input,
+      .alert-form textarea {
+        padding: 14px;
+        font-size: 1rem;
+        width: 100%;
+        border-radius: 10px;
+        box-sizing: border-box;
+      }
 
-  .alert-form .btn {
-    font-size: 1rem;
-    padding: 12px;
-    margin-top: 4px;
-    width: 100%;
-    border-radius: 10px;
-    box-sizing: border-box;
-  }
+      .alert-form .btn {
+        font-size: 1rem;
+        padding: 12px;
+        margin-top: 4px;
+        width: 100%;
+        border-radius: 10px;
+        box-sizing: border-box;
+      }
 
-  #alertsSection h2 {
-    font-size: 1.4rem;
-    margin-top: 30px;
-  }
-}
+      #alertsSection h2 {
+        font-size: 1.4rem;
+        margin-top: 30px;
+      }
+   }
+</style>
 
-  </style>
 </head>
 <body>
    <nav class="navbar">
@@ -552,15 +583,19 @@
             // Display creator name if available, otherwise fall back to email
             const creatorInfo = alert.createdByName || alert.createdBy || 'غير معروف';
             
-            div.innerHTML = `
-              <strong>${alert.title || 'بدون عنوان'}</strong><br>
-              ${alert.message || 'لا يوجد محتوى'}<br>
-              <small>${alert.time || 'غير محدد'}</small>
-              <small style="display: block; margin-top: 5px; color: #555; font-style: italic;">
-                أضيف بواسطة: ${creatorInfo}
-              </small>
-              <button class="delete-btn" onclick="deleteAlert('${alert.id}')">🗑 حذف</button>
-            `;
+ div.innerHTML = `
+  <strong>${alert.title || 'بدون عنوان'}</strong><br>
+  ${alert.message || 'لا يوجد محتوى'}<br>
+  <small>${alert.time || 'غير محدد'}</small>
+  <small style="display:block;margin-top:5px;color:#555;font-style:italic;">
+    أضيف بواسطة: ${alert.createdByName || alert.createdBy || 'غير معروف'}
+  </small>
+  <div class="alert-actions">
+    <button class="delete-btn" onclick="deleteAlert('${alert.id}')">🗑 حذف</button>
+    <button class="edit-btn" onclick="editAlert('${alert.id}', '${alert.title}', '${alert.message}')"> تعديل</button>
+  </div>
+`;
+
             alertsList.appendChild(div);
           });
 
@@ -587,6 +622,28 @@
         });
       }
     }
+
+    //function edit 
+    function editAlert(id, oldTitle, oldMessage) {
+  const newTitle = prompt("✏️ عدل عنوان التنبيه:", oldTitle);
+  const newMessage = prompt("📝 عدل نص التنبيه:", oldMessage);
+
+  if (newTitle !== null && newMessage !== null) {
+    db.ref('alerts/' + id).update({
+      title: newTitle,
+      message: newMessage,
+      time: new Date().toLocaleString()
+    }).then(() => {
+      alertsCache.invalidateCache('alerts'); 
+      debouncedRenderAlerts();
+      alert('✅ تم تعديل التنبيه بنجاح!');
+    }).catch((error) => {
+      console.error('Error updating alert:', error);
+      alert('⚠️ حدث خطأ أثناء تعديل التنبيه');
+    });
+  }
+}
+
 
     // Logout function
     function logout() {
