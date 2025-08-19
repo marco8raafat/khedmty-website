@@ -48,7 +48,7 @@
   <!-- Modal for full-size image -->
   <div id="imageModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);">
     <div style="position: relative; margin: auto; padding: 20px; width: 90%; max-width: 800px; top: 50%; transform: translateY(-50%); text-align: center;">
-      <span onclick="closeModal()" style="position: absolute; top: 10px; right: 25px; color: white; font-size: 35px; font-weight: bold; cursor: pointer;">&times;</span>
+      <span onclick="closeModal()" style="position: absolute; top: 7px; right: 25px; color: white; -webkit-text-stroke: 2px #233B6E; font-size: 40px; font-weight: bold; cursor: pointer;">&times;</span>
       <img id="modalImage" src="" alt="" style="max-width: 100%; max-height: 70vh; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
     </div>
   </div>
@@ -177,6 +177,12 @@
           errorDiv.textContent = 'صورة غير متاحة';
           errorDiv.style.cssText = 'padding: 20px; background: #f0f0f0; color: #666; text-align: center; border-radius: 5px;';
           this.parentNode.insertBefore(errorDiv, this);
+        };
+        
+        // Add click event to open modal
+        photoThumbnail.style.cursor = 'pointer';
+        photoThumbnail.onclick = function() {
+          openModal(imageSource, photo.title || 'صورة');
         };
   
         const photoTitle = document.createElement('span');

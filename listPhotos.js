@@ -174,6 +174,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             errorDiv.style.cssText = 'padding: 20px; background: #f0f0f0; color: #666; text-align: center; border-radius: 5px;';
             this.parentNode.insertBefore(errorDiv, this);
           };
+
+          // Add click event to open modal
+          photoThumbnail.style.cursor = 'pointer';
+          photoThumbnail.onclick = function() {
+            if (typeof openModal === 'function') {
+              openModal(imageSource, photo.title || 'صورة');
+            } else {
+              // Fallback to opening in new tab if modal function is not available
+              window.open(imageSource, '_blank');
+            }
+          };
     
           const photoTitle = document.createElement('span');
           photoTitle.className = 'photo-title';
