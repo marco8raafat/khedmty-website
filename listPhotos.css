@@ -216,7 +216,8 @@
     border: 1px solid rgba(35, 59, 110, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    height: 100%; /* Ensure all cards have equal height */
+    min-height: 320px; /* Minimum height for consistency */
   }
   
   .photo-item:hover {
@@ -226,10 +227,11 @@
   
   .photo-thumbnail {
     width: 100%;
-    
-    object-fit: cover;
+    height: 200px; /* Fixed height for consistent image display */
+    object-fit: cover; /* Crop images consistently */
     border-radius: 8px;
     transition: var(--transition);
+    flex-shrink: 0; /* Prevent image from shrinking */
   }
   
   .photo-item:hover .photo-thumbnail {
@@ -245,12 +247,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    margin: 12px 0; /* Add consistent margin */
+    flex-grow: 1; /* Allow title to take up available space */
+    display: flex;
+    align-items: center; /* Vertically center the title text */
   }
   
   .photo-actions {
     display: flex;
     gap: 8px;
     justify-content: space-between;
+    margin-top: auto; /* Push buttons to bottom */
+    flex-shrink: 0; /* Prevent buttons from shrinking */
   }
   
   .photo-actions a {
@@ -438,9 +446,12 @@
   
     .photo-item {
       padding: 12px;
+      min-height: 280px; /* Adjusted minimum height for mobile */
     }
   
-
+    .photo-thumbnail {
+      height: 150px; /* Adjusted height for mobile */
+    }
   
     .photo-title {
       font-size: 0.95em;
@@ -477,7 +488,14 @@
       gap: 12px;
     }
   
- 
+    .photo-item {
+      min-height: 300px; /* Ensure consistent height on small screens */
+    }
+  
+    .photo-thumbnail {
+      height: 180px; /* Larger height for single column layout */
+    }
+  
     .photo-title {
       font-size: 0.9em;
     }
@@ -513,9 +531,12 @@
   
     .photo-item {
       padding: 10px;
+      min-height: 280px; /* Adjusted for very small screens */
     }
   
-   
+    .photo-thumbnail {
+      height: 160px; /* Proportional adjustment for very small screens */
+    }
   
     .photo-actions a {
       min-width: 55px;
