@@ -167,10 +167,25 @@
       window.currentAttendanceData = data;
       window.currentDate = date;
 
-      Object.keys(data).forEach(studentId => {
-        const record = data[studentId];
+      // Convert data to array and sort by student name in Arabic
+      const recordsArray = Object.keys(data).map(studentId => ({
+        studentId,
+        ...data[studentId]
+      }));
+
+      // Sort by student name in Arabic alphabetical order
+      recordsArray.sort((a, b) => {
+        const nameA = a.studentName || 'غير معروف';
+        const nameB = b.studentName || 'غير معروف';
+        return nameA.localeCompare(nameB, 'ar', { 
+          numeric: true, 
+          sensitivity: 'base' 
+        });
+      });
+
+      recordsArray.forEach(record => {
         const row = document.createElement('tr');
-        row.setAttribute('data-student-id', studentId);
+        row.setAttribute('data-student-id', record.studentId);
 
         const nameCell = document.createElement('td');
         nameCell.textContent = record.studentName || 'غير معروف';
@@ -184,7 +199,7 @@
           <span class="status-display ${record.status === 'present' ? 'status-present' : 'status-absent'}">
             ${record.status === 'present' ? 'حاضر ✅' : 'غائب ❌'}
           </span>
-          <select class="status-select" style="display: none;" data-student-id="${studentId}">
+          <select class="status-select" style="display: none;" data-student-id="${record.studentId}">
             <option value="present" ${record.status === 'present' ? 'selected' : ''}>حاضر ✅</option>
             <option value="absent" ${record.status === 'absent' ? 'selected' : ''}>غائب ❌</option>
           </select>
