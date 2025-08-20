@@ -418,7 +418,15 @@ async function loadStudents() {
               return;
           }
 
-          students.forEach(student => {
+          // Sort students alphabetically by Arabic name
+          const sortedStudents = [...students].sort((a, b) => {
+              return a.name.localeCompare(b.name, 'ar', { 
+                  numeric: true, 
+                  sensitivity: 'base' 
+              });
+          });
+
+          sortedStudents.forEach(student => {
               const studentCard = document.createElement('div');
               studentCard.className = 'student-card';
               studentCard.innerHTML = `
