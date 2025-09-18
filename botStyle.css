@@ -103,4 +103,28 @@ body {
     padding: 10px;
     cursor: pointer;
   }
-  
+
+  /* Typing indicator */
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 12px;
+    background: #eef2ff;
+    border: 1px solid #dbe2ff;
+    align-items: center;
+  }
+  .typing .dot {
+    width: 6px;
+    height: 6px;
+    background: #233B6E;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: typing-bounce 1.2s infinite ease-in-out;
+  }
+  .typing .dot:nth-child(2) { animation-delay: 0.15s; }
+  .typing .dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes typing-bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+    40% { transform: translateY(-4px); opacity: 0.8; }
+  }

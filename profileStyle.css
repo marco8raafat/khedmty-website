@@ -1,89 +1,317 @@
- * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Cairo', sans-serif;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Cairo', sans-serif;
+}
 
-    body {
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-image: url('knesa.jpg'); /* Change path to your image */
-      background-size: cover;        /* Make image cover the whole page */
-      background-repeat: no-repeat;  /* Prevent repeating */
-      background-attachment: fixed;  /* Keeps background fixed when scrolling */
-      background-position: center;   /* Center the image */
-      font-family: 'Arial', sans-serif;
-    }
+body {
+  background: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background-image: url('knesa.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  padding: 80px 20px 20px 20px;
+  position: relative;
+  margin: 0;
+  transition: padding-top 0.3s ease;
+}
 
-    .phone-frame {
-      width: 360px;
-      height: 640px;
-      background: #fff;
-      border-radius: 30px;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+/* Navbar Styles */
+.navbar {
+  background-color: #233B6E;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
 
-    .avatar-image {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 20px;
-      background-color: #eee;
-    }
+.nav-left {
+  display: flex;
+  align-items: center;
+}
 
-    h2 {
-      font-size: 24px;
-      color: #333;
-      margin-bottom: 16px;
-      text-align: center;
-    }
+.nav-left .church-logo {
+  height: 60px;
+  border-radius: 8px;
+  background: white;
+  padding: 5px;
+  max-width: 150px;
+  object-fit: contain;
+}
 
-    .info-line {
-      font-size: 18px;
-      color: #444;
-      margin: 10px 0;
-      width: 100%;
-      text-align: center;
-    }
+.nav-right {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
 
-    .profile-buttons {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-    }
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  margin-left: 10px;
+}
 
-    .profile-buttons button {
-      background: #233B6E;
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 15px;
-      margin: 10px 0;
-      cursor: pointer;
-      font-size: 18px;
-      transition: background 0.3s ease;
-    }
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
 
-    .profile-buttons button:hover {
-      background: #0056b3;
-    }
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
 
-    .back-icon {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 24px;
-      color: #333;
-      text-decoration: none;
-    }
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile responsive styles - matches teacherDashboard.html exactly */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .nav-left {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .nav-left .church-logo {
+    height: 60px;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-right {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .nav-right.active {
+    max-height: 300px;
+  }
+
+  .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+
+  /* Body padding adjustment when menu is open - THIS IS THE KEY PART */
+  body.menu-open {
+    padding-top: 240px;
+    overflow: hidden; /* Prevent scrolling when menu is open */
+    position: fixed; /* Lock the body position */
+    width: 100%;
+  }
+
+  .navbar.menu-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+}
+
+/* Rest of the existing styles remain the same */
+.profile-frame {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  position: relative;
+}
+
+.avatar-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  background-color: #eee;
+}
+
+h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.info-line {
+  font-size: 18px;
+  color: #444;
+  margin: 10px 0;
+  width: 100%;
+  text-align: center;
+}
+
+.profile-buttons {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.profile-buttons button {
+  background: #233B6E;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 15px;
+  margin: 10px 0;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.3s ease;
+}
+
+.profile-buttons button:hover {
+  background: #0056b3;
+}
+
+.cross-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.glowing-cross {
+  font-size: 50px;
+  color: white;
+  opacity: 0.6;
+  filter: drop-shadow(0 0 8px rgba(173, 216, 230, 0.4));
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
+
+.cross {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  animation: float 12s linear infinite;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
+.cross svg {
+  width: 100%;
+  height: 100%;
+  fill: rgba(255, 255, 255, 0.265);
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20vh) scale(1.3);
+    opacity: 0;
+  }
+}
+
+/* Loading overlay and spinner */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #d1d5db; /* light gray */
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Color variables */
+:root {
+  --primary: #233B6E;
+  --secondary: #314d9f;
+  --light: #f5f7fa;
+  --shadow: 0 2px 10px rgba(0,0,0,0.08);
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+}

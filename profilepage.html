@@ -9,28 +9,41 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  
-<a id="backBtn" class="back-icon" title="العودة للصفحة السابقة">
-  <i class="fas fa-arrow-left"></i>
-</a>
+  <div class="cross-background"></div>
 
-  <div class="phone-frame">
+  <!-- Navbar -->
+   <nav class="navbar">
+    <div class="nav-left">
+      <img src="church-logo.png" alt="Church Logo" class="church-logo">
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    </div>
+     <div class="nav-right" id="navMenu">
+      <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
+      <a href="#" class="nav-link" id="dashboardLink">لوحة التحكم</a>
+      <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
+    </div>
+  </nav> 
+
+  <div class="profile-frame">
+    <div id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+      <div class="loading-spinner" role="status" title="جاري التحميل"></div>
+    </div>
     <img class="avatar-image" src="profileicon.png" alt="User Icon">
-
     <h2 id="username"></h2>
     <div class="info-line" id="email"></div>
     <div class="info-line" id="phone"></div>
     <div class="info-line" id="group"></div>
     <div class="info-line" id="role"></div>
-
     <div class="profile-buttons">
       <button id="editBtn">تعديل البيانات</button>
       <button id="logoutBtn">تسجيل الخروج</button>
     </div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script src="profile.js"></script>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="sessionUtils.js"></script>
+  <script src="profile.js"></script>
 </body>
 </html>

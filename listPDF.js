@@ -56,7 +56,7 @@ const pdfCache = new PDFCache();
 
 // Authentication and authorization functions
 async function checkAuthentication() {
-  const currentEmail = sessionStorage.getItem("currentUser");
+  const currentEmail = await requireAuthentication("login.html");
   console.log("Current email from session:", currentEmail);
   
   if (!currentEmail) {

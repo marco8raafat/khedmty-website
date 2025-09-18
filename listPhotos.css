@@ -34,6 +34,36 @@
     background-attachment: fixed;  /* Keeps background fixed when scrolling */
     background-position: center;   /* Center the image */
   }
+
+  /* Loading overlay */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 9999;
+  }
+  .loading-overlay.hidden { display: none !important; }
+  .loading-spinner {
+    width: 56px;
+    height: 56px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #233B6E;
+    border-radius: 50%;
+    animation: dash-spin 0.9s linear infinite;
+  }
+  .loading-text { 
+    margin-top: 12px; 
+    color: #fff; 
+    font-weight: 600; 
+    letter-spacing: 0.5px; 
+  }
+  @keyframes dash-spin { 
+    to { transform: rotate(360deg); } 
+  }
   
   .container {
     max-width: 1280px;
@@ -186,7 +216,8 @@
     border: 1px solid rgba(35, 59, 110, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    height: 100%; /* Ensure all cards have equal height */
+    min-height: 320px; /* Minimum height for consistency */
   }
   
   .photo-item:hover {
@@ -196,10 +227,11 @@
   
   .photo-thumbnail {
     width: 100%;
-    
-    object-fit: cover;
+    height: 200px; /* Fixed height for consistent image display */
+    object-fit: cover; /* Crop images consistently */
     border-radius: 8px;
     transition: var(--transition);
+    flex-shrink: 0; /* Prevent image from shrinking */
   }
   
   .photo-item:hover .photo-thumbnail {
@@ -215,12 +247,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    margin: 12px 0; /* Add consistent margin */
+    flex-grow: 1; /* Allow title to take up available space */
+    display: flex;
+    align-items: center; /* Vertically center the title text */
   }
   
   .photo-actions {
     display: flex;
     gap: 8px;
     justify-content: space-between;
+    margin-top: auto; /* Push buttons to bottom */
+    flex-shrink: 0; /* Prevent buttons from shrinking */
   }
   
   .photo-actions a {
@@ -306,6 +344,84 @@
     color: var(--text-muted);
     margin: 0;
     line-height: 1.5;
+  }
+
+  /* Modal Styles */
+  .modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: none;
+  }
+
+  .modal-content {
+    position: relative;
+    margin: auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+  }
+
+  .modal img {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: var(--transition);
+  }
+
+  .modal .close {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 1001;
+  }
+
+  .modal .close:hover,
+  .modal .close:focus {
+    color: #ccc;
+    transform: scale(1.1);
+  }
+
+  /* Modal responsive design */
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 95%;
+      padding: 15px;
+    }
+    
+    .modal img {
+      max-height: 60vh;
+      border-radius: 10px;
+    }
+    
+    .modal .close {
+      font-size: 30px;
+      top: 5px;
+      right: 15px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .modal img {
+      max-height: 50vh;
+    }
+    
+    .modal .close {
+      font-size: 25px;
+    }
   }
   
   /* Footer (Unchanged) */
@@ -408,9 +524,12 @@
   
     .photo-item {
       padding: 12px;
+      min-height: 280px; /* Adjusted minimum height for mobile */
     }
   
-
+    .photo-thumbnail {
+      height: 150px; /* Adjusted height for mobile */
+    }
   
     .photo-title {
       font-size: 0.95em;
@@ -447,7 +566,14 @@
       gap: 12px;
     }
   
- 
+    .photo-item {
+      min-height: 300px; /* Ensure consistent height on small screens */
+    }
+  
+    .photo-thumbnail {
+      height: 180px; /* Larger height for single column layout */
+    }
+  
     .photo-title {
       font-size: 0.9em;
     }
@@ -483,9 +609,12 @@
   
     .photo-item {
       padding: 10px;
+      min-height: 280px; /* Adjusted for very small screens */
     }
   
-   
+    .photo-thumbnail {
+      height: 160px; /* Proportional adjustment for very small screens */
+    }
   
     .photo-actions a {
       min-width: 55px;

@@ -436,6 +436,7 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="sessionUtils.js"></script>
 
 <script>
 // Firebase configuration
@@ -454,7 +455,7 @@ const db = firebase.database();
 
 // Authentication and authorization functions
 async function checkAuthentication() {
-  const currentEmail = sessionStorage.getItem("currentUser");
+  const currentEmail = await requireAuthentication("login.html");
   console.log("Current email from session:", currentEmail);
   
   if (!currentEmail) {
@@ -515,26 +516,20 @@ function checkIfServant(userData) {
 
 // Legacy function for backward compatibility
 function checkAuth() {
-  const currentUser = sessionStorage.getItem("currentUser");
-  if (!currentUser) {
+  const sessionData = verifySecureSession();
+  if (!sessionData) {
     alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
     window.location.href = "login.html";
     return null;
   }
   
-  // Handle both string email and JSON object formats
-  try {
-    return JSON.parse(currentUser);
-  } catch (e) {
-    // If parsing fails, it's just an email string
-    return { email: currentUser };
-  }
+  return { email: sessionData };
 }
 
 // Logout function
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }

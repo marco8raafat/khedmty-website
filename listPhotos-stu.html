@@ -9,9 +9,15 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="sessionUtils.js"></script>
 </head>
 <body>
 <div class="cross-background"></div>
+  <!-- Loading overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">جاري تحميل الصور...</div>
+  </div>
   <nav class="navbar">
     <div class="nav-left">
       <img src="church-logo.png" alt="Church Logo" class="church-logo">
@@ -42,7 +48,7 @@
   <!-- Modal for full-size image -->
   <div id="imageModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);">
     <div style="position: relative; margin: auto; padding: 20px; width: 90%; max-width: 800px; top: 50%; transform: translateY(-50%); text-align: center;">
-      <span onclick="closeModal()" style="position: absolute; top: 10px; right: 25px; color: white; font-size: 35px; font-weight: bold; cursor: pointer;">&times;</span>
+      <span onclick="closeModal()" style="position: absolute; top: 7px; right: 25px; color: white; -webkit-text-stroke: 2px #233B6E; font-size: 40px; font-weight: bold; cursor: pointer;">&times;</span>
       <img id="modalImage" src="" alt="" style="max-width: 100%; max-height: 70vh; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
     </div>
   </div>
@@ -72,14 +78,19 @@
   document.addEventListener('DOMContentLoaded', () => {
     const photoList = document.getElementById('photoList');
     const titleFilter = document.getElementById('titleFilter');
+    const loadingOverlay = document.getElementById('loadingOverlay');
   
-    if (!photoList || !titleFilter) {
+    if (!photoList || !titleFilter || !loadingOverlay) {
       console.error('Required elements missing:', {
         photoList: !!photoList,
-        titleFilter: !!titleFilter
+        titleFilter: !!titleFilter,
+        loadingOverlay: !!loadingOverlay
       });
       return;
     }
+
+    // Show loading overlay initially
+    loadingOverlay.classList.remove('hidden');
   
     let allPhotos = []; // Store all photos for filtering
   
@@ -91,6 +102,8 @@
         if (!snapshot.exists()) {
           console.log('No photos found in Firebase');
           displayEmptyState();
+          // Hide loading overlay
+          loadingOverlay.classList.add('hidden');
           return;
         }
   
@@ -107,9 +120,13 @@
         
         console.log('Loaded photos from Firebase:', allPhotos.length);
         renderPhotos(); // Render all photos initially
+        // Hide loading overlay after data is loaded
+        loadingOverlay.classList.add('hidden');
       }, (error) => {
         console.error('Error loading photos from Firebase:', error);
         displayEmptyState();
+        // Hide loading overlay even on error
+        loadingOverlay.classList.add('hidden');
       });
     }
   
@@ -160,6 +177,12 @@
           errorDiv.textContent = 'صورة غير متاحة';
           errorDiv.style.cssText = 'padding: 20px; background: #f0f0f0; color: #666; text-align: center; border-radius: 5px;';
           this.parentNode.insertBefore(errorDiv, this);
+        };
+        
+        // Add click event to open modal
+        photoThumbnail.style.cursor = 'pointer';
+        photoThumbnail.onclick = function() {
+          openModal(imageSource, photo.title || 'صورة');
         };
   
         const photoTitle = document.createElement('span');
@@ -215,7 +238,7 @@
           // Logout function
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }

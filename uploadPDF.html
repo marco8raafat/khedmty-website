@@ -17,6 +17,7 @@
     <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+      <a href="listPDF.html" class="nav-link">عرض المصادر</a>
       <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
       <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
@@ -29,10 +30,15 @@
         <h2 class="section-title">رفع مصدر تعليمي جديد</h2>
         <div style="background-color: #e8f4fd; border: 1px solid #0066cc; border-radius: 5px; padding: 15px; margin-bottom: 20px; text-align: center;">
           <p style="margin: 0; color: #0066cc; font-weight: bold;">
-            📌 يجب رفع الصورة أولاً على هذا الموقع: 
+            📌 يجب رفع الملف أولاً على هذا الموقع: 
             <a href="https://gofile.io/" target="_blank" style="color: #0066cc; text-decoration: underline;">https://gofile.io/</a>
             <br>
-            ثم نسخ الرابط المباشر للصورة ولصقه هنا
+            ثم نسخ الرابط المباشر للملف ولصقه هنا
+            <br>
+            <span style="color: #ff0000; font-weight: bold;">ملحوظة صلاحية الملف 10 أيام فقط، بعد ذلك يجب رفعه مرة أخرى</span>
+            <br>
+             او قم برفعه بدون صلاحية من خلال :
+            <a href="https://drive.google.com/drive/quota" target="_blank" style="color: #0066cc; text-decoration: underline;">google drive</a>
           </p>
         </div>
         <form id="uploadForm">
@@ -59,6 +65,20 @@
         </div>
       </div>
     </main>
+              <!-- Step-by-step visual guide for uploading a photo -->
+      <div class="upload-guide" style="background: #ffffffff; border: 1px solid #b3d4fc; border-radius: 12px; padding: 20px; margin-bottom: 30px; max-width: 700px; margin-left: auto; margin-right: auto; box-shadow: 0 2px 10px rgba(35,59,110,0.07);">
+        <h3 style="color: #233B6E; margin-bottom: 18px; font-size: 1.3em; text-align: center;">شرح خطوات رفع الصورة</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; align-items: flex-start;">
+          <div style="flex: 1 1 220px; min-width: 220px; max-width: 320px; text-align: center;">
+            <img src="step1PDF.png" alt="اختيار الصورة من جهازك" style="width: 100%; max-width: 320px; border-radius: 8px; border: 1px solid #b3d4fc; box-shadow: 0 2px 8px rgba(35,59,110,0.07); margin-bottom: 10px;">
+            <div style="color: #0066cc; font-weight: 600; font-size: 1em;">١.اضغط <span style="background: #e3f2fd; border-radius: 4px; padding: 2px 6px;">Drag & Drop or Click to Upload</span> و اختر الملف من جهازك</div>
+          </div>
+          <div style="flex: 1 1 220px; min-width: 220px; max-width: 320px; text-align: center;">
+            <img src="step2PDF.png" alt="نسخ الرابط المباشر للصورة" style="width: 100%; max-width: 320px; border-radius: 8px; border: 1px solid #b3d4fc; box-shadow: 0 2px 8px rgba(35,59,110,0.07); margin-bottom: 10px;">
+            <div style="color: #0066cc; font-weight: 600; font-size: 1em;">٢. بعد رفع الملف، انسخ <span style="background: #e3f2fd; border-radius: 4px; padding: 2px 6px;">الرابط</span> كما هو موضح</div>
+          </div>
+        </div>
+      </div>
   </div>
 
   <footer>
@@ -68,6 +88,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="sessionUtils.js"></script>
   
   <script>
     const firebaseConfig = {
@@ -85,21 +106,21 @@
 
     // Authentication check function
     async function checkAuthentication() {
-      const currentUser = sessionStorage.getItem("currentUser");
-      
-      if (!currentUser) {
-        alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
-        window.location.href = "login.html";
-        return false;
-      }
-
-      // Verify user exists in Firebase
-      const emailKey = currentUser.replace(/\./g, '_');
       try {
+        const currentUser = await requireAuthentication();
+        
+        if (!currentUser) {
+          alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+          window.location.href = "login.html";
+          return false;
+        }
+
+        // Verify user exists in Firebase
+        const emailKey = currentUser.replace(/\./g, '_');
         const snapshot = await db.ref('users/' + emailKey).once('value');
         if (!snapshot.exists()) {
           alert("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى");
-          sessionStorage.removeItem("currentUser");
+          clearSession();
           window.location.href = "login.html";
           return false;
         }
@@ -113,6 +134,7 @@
         }
         
         return true;
+        
       } catch (error) {
         console.error("Error verifying user:", error);
         alert("حدث خطأ في التحقق من المستخدم. يرجى تسجيل الدخول مرة أخرى");
@@ -121,12 +143,7 @@
       }
     }
 
-    function logout() {
-      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
-        window.location.href = "index.html";
-      }
-    }
+
 
     // Initialize page
     async function initializePage() {
@@ -146,7 +163,7 @@
     // Logout function
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }

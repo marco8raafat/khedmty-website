@@ -594,6 +594,7 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="sessionUtils.js"></script>
 
 <script>
   // Firebase configuration
@@ -619,7 +620,7 @@
 
   // Authentication and authorization functions
   async function checkAuthentication() {
-    const currentEmail = sessionStorage.getItem("currentUser");
+    const currentEmail = await requireAuthentication("login.html");
     console.log("Current email from session:", currentEmail);
     
     if (!currentEmail) {
@@ -680,7 +681,7 @@
 
   // Legacy function for backward compatibility
   function checkAuth() {
-    const currentUser = sessionStorage.getItem("currentUser");
+    const currentUser = verifySecureSession();
     if (!currentUser) {
       alert("يجب تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
       window.location.href = "login.html";
@@ -698,7 +699,7 @@
   // Logout function
   function logout() {
     if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-      sessionStorage.removeItem("currentUser");
+      clearSession();
       window.location.href = "index.html";
     }
   }

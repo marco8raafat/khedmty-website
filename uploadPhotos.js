@@ -72,18 +72,18 @@ const photoCache = new PhotoCache();
 
 // Authentication and authorization functions
 async function checkAuthentication() {
-  const currentEmail = sessionStorage.getItem("currentUser");
-  console.log("Current email from session:", currentEmail);
-  
-  if (!currentEmail) {
-    alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
-    window.location.href = "login.html";
-    return false;
-  }
-
-  const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
-  
   try {
+    const currentEmail = await requireAuthentication();
+    console.log("Current email from session:", currentEmail);
+    
+    if (!currentEmail) {
+      alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
+    
     const userSnapshot = await database.ref(`users/${emailKey}`).once('value');
     const userData = userSnapshot.val();
     

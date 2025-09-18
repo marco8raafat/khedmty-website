@@ -18,6 +18,7 @@
      <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+      <a href="uploadPDF.html" class="nav-link">رفع المصادر</a>
       <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
       <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
@@ -47,7 +48,8 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  
+  <script src="sessionUtils.js"></script>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
@@ -81,7 +83,7 @@
             // Logout function
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }

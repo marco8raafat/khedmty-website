@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styleAttendanceData.css">
+   <link rel="icon" type="image/png" href="logoCircle1.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <title>تسجيل الحضور </title>
@@ -267,7 +268,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
+  <script src="sessionUtils.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -288,7 +289,7 @@
 
       // Check if user is authenticated and has servant role
       async function checkAuthentication() {
-        const currentEmail = sessionStorage.getItem("currentUser");
+        const currentEmail = await requireAuthentication("login.html");
         console.log("Current email from session:", currentEmail);
         
         if (!currentEmail) {
@@ -417,7 +418,15 @@ async function loadStudents() {
               return;
           }
 
-          students.forEach(student => {
+          // Sort students alphabetically by Arabic name
+          const sortedStudents = [...students].sort((a, b) => {
+              return a.name.localeCompare(b.name, 'ar', { 
+                  numeric: true, 
+                  sensitivity: 'base' 
+              });
+          });
+
+          sortedStudents.forEach(student => {
               const studentCard = document.createElement('div');
               studentCard.className = 'student-card';
               studentCard.innerHTML = `
@@ -475,6 +484,25 @@ async function loadStudents() {
           document.getElementById('presentCount').textContent = presentCount;
           document.getElementById('absentCount').textContent = absentCount;
           document.getElementById('notMarkedCount').textContent = notMarkedCount;
+
+          // Update save button appearance based on completion
+          const saveButton = document.querySelector('.btn-success');
+          if (notMarkedCount === 0 && totalStudents > 0) {
+              // All students marked - enable and highlight button
+              saveButton.style.background = '#28a745';
+              saveButton.innerHTML = '💾 حفظ الحضور (مكتمل ✅)';
+              saveButton.disabled = false;
+          } else if (presentCount + absentCount > 0) {
+              // Partially marked - warning style
+              saveButton.style.background = '#fd7e14';
+              saveButton.innerHTML = `💾 حفظ الحضور (${notMarkedCount} غير مسجل ⚠️)`;
+              saveButton.disabled = false;
+          } else {
+              // Nothing marked - default style
+              saveButton.style.background = '#6c757d';
+              saveButton.innerHTML = '💾 حفظ الحضور';
+              saveButton.disabled = true;
+          }
       }
 
       function filterStudents() {
@@ -515,6 +543,20 @@ async function loadStudents() {
               if (Object.keys(attendanceData).length === 0) {
                   alert('يرجى تسجيل حضور الطلاب أولاً');
                   return;
+              }
+
+              // Check if all students have attendance marked
+              const totalStudents = students.length;
+              const markedStudents = Object.keys(attendanceData).length;
+              
+              if (markedStudents < totalStudents) {
+                  const unmarkedCount = totalStudents - markedStudents;
+                  const confirmMessage = `تحذير: لم يتم تسجيل حضور ${unmarkedCount} من الطلاب.\n\nهل تريد المتابعة والحفظ للطلاب المسجلين فقط؟\n\nأم تريد العودة لتسجيل حضور جميع الطلاب؟`;
+                  
+                  if (!confirm(confirmMessage)) {
+                      // User chose to go back and mark all students
+                      return;
+                  }
               }
 
               const attendanceRef = database.ref('attendance/' + selectedDate);
@@ -649,7 +691,7 @@ async function loadStudents() {
       function logout() {
           if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
               localStorage.removeItem('userToken');
-              sessionStorage.clear();
+               clearSession();
               window.location.href = 'index.html';
           }
       }

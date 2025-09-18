@@ -25,9 +25,9 @@ const firebaseConfig = {
 
     // Authentication check function
     async function checkAuthentication() {
-      const currentUser = sessionStorage.getItem("currentUser");
+      const currentEmail = await requireAuthentication("login.html");
       
-      if (!currentUser) {
+      if (!currentEmail) {
         showMessage("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة", "error");
         setTimeout(() => {
           window.location.href = "login.html";
@@ -36,12 +36,12 @@ const firebaseConfig = {
       }
 
       // Verify user exists in Firebase
-      const emailKey = currentUser.replace(/[.#$\[\]]/g, '_');
+      const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
       try {
         const snapshot = await db.ref('users/' + emailKey).once('value');
         if (!snapshot.exists()) {
           showMessage("جلسة المستخدم غير صالحة. يرجى تسجيل الدخول مرة أخرى", "error");
-          sessionStorage.removeItem("currentUser");
+          clearSession();
           setTimeout(() => {
             window.location.href = "login.html";
           }, 2000);
@@ -89,7 +89,7 @@ const firebaseConfig = {
 
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }
@@ -106,7 +106,7 @@ const firebaseConfig = {
 
       const examName = document.getElementById("examName").value.trim();
       const examLink = document.getElementById("examLink").value.trim();
-      const currentUser = sessionStorage.getItem("currentUser");
+      const currentUser = verifySecureSession();
       const submitBtn = document.getElementById("submitBtn");
 
       if (examName === "" || examLink === "") {

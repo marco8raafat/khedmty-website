@@ -83,162 +83,188 @@ function debounce(func, wait) {
   };
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const photoList = document.getElementById('photoList');
-    const titleFilter = document.getElementById('titleFilter');
-  
-    if (!photoList || !titleFilter) {
-      console.error('Required elements missing:', {
-        photoList: !!photoList,
-        titleFilter: !!titleFilter
-      });
-      return;
-    }
-  
-    let allPhotos = []; // Store all photos for filtering
-  
-    // Load photos from Firebase with smart caching
-    function loadPhotosFromFirebase() {
-      console.log('[Photo List] Loading photos with smart caching...');
-      
-      // Use cached data with real-time listener
-      photoCache.getData('photos', (photosData) => {
-        allPhotos = []; // Clear the array
+document.addEventListener('DOMContentLoaded', async () => {
+    const overlay = document.getElementById('loadingOverlay');
+    try {
+      if (overlay) overlay.classList.remove('hidden');
+
+      // Check authentication first
+      const isAuthenticated = await checkAuthentication();
+      if (!isAuthenticated) {
+        return; // Exit if not authenticated
+      }
+
+      const photoList = document.getElementById('photoList');
+      const titleFilter = document.getElementById('titleFilter');
+    
+      if (!photoList || !titleFilter) {
+        console.error('Required elements missing:', {
+          photoList: !!photoList,
+          titleFilter: !!titleFilter
+        });
+        return;
+      }
+    
+      let allPhotos = []; // Store all photos for filtering
+    
+      // Load photos from Firebase with smart caching
+      function loadPhotosFromFirebase() {
+        console.log('[Photo List] Loading photos with smart caching...');
         
-        if (!photosData || Object.keys(photosData).length === 0) {
-          console.log('[Photo List] No photos found in Firebase');
+        // Use cached data with real-time listener
+        photoCache.getData('photos', (photosData) => {
+          allPhotos = []; // Clear the array
+          
+          if (!photosData || Object.keys(photosData).length === 0) {
+            console.log('[Photo List] No photos found in Firebase');
+            displayEmptyState();
+            return;
+          }
+
+          // Convert Firebase data to array format
+          Object.entries(photosData).forEach(([photoKey, photo]) => {
+            allPhotos.push({
+              ...photo,
+              firebaseKey: photoKey
+            });
+          });
+          
+          console.log('[Photo List] Loaded photos from cache/Firebase:', allPhotos.length);
+          debouncedRenderPhotos(); // Use debounced version
+        });
+      }
+    
+      // Display photos based on filter with smooth transitions
+      function renderPhotos(filterText = '') {
+        photoList.innerHTML = ''; // Clear current list
+        
+        const filteredPhotos = allPhotos.filter(photo =>
+          photo.title && photo.title.toLowerCase().includes(filterText.toLowerCase())
+        );
+    
+        if (filteredPhotos.length === 0) {
           displayEmptyState();
           return;
         }
 
-        // Convert Firebase data to array format
-        Object.entries(photosData).forEach(([photoKey, photo]) => {
-          allPhotos.push({
-            ...photo,
-            firebaseKey: photoKey
+        // Add subtle animation
+        photoList.style.opacity = '0.7';
+        setTimeout(() => {
+          photoList.style.opacity = '1';
+        }, 100);
+    
+        filteredPhotos.forEach(photo => {
+          const photoItem = document.createElement('div');
+          photoItem.className = 'photo-item';
+    
+          const photoThumbnail = document.createElement('img');
+          photoThumbnail.className = 'photo-thumbnail';
+          
+          // Use URL if available, fallback to data for backward compatibility
+          const imageSource = photo.url || photo.data;
+          photoThumbnail.src = imageSource;
+          photoThumbnail.alt = photo.title || 'صورة';
+          
+          // Add error handling for broken images
+          photoThumbnail.onerror = function() {
+            this.style.display = 'none';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'photo-error';
+            errorDiv.textContent = 'صورة غير متاحة';
+            errorDiv.style.cssText = 'padding: 20px; background: #f0f0f0; color: #666; text-align: center; border-radius: 5px;';
+            this.parentNode.insertBefore(errorDiv, this);
+          };
+
+          // Add click event to open modal
+          photoThumbnail.style.cursor = 'pointer';
+          photoThumbnail.onclick = function() {
+            if (typeof openModal === 'function') {
+              openModal(imageSource, photo.title || 'صورة');
+            } else {
+              // Fallback to opening in new tab if modal function is not available
+              window.open(imageSource, '_blank');
+            }
+          };
+    
+          const photoTitle = document.createElement('span');
+          photoTitle.className = 'photo-title';
+          photoTitle.textContent = photo.title || 'بدون عنوان';
+    
+          const photoActions = document.createElement('div');
+          photoActions.className = 'photo-actions';
+    
+          // View button - open image in new tab
+          const viewLink = document.createElement('a');
+          viewLink.href = imageSource;
+          viewLink.textContent = 'عرض';
+          viewLink.setAttribute('target', '_blank');
+          viewLink.setAttribute('rel', 'noopener noreferrer');
+
+          // Share button
+          const shareButton = document.createElement('button');
+          shareButton.textContent = 'مشاركة';
+          shareButton.className = 'share-button';
+          shareButton.onclick = function() {
+            shareImage(imageSource, photo.title || 'صورة من الكنيسة');
+          };
+    
+          // Delete button
+          const deleteLink = document.createElement('a');
+          deleteLink.href = '#';
+          deleteLink.textContent = 'حذف';
+          deleteLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            deletePhotoFromFirebase(photo.firebaseKey, photo.title);
           });
-        });
-        
-        console.log('[Photo List] Loaded photos from cache/Firebase:', allPhotos.length);
-        debouncedRenderPhotos(); // Use debounced version
-      });
-    }
-  
-    // Display photos based on filter with smooth transitions
-    function renderPhotos(filterText = '') {
-      photoList.innerHTML = ''; // Clear current list
-      
-      const filteredPhotos = allPhotos.filter(photo =>
-        photo.title && photo.title.toLowerCase().includes(filterText.toLowerCase())
-      );
-  
-      if (filteredPhotos.length === 0) {
-        displayEmptyState();
-        return;
-      }
-
-      // Add subtle animation
-      photoList.style.opacity = '0.7';
-      setTimeout(() => {
-        photoList.style.opacity = '1';
-      }, 100);
-  
-      filteredPhotos.forEach(photo => {
-        const photoItem = document.createElement('div');
-        photoItem.className = 'photo-item';
-  
-        const photoThumbnail = document.createElement('img');
-        photoThumbnail.className = 'photo-thumbnail';
-        
-        // Use URL if available, fallback to data for backward compatibility
-        const imageSource = photo.url || photo.data;
-        photoThumbnail.src = imageSource;
-        photoThumbnail.alt = photo.title || 'صورة';
-        
-        // Add error handling for broken images
-        photoThumbnail.onerror = function() {
-          this.style.display = 'none';
-          const errorDiv = document.createElement('div');
-          errorDiv.className = 'photo-error';
-          errorDiv.textContent = 'صورة غير متاحة';
-          errorDiv.style.cssText = 'padding: 20px; background: #f0f0f0; color: #666; text-align: center; border-radius: 5px;';
-          this.parentNode.insertBefore(errorDiv, this);
-        };
-  
-        const photoTitle = document.createElement('span');
-        photoTitle.className = 'photo-title';
-        photoTitle.textContent = photo.title || 'بدون عنوان';
-  
-        const photoActions = document.createElement('div');
-        photoActions.className = 'photo-actions';
-  
-        // View button - open image in new tab
-        const viewLink = document.createElement('a');
-        viewLink.href = imageSource;
-        viewLink.textContent = 'عرض';
-        viewLink.setAttribute('target', '_blank');
-        viewLink.setAttribute('rel', 'noopener noreferrer');
-
-        // Share button
-        const shareButton = document.createElement('button');
-        shareButton.textContent = 'مشاركة';
-        shareButton.className = 'share-button';
-        shareButton.onclick = function() {
-          shareImage(imageSource, photo.title || 'صورة من الكنيسة');
-        };
-  
-        // Delete button
-        const deleteLink = document.createElement('a');
-        deleteLink.href = '#';
-        deleteLink.textContent = 'حذف';
-        deleteLink.addEventListener('click', (e) => {
-          e.preventDefault();
-          deletePhotoFromFirebase(photo.firebaseKey, photo.title);
-        });
-  
-        photoActions.appendChild(viewLink);
-        photoActions.appendChild(shareButton);
-        photoActions.appendChild(deleteLink);
-        photoItem.appendChild(photoThumbnail);
-        photoItem.appendChild(photoTitle);
-        photoItem.appendChild(photoActions);
-        photoList.appendChild(photoItem);
-      });
-    }
-
-    // Debounced version to prevent rapid updates
-    const debouncedRenderPhotos = debounce(renderPhotos, 200);
-  
-    // Initial load from Firebase
-    loadPhotosFromFirebase();
-  
-    // Filter input event with debouncing
-    titleFilter.addEventListener('input', (e) => {
-      console.log('[Photo List] Filtering by title:', e.target.value);
-      debouncedRenderPhotos(e.target.value);
-    });
-  
-    // Delete photo from Firebase with cache integration
-    function deletePhotoFromFirebase(firebaseKey, photoTitle) {
-      if (confirm(`هل أنت متأكد من حذف الصورة "${photoTitle}"؟`)) {
-        console.log('[Photo List] Deleting photo:', firebaseKey);
-        database.ref("photos/" + firebaseKey).remove().then(() => {
-          console.log('[Photo List] Photo deleted successfully from Firebase');
-          // The real-time listener will automatically update the UI and cache
-        }).catch((error) => {
-          console.error('[Photo List] Error deleting photo from Firebase:', error);
-          alert('حدث خطأ أثناء حذف الصورة');
+    
+          photoActions.appendChild(viewLink);
+          photoActions.appendChild(shareButton);
+          photoActions.appendChild(deleteLink);
+          photoItem.appendChild(photoThumbnail);
+          photoItem.appendChild(photoTitle);
+          photoItem.appendChild(photoActions);
+          photoList.appendChild(photoItem);
         });
       }
-    }
-  
-    function displayEmptyState() {
-      photoList.innerHTML = `
-        <div class="empty-state">
-          <p>لا توجد صور مرفوعة حاليًا</p>
-        </div>
-      `;
-      console.log('[Photo List] Displayed empty state');
+
+      // Debounced version to prevent rapid updates
+      const debouncedRenderPhotos = debounce(renderPhotos, 200);
+    
+      // Initial load from Firebase
+      loadPhotosFromFirebase();
+    
+      // Filter input event with debouncing
+      titleFilter.addEventListener('input', (e) => {
+        console.log('[Photo List] Filtering by title:', e.target.value);
+        debouncedRenderPhotos(e.target.value);
+      });
+    
+      // Delete photo from Firebase with cache integration
+      function deletePhotoFromFirebase(firebaseKey, photoTitle) {
+        if (confirm(`هل أنت متأكد من حذف الصورة "${photoTitle}"؟`)) {
+          console.log('[Photo List] Deleting photo:', firebaseKey);
+          database.ref("photos/" + firebaseKey).remove().then(() => {
+            console.log('[Photo List] Photo deleted successfully from Firebase');
+            // The real-time listener will automatically update the UI and cache
+          }).catch((error) => {
+            console.error('[Photo List] Error deleting photo from Firebase:', error);
+            alert('حدث خطأ أثناء حذف الصورة');
+          });
+        }
+      }
+    
+      function displayEmptyState() {
+        photoList.innerHTML = `
+          <div class="empty-state">
+            <p>لا توجد صور مرفوعة حاليًا</p>
+          </div>
+        `;
+        console.log('[Photo List] Displayed empty state');
+      }
+    } catch (error) {
+      console.error('[Photo List] Error during initialization:', error);
+    } finally {
+      if (overlay) overlay.classList.add('hidden');
     }
   });
 
@@ -382,3 +408,64 @@ document.addEventListener('DOMContentLoaded', () => {
       cross.style.animationDuration = (12 + Math.random() * 11) + 's';
       container.appendChild(cross);
     }
+
+// Check if user is authenticated and has servant role
+async function checkAuthentication() {
+  try {
+    const currentEmail = await requireAuthentication();
+    console.log("Current email from session:", currentEmail);
+    
+    if (!currentEmail) {
+      alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
+    
+    const userSnapshot = await database.ref(`users/${emailKey}`).once('value');
+    const userData = userSnapshot.val();
+    
+    if (!userData || Object.keys(userData).length === 0) {
+      console.log("No user data found, redirecting to login");
+      alert("لم يتم العثور على بيانات المستخدم. يرجى تسجيل الدخول مرة أخرى");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    // Check if user is a servant/teacher
+    if (!checkIfServant(userData)) {
+      console.log("User is not a servant, access denied");
+      alert("غير مسموح لك بالوصول إلى هذه الصفحة. هذه الصفحة مخصصة للخدام فقط");
+      window.location.href = "login.html";
+      return false;
+    }
+
+    console.log("User authenticated successfully as servant");
+    return true;
+    
+  } catch (error) {
+    console.error("Error checking authentication:", error);
+    alert("حدث خطأ أثناء التحقق من الصلاحيات. يرجى المحاولة مرة أخرى");
+    window.location.href = "login.html";
+    return false;
+  }
+}
+
+function checkIfServant(userData) {
+  if (!userData || !userData.role) {
+    console.log("No role found in user data");
+    return false;
+  }
+  
+  const userRole = userData.role.toLowerCase();
+  const allowedRoles = ['teacher', 'servant', 'admin', 'خادم', 'معلم', 'مدير'];
+  
+  console.log("User role:", userRole);
+  console.log("Checking against allowed roles:", allowedRoles);
+  
+  const isServant = allowedRoles.includes(userRole);
+  console.log("Is servant:", isServant);
+  
+  return isServant;
+}

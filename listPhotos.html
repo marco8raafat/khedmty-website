@@ -9,8 +9,13 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="sessionUtils.js"></script>
 </head>
 <body>
+<div id="loadingOverlay" class="loading-overlay hidden" role="status" aria-live="polite" aria-busy="true">
+  <div class="loading-spinner" aria-hidden="true"></div>
+  <div class="loading-text">جارٍ التحميل...</div>
+</div>
 <div class="cross-background"></div>
   <nav class="navbar">
     <div class="nav-left">
@@ -20,6 +25,7 @@
      <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
+      <a href="uploadPhotos.html" class="nav-link">رفع الصور</a>
       <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
       <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
     </div>
@@ -38,6 +44,14 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Modal for full-size image -->
+  <div id="imageModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);">
+    <div style="position: relative; margin: auto; padding: 20px; width: 90%; max-width: 800px; top: 50%; transform: translateY(-50%); text-align: center;">
+      <span onclick="closeModal()" style="position: absolute; top: 7px; right: 25px; color: white; -webkit-text-stroke: 2px #233B6E; font-size: 40px; font-weight: bold; cursor: pointer;">&times;</span>
+      <img id="modalImage" src="" alt="" style="max-width: 100%; max-height: 70vh; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+    </div>
   </div>
 
   <footer>
@@ -64,10 +78,39 @@
             // Logout function
     function logout() {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        sessionStorage.removeItem("currentUser");
+        clearSession();
         window.location.href = "index.html";
       }
     }
+
+    // Modal functions
+    function openModal(imageUrl, title) {
+      const modal = document.getElementById('imageModal');
+      const modalImage = document.getElementById('modalImage');
+      
+      modalImage.src = imageUrl;
+      modalImage.alt = title;
+      modal.style.display = 'block';
+      
+      // Close modal when clicking outside the image
+      modal.onclick = function(event) {
+        if (event.target === modal) {
+          closeModal();
+        }
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('imageModal');
+      modal.style.display = 'none';
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
   </script>
   <script src="listPhotos.js"></script>
 </body>

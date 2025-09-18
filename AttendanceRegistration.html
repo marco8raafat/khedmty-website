@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="logoCircle1.png">
   <title>سجل الحضور</title>
   <link rel="stylesheet" href="styleAttendance.css">
   
@@ -50,7 +51,78 @@
     flex: 1 1 100%; 
   }
 }
-cross-background {
+
+/* Edit button styles .*/
+.btn-edit {
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-edit:hover {
+  background-color: #138496;
+  transform: translateY(-2px);
+}
+
+.btn-edit.editing {
+  background-color: #dc3545;
+}
+
+.btn-edit.editing:hover {
+  background-color: #c82333;
+}
+
+/* Edit mode styles */
+.edit-mode .status-cell {
+  position: relative;
+}
+
+.edit-mode .status-select {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+}
+
+.edit-mode .status-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Save changes button */
+.save-changes-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+  display: none;
+  width: 100%;
+}
+
+.save-changes-btn:hover {
+  background-color: #218838;
+}
+
+.save-changes-btn.show {
+  display: inline-block;
+}
+
+.cross-background {
   position: fixed;
   top: 0;
   left: 0;
@@ -130,14 +202,23 @@ cross-background {
       <div class="controls">
         <input type="text" id="searchInput" placeholder="بحث بالاسم و مجموعة و حالة" oninput="filterAttendanceHistory()">
 
-
         <select id="dateSelect">
           <option value="">-- تحميل التواريخ --</option>
         </select>
         <button onclick="fetchAttendanceByDate()">عرض الحضور</button>
+        
+        <!-- Edit button - only appears after date selection -->
+        <button id="editButton" class="btn-edit" onclick="toggleEditMode()" style="display: none;">
+          ✏️ تعديل الحضور
+        </button>
       </div>
 
       <div class="table-container">
+        <!-- Save changes button - appears only in edit mode -->
+        <button id="saveChangesBtn" class="save-changes-btn" onclick="saveAttendanceChanges()">
+          💾 حفظ التعديلات
+        </button>
+        
         <table id="historyTable">
         <thead>
             <tr>
@@ -161,6 +242,7 @@ cross-background {
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="sessionUtils.js"></script>
   <script src="attendance.js"></script>
 </body>
 </html>
