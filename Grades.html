@@ -556,13 +556,11 @@ for (let i = 0; i < crossCount; i++) {
     // إظهار الـ spinner
     document.getElementById("loadingSpinner").style.display = "block";
     
-    Promise.all([
-      // Load regular grades from Google Sheets
-      fetch('https://script.google.com/macros/s/AKfycbyWbp6mp9l7djfsSc75eLDWaH8PYED0lOgZsEObfqtRCyxFqG5iMJnXtKqgWpYnWzUs/exec')
-        .then(response => response.json()),
-      // Load research grades from Firebase
-      loadResearchGrades(studentName, null)
-    ])
+   Promise.all([
+   fetch('https://script.google.com/macros/s/AKfycbx1K5vaPBxEukldhDMpkuBYIku2uj9G--DXEBNm8KRkR-uIBaus3FMGhT4IAyKfvvJ6/exec')
+    .then(response => response.json())
+   ])
+
     .then(async ([sheetsData]) => {
       const tableBody = document.querySelector("#gradesTable tbody");
       tableBody.innerHTML = "";
@@ -635,6 +633,7 @@ for (let i = 0; i < crossCount; i++) {
     .finally(() => {
       document.getElementById("loadingSpinner").style.display = "none";
     });
+
   }
 
 
