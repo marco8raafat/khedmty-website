@@ -141,6 +141,38 @@ window.addEventListener('resize', () => {
 document.getElementById("editForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
+  // Get password fields
+  const currentPassword = document.getElementById("current-password").value.trim();
+  const newPassword = document.getElementById("new-password").value.trim();
+  const confirmPassword = document.getElementById("confirm-password").value.trim();
+
+  // Check if user wants to change password
+  const wantsToChangePassword = currentPassword || newPassword || confirmPassword;
+
+  // Validate password fields if any are filled
+  if (wantsToChangePassword) {
+    if (!currentPassword) {
+      alert("يرجى إدخال كلمة المرور الحالية");
+      return;
+    }
+    if (!newPassword) {
+      alert("يرجى إدخال كلمة المرور الجديدة");
+      return;
+    }
+    if (!confirmPassword) {
+      alert("يرجى تأكيد كلمة المرور الجديدة");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      alert("كلمة المرور الجديدة وتأكيد كلمة المرور غير متطابقين");
+      return;
+    }
+    if (newPassword.length < 6) {
+      alert("كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل");
+      return;
+    }
+  }
+
   // Get current user data first, then update
   database.ref("users/" + emailKey).once("value").then((snapshot) => {
     if (!snapshot.exists()) {
@@ -150,18 +182,30 @@ document.getElementById("editForm").addEventListener("submit", function(e) {
 
     const userData = snapshot.val();
     
+    // If user wants to change password, verify current password first
+    if (wantsToChangePassword) {
+      if (userData.password !== currentPassword) {
+        alert("كلمة المرور الحالية غير صحيحة");
+        return;
+      }
+    }
+
     const updatedUser = {
       username: document.getElementById("edit-name").value,
       email: userData.email, 
       phone: document.getElementById("edit-phone").value,
       group: document.getElementById("edit-group").value,
       role: userData.role,  
-      password: userData.password 
+      password: wantsToChangePassword ? newPassword : userData.password 
     };
 
     // Update user data in Firebase
     database.ref("users/" + emailKey).set(updatedUser).then(() => {
-      alert("تم تحديث البيانات بنجاح!");
+      if (wantsToChangePassword) {
+        alert("تم تحديث البيانات وكلمة المرور بنجاح!");
+      } else {
+        alert("تم تحديث البيانات بنجاح!");
+      }
       window.location.href = "profilepage.html";
     }).catch((error) => {
       console.error("Firebase error:", error);
