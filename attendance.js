@@ -109,7 +109,10 @@
       const snapshot = await db.ref('attendance').once('value');
       const data = snapshot.val();
       const dateSelect = document.getElementById('dateSelect');
+      const periodSelect = document.getElementById('periodSelect');
       dateSelect.innerHTML = '<option value="">-- اختر التاريخ --</option>';
+      periodSelect.style.display = 'none';
+      periodSelect.innerHTML = '<option value="">-- اختر الفترة --</option>';
 
       if (data) {
         const dates = Object.keys(data).sort((a, b) => new Date(b) - new Date(a));
@@ -123,6 +126,37 @@
             weekday: 'long'
           });
           dateSelect.appendChild(option);
+        });
+        
+        // Add event listener to show period select when date is selected
+        dateSelect.addEventListener('change', function() {
+          const selectedDate = this.value;
+          periodSelect.innerHTML = '<option value="">-- اختر الفترة --</option>';
+          
+          if (selectedDate && data[selectedDate]) {
+            const periods = Object.keys(data[selectedDate]);
+            if (periods.includes('period1') || periods.includes('period2')) {
+              // New structure with periods
+              if (periods.includes('period1')) {
+                const option1 = document.createElement('option');
+                option1.value = 'period1';
+                option1.textContent = 'الفترة الأولى';
+                periodSelect.appendChild(option1);
+              }
+              if (periods.includes('period2')) {
+                const option2 = document.createElement('option');
+                option2.value = 'period2';
+                option2.textContent = 'الفترة الثانية';
+                periodSelect.appendChild(option2);
+              }
+              periodSelect.style.display = 'inline-block';
+            } else {
+              // Old structure without periods - hide period select
+              periodSelect.style.display = 'none';
+            }
+          } else {
+            periodSelect.style.display = 'none';
+          }
         });
       } else {
         dateSelect.innerHTML = '<option value="">لا توجد تواريخ متاحة</option>';
@@ -140,24 +174,55 @@
     }
 
     const date = document.getElementById('dateSelect').value;
+    const periodSelect = document.getElementById('periodSelect');
+    const period = periodSelect.style.display !== 'none' ? periodSelect.value : null;
     const tbody = document.getElementById('attendanceBody');
     const editButton = document.getElementById('editButton');
     tbody.innerHTML = '';
 
     if (!date) {
       tbody.innerHTML = '<tr><td colspan="3" class="empty-state">❌ الرجاء اختيار تاريخ</td></tr>';
-      editButton.style.display = 'none'; // Hide edit button when no date is selected
+      editButton.style.display = 'none';
       return;
     }
 
     try {
-      const snapshot = await db.ref('attendance/' + date).once('value');
-      const data = snapshot.val();
-
-      if (!data) {
+      let attendanceRef;
+      let data;
+      
+      // Check if this date uses the new period structure
+      const dateSnapshot = await db.ref('attendance/' + date).once('value');
+      const dateData = dateSnapshot.val();
+      
+      if (!dateData) {
         tbody.innerHTML = '<tr><td colspan="3">📭 لا توجد بيانات لهذا اليوم</td></tr>';
-        editButton.style.display = 'none'; // Hide edit button when no data
+        editButton.style.display = 'none';
         return;
+      }
+      
+      // Check if data has period structure
+      const hasPeriods = dateData.hasOwnProperty('period1') || dateData.hasOwnProperty('period2');
+      
+      if (hasPeriods) {
+        // New structure with periods
+        if (!period) {
+          tbody.innerHTML = '<tr><td colspan="3" class="empty-state">❌ الرجاء اختيار الفترة</td></tr>';
+          editButton.style.display = 'none';
+          return;
+        }
+        attendanceRef = db.ref('attendance/' + date + '/' + period);
+        const snapshot = await attendanceRef.once('value');
+        data = snapshot.val();
+        
+        if (!data) {
+          const periodText = period === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
+          tbody.innerHTML = `<tr><td colspan="3">📭 لا توجد بيانات لـ ${periodText}</td></tr>`;
+          editButton.style.display = 'none';
+          return;
+        }
+      } else {
+        // Old structure without periods
+        data = dateData;
       }
 
       // Show edit button when data is loaded
@@ -166,6 +231,7 @@
       // Store current data for editing
       window.currentAttendanceData = data;
       window.currentDate = date;
+      window.currentPeriod = period;
 
       // Convert data to array and sort by student name in Arabic
       const recordsArray = Object.keys(data).map(studentId => ({
@@ -228,6 +294,11 @@ document.querySelector('.nav-right').classList.toggle('show');
 function printAttendance() {
   const printContents = document.getElementById("historyTable").outerHTML;
   const selectedDate = document.getElementById("dateSelect").value || "تاريخ غير محدد";
+  const periodSelect = document.getElementById("periodSelect");
+  const selectedPeriod = periodSelect.style.display !== 'none' && periodSelect.value 
+    ? (periodSelect.value === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية')
+    : '';
+  
   const printWindow = window.open("", "", "height=600,width=800");
   printWindow.document.write("<html><head><title>سجل الحضور</title>");
   printWindow.document.write("<style>");
@@ -239,6 +310,9 @@ function printAttendance() {
   printWindow.document.write("</head><body>");
   printWindow.document.write("<h2>سجل الحضور</h2>");
   printWindow.document.write(`<h4>تاريخ يوم: ${selectedDate}</h4>`);
+  if (selectedPeriod) {
+    printWindow.document.write(`<h4>الفترة: ${selectedPeriod}</h4>`);
+  }
   printWindow.document.write(printContents);
   printWindow.document.write("</body></html>");
   printWindow.document.close();
@@ -278,7 +352,17 @@ const formattedDate = new Date(selectedDate).toLocaleDateString("ar-EG", {
   weekday: 'long'
 });
 
-let csvContent = `"${RLM}الاسم","${RLM}المجموعة","${RLM}الحالة","${RLM}التاريخ"\n`;
+const periodSelect = document.getElementById("periodSelect");
+const selectedPeriod = periodSelect.style.display !== 'none' && periodSelect.value 
+  ? (periodSelect.value === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية')
+  : '';
+
+let csvContent = `"${RLM}الاسم","${RLM}المجموعة","${RLM}الحالة","${RLM}التاريخ"`;
+if (selectedPeriod) {
+  csvContent = `"${RLM}الاسم","${RLM}المجموعة","${RLM}الحالة","${RLM}الفترة","${RLM}التاريخ"\n`;
+} else {
+  csvContent += "\n";
+}
 
 const rows = table.querySelectorAll("tbody tr");
 rows.forEach(row => {
@@ -288,7 +372,11 @@ rows.forEach(row => {
     let team = cols[1].textContent.trim();
     let status = cols[2].textContent.includes("حاضر") ? "حاضر" : "غائب";
 
-    csvContent += `"${RLM + name}","${RLM + team}","${RLM + status}","${RLM + formattedDate}"\n`;
+    if (selectedPeriod) {
+      csvContent += `"${RLM + name}","${RLM + team}","${RLM + status}","${RLM + selectedPeriod}","${RLM + formattedDate}"\n`;
+    } else {
+      csvContent += `"${RLM + name}","${RLM + team}","${RLM + status}","${RLM + formattedDate}"\n`;
+    }
   }
 });
 
@@ -439,8 +527,12 @@ async function saveAttendanceChanges() {
     saveButton.disabled = true;
     
     const updates = {};
+    const basePath = window.currentPeriod 
+      ? `attendance/${window.currentDate}/${window.currentPeriod}`
+      : `attendance/${window.currentDate}`;
+    
     Object.keys(window.attendanceChanges).forEach(studentId => {
-      updates[`attendance/${window.currentDate}/${studentId}`] = window.attendanceChanges[studentId];
+      updates[`${basePath}/${studentId}`] = window.attendanceChanges[studentId];
     });
     
     await db.ref().update(updates);

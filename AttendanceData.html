@@ -213,6 +213,13 @@
                 <input type="date" id="attendanceDate" value="">
             </div>
             
+            <div class="date-picker">
+                <select id="periodSelect" >
+                    <option value="period1">الفترة الأولى</option>
+                    <option value="period2">الفترة الثانية</option>
+                </select>
+            </div>
+            
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="🔍 ابحث عن الطالب..." oninput="filterStudents()">
             </div>
@@ -535,6 +542,8 @@ async function loadStudents() {
 
           try {
               const selectedDate = document.getElementById('attendanceDate').value;
+              const selectedPeriod = document.getElementById('periodSelect').value;
+              
               if (!selectedDate) {
                   alert('يرجى اختيار التاريخ');
                   return;
@@ -551,7 +560,8 @@ async function loadStudents() {
               
               if (markedStudents < totalStudents) {
                   const unmarkedCount = totalStudents - markedStudents;
-                  const confirmMessage = `تحذير: لم يتم تسجيل حضور ${unmarkedCount} من الطلاب.\n\nهل تريد المتابعة والحفظ للطلاب المسجلين فقط؟\n\nأم تريد العودة لتسجيل حضور جميع الطلاب؟`;
+                  const periodText = selectedPeriod === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
+                  const confirmMessage = `تحذير: لم يتم تسجيل حضور ${unmarkedCount} من الطلاب في ${periodText}.\n\nهل تريد المتابعة والحفظ للطلاب المسجلين فقط؟\n\nأم تريد العودة لتسجيل حضور جميع الطلاب؟`;
                   
                   if (!confirm(confirmMessage)) {
                       // User chose to go back and mark all students
@@ -559,16 +569,18 @@ async function loadStudents() {
                   }
               }
 
-              const attendanceRef = database.ref('attendance/' + selectedDate);
+              const attendanceRef = database.ref('attendance/' + selectedDate + '/' + selectedPeriod);
               const promises = [];
 
               Object.keys(attendanceData).forEach(studentId => {
                   const student = students.find(s => s.id === studentId);
+                  const periodText = selectedPeriod === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
                   const attendanceRecord = {
                       studentId: studentId,
                       studentName: student.name,
                       team: student.team,
                       status: attendanceData[studentId],
+                      period: periodText,
                       timestamp: firebase.database.ServerValue.TIMESTAMP
                   };
                   
@@ -577,7 +589,9 @@ async function loadStudents() {
 
               await Promise.all(promises);
               
+              const periodText = selectedPeriod === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
               const successMsg = document.getElementById('successMessage');
+              successMsg.textContent = `✅ تم حفظ بيانات الحضور لـ ${periodText} بنجاح!`;
               successMsg.style.display = 'block';
               setTimeout(() => {
                   successMsg.style.display = 'none';

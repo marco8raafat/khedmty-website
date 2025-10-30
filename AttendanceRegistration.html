@@ -122,6 +122,24 @@
   display: inline-block;
 }
 
+/* Period select styling */
+#periodSelect {
+  background: white;
+  color: #233B6E;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+#periodSelect:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.02);
+}
+
+#periodSelect option {
+  padding: 10px;
+  font-size: 14px;
+}
+
 .cross-background {
   position: fixed;
   top: 0;
@@ -205,6 +223,13 @@
         <select id="dateSelect">
           <option value="">-- تحميل التواريخ --</option>
         </select>
+        
+        <select id="periodSelect" style="padding: 5px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; display: none;">
+          <option value="">-- اختر الفترة --</option>
+          <option value="period1">الفترة الأولى</option>
+          <option value="period2">الفترة الثانية</option>
+        </select>
+        
         <button onclick="fetchAttendanceByDate()">عرض الحضور</button>
         
         <!-- Edit button - only appears after date selection -->
