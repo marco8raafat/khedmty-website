@@ -292,12 +292,39 @@ document.querySelector('.nav-right').classList.toggle('show');
 });
 
 function printAttendance() {
-  const printContents = document.getElementById("historyTable").outerHTML;
+  const table = document.getElementById("historyTable");
   const selectedDate = document.getElementById("dateSelect").value || "تاريخ غير محدد";
   const periodSelect = document.getElementById("periodSelect");
   const selectedPeriod = periodSelect.style.display !== 'none' && periodSelect.value 
     ? (periodSelect.value === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية')
     : '';
+  
+  // Clone the table to modify it for printing
+  const tableClone = table.cloneNode(true);
+  
+  // If in edit mode, update cloned table to show selected values instead of dropdowns
+  const isInEditMode = document.getElementById('historyTable').classList.contains('edit-mode');
+  if (isInEditMode) {
+    const clonedRows = tableClone.querySelectorAll('tbody tr');
+    const originalRows = table.querySelectorAll('tbody tr');
+    
+    clonedRows.forEach((clonedRow, index) => {
+      const originalRow = originalRows[index];
+      if (originalRow && originalRow.cells.length === 3) {
+        const statusCell = clonedRow.cells[2];
+        const originalStatusCell = originalRow.cells[2];
+        const statusSelect = originalStatusCell.querySelector('.status-select');
+        
+        if (statusSelect) {
+          const selectedValue = statusSelect.value;
+          const statusText = selectedValue === 'present' ? 'حاضر ✅' : 'غائب ❌';
+          statusCell.textContent = statusText;
+        }
+      }
+    });
+  }
+  
+  const printContents = tableClone.outerHTML;
   
   const printWindow = window.open("", "", "height=600,width=800");
   printWindow.document.write("<html><head><title>سجل الحضور</title>");
@@ -306,6 +333,7 @@ function printAttendance() {
   printWindow.document.write("table { width: 100%; border-collapse: collapse; margin-top: 20px; }");
   printWindow.document.write("th, td { border: 1px solid black; padding: 10px; text-align: center; }");
   printWindow.document.write("h2, h4 { margin: 0; }");
+  printWindow.document.write(".status-select { display: none; }"); // Hide any select elements
   printWindow.document.write("</style>");
   printWindow.document.write("</head><body>");
   printWindow.document.write("<h2>سجل الحضور</h2>");
@@ -320,15 +348,33 @@ function printAttendance() {
 }
 
 function filterAttendanceHistory() {
-const input = document.getElementById("searchInput").value.toLowerCase();
+const input = document.getElementById("searchInput").value.toLowerCase().trim();
 const rows = document.querySelectorAll("#attendanceBody tr");
 
 rows.forEach(row => {
+  // Skip empty state rows
+  if (row.cells.length < 3) {
+    return;
+  }
+
   const name = row.cells[0]?.textContent.toLowerCase() || "";
   const team = row.cells[1]?.textContent.toLowerCase() || "";
-  const status = row.cells[2]?.textContent.toLowerCase() || "";
+  
+  // Get status from both display span and select (for edit mode)
+  const statusCell = row.cells[2];
+  const statusDisplay = statusCell.querySelector('.status-display')?.textContent.toLowerCase() || "";
+  const statusSelect = statusCell.querySelector('.status-select')?.selectedOptions[0]?.textContent.toLowerCase() || "";
+  const status = (statusDisplay + " " + statusSelect).toLowerCase();
 
-  if (name.includes(input) || team.includes(input) || status.includes(input)) {
+  // Check if input matches name, team, or status
+  // Support searching for: حاضر, غائب, present, absent
+  const matchesSearch = name.includes(input) || 
+                        team.includes(input) || 
+                        status.includes(input) ||
+                        (input.includes('حاضر') && status.includes('حاضر')) ||
+                        (input.includes('غائب') && status.includes('غائب'));
+
+  if (matchesSearch) {
     row.style.display = "";
   } else {
     row.style.display = "none";
@@ -370,7 +416,25 @@ rows.forEach(row => {
   if (cols.length === 3) {
     let name = cols[0].textContent.trim().replace(/✅|❌/g, "");
     let team = cols[1].textContent.trim();
-    let status = cols[2].textContent.includes("حاضر") ? "حاضر" : "غائب";
+    
+    // Get status - check if in edit mode (select visible) or normal mode (display visible)
+    let status = "";
+    const statusCell = cols[2];
+    const statusSelect = statusCell.querySelector('.status-select');
+    const statusDisplay = statusCell.querySelector('.status-display');
+    
+    // If in edit mode (select is visible), get value from select
+    if (statusSelect && statusSelect.style.display !== 'none') {
+      status = statusSelect.value === 'present' ? "حاضر" : "غائب";
+    } 
+    // Otherwise get from display text
+    else if (statusDisplay) {
+      status = statusDisplay.textContent.includes("حاضر") ? "حاضر" : "غائب";
+    }
+    // Fallback to cell text content
+    else {
+      status = cols[2].textContent.includes("حاضر") ? "حاضر" : "غائب";
+    }
 
     if (selectedPeriod) {
       csvContent += `"${RLM + name}","${RLM + team}","${RLM + status}","${RLM + selectedPeriod}","${RLM + formattedDate}"\n`;
