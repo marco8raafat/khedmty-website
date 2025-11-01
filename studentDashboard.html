@@ -945,18 +945,9 @@ label {
         }
       });
 
-      // Real-time listeners for attendance and research data (update progress)
+  // Real-time listener for attendance data (update progress)
       dataCache.getData('attendance', () => {
         console.log("[Student Dashboard] Attendance data updated, recalculating progress...");
-        if (typeof debouncedUpdateProgress === 'function') {
-          debouncedUpdateProgress();
-        } else if (typeof updateProgressDisplay === 'function') {
-          updateProgressDisplay();
-        }
-      });
-
-      dataCache.getData('researches', () => {
-        console.log("[Student Dashboard] Research data updated, recalculating progress...");
         if (typeof debouncedUpdateProgress === 'function') {
           debouncedUpdateProgress();
         } else if (typeof updateProgressDisplay === 'function') {
@@ -1019,13 +1010,20 @@ label {
     });
   }
 
-  // 📊 Calculate student progress based on attendance and research submissions
+  // 📊 Calculate student progress based on attendance (period-aware)
   async function calculateStudentProgress() {
     console.log("[Student Dashboard] Calculating student progress...");
     
     if (!currentEmail) {
       console.log("[Student Dashboard] No current user for progress calculation");
-      return 0;
+      return {
+        percentage: 0,
+        attendance: {
+          combined: { present: 0, total: 0, percentage: 0 },
+          period1: { present: 0, total: 0, percentage: 0 },
+          period2: { present: 0, total: 0, percentage: 0 }
+        }
+      };
     }
 
     try {
@@ -1037,93 +1035,128 @@ label {
       
       if (!userData) {
         console.log("[Student Dashboard] No user data found for progress calculation");
-        return 0;
+        return {
+          percentage: 0,
+          attendance: {
+            combined: { present: 0, total: 0, percentage: 0 },
+            period1: { present: 0, total: 0, percentage: 0 },
+            period2: { present: 0, total: 0, percentage: 0 }
+          }
+        };
       }
 
-      const studentName = userData.username || userData.name || userData.fullName || userData.firstName;
+  const studentName = userData.username || userData.name || userData.fullName || userData.firstName || '';
+  const firstNameToken = studentName ? studentName.split(' ')[0] : '';
       console.log("[Student Dashboard] Calculating progress for student:", studentName);
 
       // Get attendance data
       const attendanceSnapshot = await database.ref('attendance').once('value');
       const attendanceData = attendanceSnapshot.val() || {};
-      
-      // Get research submissions data
-      const researchSnapshot = await database.ref('researches').once('value');
-      const researchData = researchSnapshot.val() || {};
 
-      // Calculate attendance progress
-      let totalAttendanceDays = 0;
-      let presentDays = 0;
-      
-      Object.values(attendanceData).forEach(dateData => {
-        Object.values(dateData).forEach(record => {
-          if (record.studentName === studentName || 
-              record.studentName?.includes(studentName?.split(' ')[0]) ||
-              studentName?.includes(record.studentName?.split(' ')[0])) {
-            totalAttendanceDays++;
-            if (record.status === 'present') {
-              presentDays++;
-            }
+      const periodStats = {
+        period1: { present: 0, total: 0 },
+        period2: { present: 0, total: 0 }
+      };
+
+      const matchesStudent = (record = {}) => {
+        if (!record) return false;
+        const recordId = record.studentId || record.id;
+        const recordEmail = record.studentEmail || record.email;
+        const recordName = record.studentName || record.name || '';
+        const recordFirstToken = recordName ? recordName.split(' ')[0] : '';
+
+        return recordId === emailKey ||
+               recordEmail === currentEmail ||
+               (recordName && studentName && (
+                 recordName === studentName ||
+                 (firstNameToken && recordName.includes(firstNameToken)) ||
+                 (recordFirstToken && studentName.includes(recordFirstToken))
+               ));
+      };
+
+      const collectStatsForPeriod = (periodKey, periodPayload) => {
+        if (!periodPayload || typeof periodPayload !== 'object') {
+          return;
+        }
+
+        const directRecord = periodPayload[emailKey];
+        let studentRecord = directRecord;
+
+        if (!studentRecord) {
+          studentRecord = Object.values(periodPayload).find(matchesStudent);
+        }
+
+        if (studentRecord) {
+          periodStats[periodKey].total += 1;
+          if (studentRecord.status === 'present') {
+            periodStats[periodKey].present += 1;
           }
-        });
-      });
+        }
+      };
 
-      // Calculate research submissions progress
-      let totalRequiredResearches = 1; // Based on requirement: "one resource of one resource"
-      let submittedResearches = 0;
-      
-      Object.values(researchData).forEach(research => {
-        if (research.studentEmail === currentEmail || 
-            research.studentName === studentName ||
-            research.studentName?.includes(studentName?.split(' ')[0]) ||
-            studentName?.includes(research.studentName?.split(' ')[0])) {
-          submittedResearches++;
+      Object.values(attendanceData).forEach(dateData => {
+        if (!dateData || typeof dateData !== 'object') {
+          return;
+        }
+
+        const hasPeriods = dateData.period1 || dateData.period2;
+
+        if (hasPeriods) {
+          collectStatsForPeriod('period1', dateData.period1);
+          collectStatsForPeriod('period2', dateData.period2);
+        } else {
+          // Legacy structure without periods, treat as period1
+          collectStatsForPeriod('period1', dateData);
         }
       });
 
-      // Limit submitted researches to required amount
-      submittedResearches = Math.min(submittedResearches, totalRequiredResearches);
+      const combinedPresent = periodStats.period1.present + periodStats.period2.present;
+      const combinedTotal = periodStats.period1.total + periodStats.period2.total;
+      const progressPercentage = combinedTotal > 0
+        ? Math.min(Math.round((combinedPresent / combinedTotal) * 100), 100)
+        : 0;
 
-      // Calculate overall progress based on attendance only
-      let attendanceProgress = totalAttendanceDays > 0 ? (presentDays / totalAttendanceDays) : 0;
-      let researchProgress = submittedResearches / totalRequiredResearches;
+      const buildPercentage = (present, total) => total > 0
+        ? Math.min(Math.round((present / total) * 100), 100)
+        : 0;
 
-      let overallProgress = attendanceProgress;
-      
-      // Convert to percentage and cap at 100%
-      let progressPercentage = Math.min(Math.round(overallProgress * 100), 100);
+      const attendanceSummary = {
+        combined: {
+          present: combinedPresent,
+          total: combinedTotal,
+          percentage: progressPercentage
+        },
+        period1: {
+          present: periodStats.period1.present,
+          total: periodStats.period1.total,
+          percentage: buildPercentage(periodStats.period1.present, periodStats.period1.total)
+        },
+        period2: {
+          present: periodStats.period2.present,
+          total: periodStats.period2.total,
+          percentage: buildPercentage(periodStats.period2.present, periodStats.period2.total)
+        }
+      };
 
       console.log("[Student Dashboard] Progress calculation:", {
         studentName,
-        totalAttendanceDays,
-        presentDays,
-        attendanceProgress: Math.round(attendanceProgress * 100) + '%',
-        submittedResearches,
-        totalRequiredResearches,
-        researchProgress: Math.round(researchProgress * 100) + '%',
-        overallProgress: progressPercentage + '%'
+        attendance: attendanceSummary
       });
 
       return {
         percentage: progressPercentage,
-        attendance: {
-          present: presentDays,
-          total: totalAttendanceDays,
-          percentage: Math.round(attendanceProgress * 100)
-        },
-        research: {
-          submitted: submittedResearches,
-          required: totalRequiredResearches,
-          percentage: Math.round(researchProgress * 100)
-        }
+        attendance: attendanceSummary
       };
 
     } catch (error) {
       console.error("[Student Dashboard] Error calculating progress:", error);
       return {
         percentage: 0,
-        attendance: { present: 0, total: 0, percentage: 0 },
-        research: { submitted: 0, required: 1, percentage: 0 }
+        attendance: {
+          combined: { present: 0, total: 0, percentage: 0 },
+          period1: { present: 0, total: 0, percentage: 0 },
+          period2: { present: 0, total: 0, percentage: 0 }
+        }
       };
     }
   }
@@ -1152,20 +1185,24 @@ label {
     
     try {
       const progressData = await calculateStudentProgress();
-      
+
+      const combined = progressData.attendance?.combined || { percentage: 0 };
+      const period1 = progressData.attendance?.period1 || { present: 0, total: 0, percentage: 0 };
+      const period2 = progressData.attendance?.period2 || { present: 0, total: 0, percentage: 0 };
+
       // Remove loading state
-      if (progressFill) {
+      if (progressFill && progressFill.parentElement) {
         progressFill.parentElement.classList.remove('loading-progress');
         
         // Animate progress bar
         setTimeout(() => {
-          progressFill.style.width = progressData.percentage + '%';
+          progressFill.style.width = combined.percentage + '%';
         }, 200);
       }
       
       if (progressText) {
         // Update progress text with detailed information
-        progressText.innerHTML = `${progressData.percentage}% تقدمك في التعلم`;
+        progressText.innerHTML = `${combined.percentage}% تقدمك الكلي`;
       }
       
       // Update the description with breakdown
@@ -1174,17 +1211,20 @@ label {
         let statusMessage = '';
         let statusColor = '#666';
         
-        if (progressData.percentage >= 90) {
-          statusMessage = 'ممتاز! انت ضمن الطلاب الاكثر تفاعل 🎉';
+        if (combined.percentage >= 90) {
+          statusMessage = 'ممتاز! أنت ضمن الطلاب الأكثر تفاعلاً 🎉';
           statusColor = '#388e3c';
-        } else if (progressData.percentage >= 75) {
-          statusMessage = 'أداء جيد جداً! استمر في المتابعة 👏';
+        } else if (combined.percentage >= 75) {
+          statusMessage = 'أداء رائع! استمر في المتابعة 👏';
           statusColor = '#2e7d32';
-        } else if (progressData.percentage >= 50) {
+        } else if (combined.percentage >= 50) {
           statusMessage = 'أداء جيد، يمكنك تحسينه أكثر 💪';
           statusColor = '#f57c00';
+        } else if (combined.total === 0) {
+          statusMessage = 'لم يتم تسجيل أي حضور بعد 📅';
+          statusColor = '#546e7a';
         } else {
-          statusMessage = 'تحتاج لمزيد من المشاركة والحضور 📚';
+          statusMessage = 'تحتاج لمزيد من الالتزام بالحضور 📚';
           statusColor = '#d32f2f';
         }
         
@@ -1192,9 +1232,12 @@ label {
           <div style="color: ${statusColor}; margin-bottom: 10px; font-weight: bold;">
             ${statusMessage}
           </div>
-          <div style="font-size: 0.9em; line-height: 1.6;">
-            📊 <strong>تفاصيل التقدم:</strong><br>
-            • الحضور: ${progressData.attendance.present} من ${progressData.attendance.total} يوم (${progressData.attendance.percentage}%)
+          <div style="font-size: 0.9em; line-height: 1.7;">
+            • الحضور: ${period1.present} من ${period1.total} يوم (${period1.percentage}%) الفترة الأولى<br>
+            • الحضور: ${period2.present} من ${period2.total} يوم (${period2.percentage}%) الفترة الثانية
+          </div>
+          <div style="font-size: 0.85em; margin-top: 10px; color: #607d8b;">
+            يتم حساب هذا التقدم اعتماداً على سجل الحضور فقط.
           </div>
         `;
         progressDescription.style.color = '#666';
