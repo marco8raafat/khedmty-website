@@ -236,6 +236,10 @@
         <div id="successMessage" class="alert success">✅ تم حفظ بيانات الحضور بنجاح!</div>
         <div id="errorMessage" class="alert error">❌ حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.</div>
         
+        <div style="background-color: #06385bff; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-right: 4px solid #233B6E;">
+            <strong>💡 ملاحظة:</strong> يمكنك حفظ حضور جزء من الطلاب والعودة لاحقاً لتسجيل حضور الباقي. سيتم دمج البيانات الجديدة مع البيانات المحفوظة مسبقاً.
+        </div>
+        
         <div class="stats">
             <div class="stat-card">
                 <h3>إجمالي الطلاب</h3>
@@ -407,12 +411,44 @@ async function loadStudents() {
             });
         }
 
+        // Load existing attendance data for selected date/period
+        await loadExistingAttendance();
+        
         displayStudents();
         document.getElementById('loading').style.display = 'none';
         
     } catch (error) {
         console.error('Error loading students:', error);
         document.getElementById('loading').innerHTML = '❌ خطأ في تحميل البيانات';
+    }
+}
+
+async function loadExistingAttendance() {
+    try {
+        const selectedDate = document.getElementById('attendanceDate').value;
+        const selectedPeriod = document.getElementById('periodSelect').value;
+        
+        if (!selectedDate) {
+            console.log('No date selected, skipping attendance load');
+            return;
+        }
+
+        const attendanceRef = database.ref('attendance/' + selectedDate + '/' + selectedPeriod);
+        const snapshot = await attendanceRef.once('value');
+        const existingData = snapshot.val();
+
+        if (existingData) {
+            console.log('Loading existing attendance data:', existingData);
+            // Pre-populate attendanceData with existing records
+            Object.keys(existingData).forEach(studentId => {
+                attendanceData[studentId] = existingData[studentId].status;
+            });
+            console.log('Loaded attendance for', Object.keys(attendanceData).length, 'students');
+        } else {
+            console.log('No existing attendance data found for this date/period');
+        }
+    } catch (error) {
+        console.error('Error loading existing attendance:', error);
     }
 }
 
@@ -436,6 +472,12 @@ async function loadStudents() {
           sortedStudents.forEach(student => {
               const studentCard = document.createElement('div');
               studentCard.className = 'student-card';
+              
+              // Check if student already has attendance marked
+              const existingStatus = attendanceData[student.id];
+              const presentActive = existingStatus === 'present' ? 'active' : '';
+              const absentActive = existingStatus === 'absent' ? 'active' : '';
+              
               studentCard.innerHTML = `
                   <div class="student-info">
                       <div class="student-avatar">
@@ -447,10 +489,10 @@ async function loadStudents() {
                       </div>
                   </div>
                   <div class="attendance-buttons">
-                      <button class="attendance-btn btn-present" onclick="markAttendance(event, '${student.id}', 'present')">
+                      <button class="attendance-btn btn-present ${presentActive}" onclick="markAttendance(event, '${student.id}', 'present')">
                           حاضر
                       </button>
-                      <button class="attendance-btn btn-absent" onclick="markAttendance(event, '${student.id}', 'absent')">
+                      <button class="attendance-btn btn-absent ${absentActive}" onclick="markAttendance(event, '${student.id}', 'absent')">
                           غائب
                       </button>
                   </div>
@@ -500,9 +542,9 @@ async function loadStudents() {
               saveButton.innerHTML = '💾 حفظ الحضور (مكتمل ✅)';
               saveButton.disabled = false;
           } else if (presentCount + absentCount > 0) {
-              // Partially marked - warning style
-              saveButton.style.background = '#fd7e14';
-              saveButton.innerHTML = `💾 حفظ الحضور (${notMarkedCount} غير مسجل ⚠️)`;
+              // Partially marked - show as ready to save
+              saveButton.style.background = '#2196F3';
+              saveButton.innerHTML = `💾 حفظ الحضور (${presentCount + absentCount} من ${totalStudents})`;
               saveButton.disabled = false;
           } else {
               // Nothing marked - default style
@@ -554,17 +596,17 @@ async function loadStudents() {
                   return;
               }
 
-              // Check if all students have attendance marked
+              // Check if all students have attendance marked (optional warning, not blocking)
               const totalStudents = students.length;
               const markedStudents = Object.keys(attendanceData).length;
               
               if (markedStudents < totalStudents) {
                   const unmarkedCount = totalStudents - markedStudents;
                   const periodText = selectedPeriod === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
-                  const confirmMessage = `تحذير: لم يتم تسجيل حضور ${unmarkedCount} من الطلاب في ${periodText}.\n\nهل تريد المتابعة والحفظ للطلاب المسجلين فقط؟\n\nأم تريد العودة لتسجيل حضور جميع الطلاب؟`;
+                  const confirmMessage = `تنبيه: لم يتم تسجيل حضور ${unmarkedCount} من الطلاب في ${periodText}.\n\nسيتم حفظ حضور ${markedStudents} طالب فقط.\nيمكنك العودة لاحقاً لتسجيل حضور الطلاب المتبقين.\n\nهل تريد المتابعة والحفظ؟`;
                   
                   if (!confirm(confirmMessage)) {
-                      // User chose to go back and mark all students
+                      // User chose to cancel
                       return;
                   }
               }
@@ -572,8 +614,14 @@ async function loadStudents() {
               const attendanceRef = database.ref('attendance/' + selectedDate + '/' + selectedPeriod);
               const promises = [];
 
+              // Save only the students with marked attendance
               Object.keys(attendanceData).forEach(studentId => {
                   const student = students.find(s => s.id === studentId);
+                  if (!student) {
+                      console.warn('Student not found:', studentId);
+                      return;
+                  }
+                  
                   const periodText = selectedPeriod === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
                   const attendanceRecord = {
                       studentId: studentId,
@@ -584,6 +632,7 @@ async function loadStudents() {
                       timestamp: firebase.database.ServerValue.TIMESTAMP
                   };
                   
+                  // Use set() to overwrite existing record or create new one
                   promises.push(attendanceRef.child(studentId).set(attendanceRecord));
               });
 
@@ -591,23 +640,21 @@ async function loadStudents() {
               
               const periodText = selectedPeriod === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
               const successMsg = document.getElementById('successMessage');
-              successMsg.textContent = `✅ تم حفظ بيانات الحضور لـ ${periodText} بنجاح!`;
+              successMsg.textContent = `✅ تم حفظ حضور ${markedStudents} طالب لـ ${periodText} بنجاح!`;
               successMsg.style.display = 'block';
               setTimeout(() => {
                   successMsg.style.display = 'none';
-              }, 3000);
+              }, 4000);
 
-              attendanceData = {};
-              
-              document.querySelectorAll('.attendance-btn.active').forEach(btn => {
-                  btn.classList.remove('active');
-              });
+              // Don't clear attendanceData - keep it so user can see what was saved
+              // attendanceData will be refreshed when date/period changes
               
               updateStats();
 
           } catch (error) {
               console.error('Error saving attendance:', error);
               const errorMsg = document.getElementById('errorMessage');
+              errorMsg.textContent = '❌ حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.';
               errorMsg.style.display = 'block';
               setTimeout(() => {
                   errorMsg.style.display = 'none';
@@ -712,6 +759,17 @@ async function loadStudents() {
 
       window.onload = function() {
           loadStudents();
+          
+          // Add event listeners for date and period changes
+          document.getElementById('attendanceDate').addEventListener('change', function() {
+              console.log('Date changed, reloading students and attendance...');
+              loadStudents();
+          });
+          
+          document.getElementById('periodSelect').addEventListener('change', function() {
+              console.log('Period changed, reloading students and attendance...');
+              loadStudents();
+          });
       };
 
       const navLinks = document.querySelectorAll('.nav-link');
