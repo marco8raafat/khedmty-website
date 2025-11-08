@@ -853,61 +853,40 @@ footer {
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Cache management system
-    class DataCache {
+    // Simple cache for temporary data storage (no real-time listeners)
+    class SimpleCache {
       constructor() {
         this.cache = new Map();
-        this.listeners = new Map();
-        this.lastUpdated = new Map();
-        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache expiry
+        this.cacheExpiry = 30 * 60 * 1000; // 30 minutes expiry
       }
 
-      // Check if cached data is still valid
-      isCacheValid(path) {
-        const lastUpdate = this.lastUpdated.get(path);
-        if (!lastUpdate) return false;
-        return (Date.now() - lastUpdate) < this.cacheExpiry;
-      }
-
-      // Get data from cache or Firebase with real-time listener
-      async getData(path, callback) {
-        // If we have valid cached data, use it immediately
-        if (this.isCacheValid(path) && this.cache.has(path)) {
-          console.log(`Using cached data for ${path}`);
-          if (callback) callback(this.cache.get(path));
-          return this.cache.get(path);
-        }
-
-        // Set up real-time listener if not already exists
-        if (!this.listeners.has(path)) {
-          console.log(`Setting up real-time listener for ${path}`);
-          const listener = database.ref(path).on('value', (snapshot) => {
-            const data = snapshot.val() || {};
-            this.cache.set(path, data);
-            this.lastUpdated.set(path, Date.now());
-            console.log(`Data updated for ${path}:`, Object.keys(data).length, 'items');
-            if (callback) callback(data);
-          });
-          this.listeners.set(path, listener);
-        }
-
-        // Return cached data if available, otherwise return empty object
-        return this.cache.get(path) || {};
-      }
-
-      // Clean up listeners when not needed
-      cleanup() {
-        this.listeners.forEach((listener, path) => {
-          database.ref(path).off('value', listener);
+      set(key, value) {
+        this.cache.set(key, {
+          data: value,
+          timestamp: Date.now()
         });
-        this.listeners.clear();
+      }
+
+      get(key) {
+        const cached = this.cache.get(key);
+        if (!cached) return null;
+        
+        // Check if cache is still valid
+        if (Date.now() - cached.timestamp > this.cacheExpiry) {
+          this.cache.delete(key);
+          return null;
+        }
+        
+        return cached.data;
+      }
+
+      clear() {
         this.cache.clear();
-        this.lastUpdated.clear();
       }
     }
 
-    // Initialize cache instance
-    const dataCache = new DataCache();
+    // Initialize simple cache instance
+    const simpleCache = new SimpleCache();
 
     // Debounce function to prevent rapid successive updates
     function debounce(func, wait) {
@@ -942,27 +921,35 @@ footer {
     }
 
     async function getStatisticsData() {
-      console.log('Getting statistics data...');
+      console.log('Getting statistics data with one-time queries...');
       
-      // Use cached data with real-time listeners
-      const [alerts, students, attendance, pdfs, photos, exams, researches] = await Promise.all([
-        dataCache.getData('alerts'),
-        dataCache.getData('users'),
-        dataCache.getData('attendance'),
-        dataCache.getData('educational-resources'),
-        dataCache.getData('photos'),
-        dataCache.getData('exams'),
-        dataCache.getData('researches')
+      // Use one-time queries instead of real-time listeners to reduce bandwidth
+      const [alertsSnap, studentsSnap, attendanceSnap, pdfsSnap, photosSnap, examsSnap, researchesSnap] = await Promise.all([
+        database.ref('alerts').once('value'),
+        database.ref('users').orderByChild('role').equalTo('student').once('value'),
+        database.ref('attendance').orderByKey().limitToLast(60).once('value'), // Only last 60 dates
+        database.ref('educational-resources').once('value'),
+        database.ref('photos').once('value'),
+        database.ref('exams').once('value'),
+        database.ref('researches').once('value')
       ]);
 
+      const alerts = alertsSnap.val() || {};
+      const students = studentsSnap.val() || {};
+      const attendance = attendanceSnap.val() || {};
+      const pdfs = pdfsSnap.val() || {};
+      const photos = photosSnap.val() || {};
+      const exams = examsSnap.val() || {};
+      const researches = researchesSnap.val() || {};
+
       return {
-        alerts: Object.values(alerts || {}),
-        students: Object.values(students || {}).filter(user => user.role === 'student'),
-        attendance: attendance || {},
-        pdfs: Object.values(pdfs || {}),
-        photos: Object.values(photos || {}),
-        exams: Object.values(exams || {}),
-        researches: Object.values(researches || {})
+        alerts: Object.values(alerts),
+        students: Object.values(students),
+        attendance: attendance,
+        pdfs: Object.values(pdfs),
+        photos: Object.values(photos),
+        exams: Object.values(exams),
+        researches: Object.values(researches)
       };
     }
 
@@ -977,13 +964,9 @@ footer {
 
       const emailKey = currentEmail.replace(/[.#$\[\]]/g, '_');
       
-      // Wait for user data to be loaded from cache/Firebase
-      const userData = await new Promise((resolve) => {
-        dataCache.getData(`users/${emailKey}`, (data) => {
-          console.log("User data loaded:", data);
-          resolve(data);
-        });
-      });
+      // Use one-time query instead of real-time listener
+      const userSnapshot = await database.ref(`users/${emailKey}`).once('value');
+      const userData = userSnapshot.val();
       
       if (!userData || Object.keys(userData).length === 0) {
         console.log("No user data found, redirecting to login");
@@ -1168,24 +1151,26 @@ footer {
     }
 
     async function setupRealTimeUpdates() {
-      console.log('Setting up real-time updates...');
+      console.log('Setting up periodic stats refresh (every 30 seconds)...');
       
-      // Set up real-time listeners for each data type that will auto-update stats
-      const dataPaths = ['alerts', 'users', 'attendance', 'educational-resources', 'photos', 'exams', 'researches'];
+      // Instead of real-time listeners, use periodic refresh every 30 seconds
+      // This drastically reduces bandwidth usage
+      setInterval(async () => {
+        console.log('Auto-refreshing dashboard stats...');
+        await updateStats();
+      }, 30000); // 30 seconds
       
-      dataPaths.forEach(path => {
-        dataCache.getData(path, () => {
-          console.log(`Data changed in ${path}, scheduling stats update...`);
-          debouncedUpdateStats(); // Use debounced version
-        });
-      });
+      // Optional: Add manual refresh button indicator
+      console.log('Dashboard will auto-refresh every 30 seconds');
     }
 
     async function loadLatestNotifications() {
       try {
-        const alerts = await dataCache.getData('alerts');
-        const alertsArray = Object.values(alerts || {});
-        console.log('Latest notifications loaded from cache:', alertsArray.length);
+        // Use one-time query instead of cached real-time listener
+        const alertsSnapshot = await database.ref('alerts').limitToLast(5).once('value');
+        const alerts = alertsSnapshot.val() || {};
+        const alertsArray = Object.values(alerts);
+        console.log('Latest notifications loaded (one-time query):', alertsArray.length);
       } catch (error) {
         console.error('Error loading notifications:', error);
       }

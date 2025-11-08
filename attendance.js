@@ -98,6 +98,12 @@
     }
   }
 
+  // Pagination variables
+  let allDates = [];
+  let currentPage = 0;
+  const DATES_PER_PAGE = 30;
+  let hasMoreDates = false;
+
   async function loadAvailableDates() {
     // Check authentication before loading data
     const isAuthenticated = await checkAuthentication();
@@ -106,27 +112,36 @@
     }
 
     try {
-      const snapshot = await db.ref('attendance').once('value');
+      // OPTIMIZED: Only fetch last 100 dates instead of ALL attendance data
+      const snapshot = await db.ref('attendance').orderByKey().limitToLast(100).once('value');
       const data = snapshot.val();
       const dateSelect = document.getElementById('dateSelect');
       const periodSelect = document.getElementById('periodSelect');
+      const loadMoreBtn = document.getElementById('loadMoreDatesBtn');
+      
       dateSelect.innerHTML = '<option value="">-- اختر التاريخ --</option>';
       periodSelect.style.display = 'none';
       periodSelect.innerHTML = '<option value="">-- اختر الفترة --</option>';
 
       if (data) {
-        const dates = Object.keys(data).sort((a, b) => new Date(b) - new Date(a));
-        dates.forEach(date => {
-          const option = document.createElement('option');
-          option.value = date;
-          option.textContent = new Date(date).toLocaleDateString('ar-EG', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            weekday: 'long'
-          });
-          dateSelect.appendChild(option);
-        });
+        // Store all dates sorted newest first
+        allDates = Object.keys(data).sort((a, b) => new Date(b) - new Date(a));
+        
+        // Show first page of dates
+        currentPage = 0;
+        displayDatesPage(data);
+        
+        // Show "Load More" button if there are more dates
+        if (allDates.length > DATES_PER_PAGE) {
+          hasMoreDates = true;
+          if (loadMoreBtn) {
+            loadMoreBtn.style.display = 'inline-block';
+            loadMoreBtn.textContent = `⬇️ تحميل المزيد (${allDates.length - DATES_PER_PAGE} تاريخ متبقي)`;
+          }
+        } else {
+          hasMoreDates = false;
+          if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+        }
         
         // Add event listener to show period select when date is selected
         dateSelect.addEventListener('change', function() {
@@ -160,12 +175,83 @@
         });
       } else {
         dateSelect.innerHTML = '<option value="">لا توجد تواريخ متاحة</option>';
+        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
       }
     } catch (error) {
       console.error("Error loading dates:", error);
       alert("❌ حدث خطأ أثناء تحميل التواريخ");
     }
   }
+
+  function displayDatesPage(data) {
+    const dateSelect = document.getElementById('dateSelect');
+    const startIndex = currentPage * DATES_PER_PAGE;
+    const endIndex = Math.min(startIndex + DATES_PER_PAGE, allDates.length);
+    
+    // Keep the placeholder option
+    const placeholder = dateSelect.querySelector('option[value=""]');
+    
+    // Add dates for current page
+    for (let i = startIndex; i < endIndex; i++) {
+      const date = allDates[i];
+      const option = document.createElement('option');
+      option.value = date;
+      option.textContent = new Date(date).toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long'
+      });
+      dateSelect.appendChild(option);
+    }
+    
+    console.log(`[Attendance] Loaded dates ${startIndex + 1}-${endIndex} of ${allDates.length}`);
+  }
+
+  function loadMoreDates() {
+    const loadMoreBtn = document.getElementById('loadMoreDatesBtn');
+    
+    if (!hasMoreDates || currentPage >= Math.floor(allDates.length / DATES_PER_PAGE)) {
+      if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+      return;
+    }
+    
+    currentPage++;
+    const dateSelect = document.getElementById('dateSelect');
+    const startIndex = currentPage * DATES_PER_PAGE;
+    const endIndex = Math.min(startIndex + DATES_PER_PAGE, allDates.length);
+    
+    // Add next page of dates
+    for (let i = startIndex; i < endIndex; i++) {
+      const date = allDates[i];
+      // Skip if already exists
+      if (dateSelect.querySelector(`option[value="${date}"]`)) continue;
+      
+      const option = document.createElement('option');
+      option.value = date;
+      option.textContent = new Date(date).toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long'
+      });
+      dateSelect.appendChild(option);
+    }
+    
+    // Update button text
+    const remainingDates = allDates.length - endIndex;
+    if (remainingDates > 0) {
+      loadMoreBtn.textContent = `⬇️ تحميل المزيد (${remainingDates} تاريخ متبقي)`;
+    } else {
+      loadMoreBtn.style.display = 'none';
+      hasMoreDates = false;
+    }
+    
+    console.log(`[Attendance] Loaded dates ${startIndex + 1}-${endIndex} of ${allDates.length}`);
+  }
+
+  // Make function globally available
+  window.loadMoreDates = loadMoreDates;
 
   async function fetchAttendanceByDate() {
     const isAuthenticated = await checkAuthentication();

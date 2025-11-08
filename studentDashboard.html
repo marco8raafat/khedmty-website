@@ -791,7 +791,7 @@ label {
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script src="sessionUtils.js"></script>
 <script>
-  // Firebase configuration (replace only if different)
+  // Firebase configuration 
   const firebaseConfig = {
     apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
     authDomain: "edad-5odam.firebaseapp.com",
@@ -807,61 +807,40 @@ label {
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
 
-  // Cache management system
-  class DataCache {
+  // Simple cache for temporary data storage (no real-time listeners)
+  class SimpleCache {
     constructor() {
       this.cache = new Map();
-      this.listeners = new Map();
-      this.lastUpdated = new Map();
-      this.cacheExpiry = 5 * 60 * 1000; // 5 minutes cache expiry
+      this.cacheExpiry = 30 * 60 * 1000; // 30 minutes expiry
     }
 
-    // Check if cached data is still valid
-    isCacheValid(path) {
-      const lastUpdate = this.lastUpdated.get(path);
-      if (!lastUpdate) return false;
-      return (Date.now() - lastUpdate) < this.cacheExpiry;
-    }
-
-    // Get data from cache or Firebase with real-time listener
-    async getData(path, callback) {
-      // If we have valid cached data, use it immediately
-      if (this.isCacheValid(path) && this.cache.has(path)) {
-        console.log(`[Student Dashboard] Using cached data for ${path}`);
-        if (callback) callback(this.cache.get(path));
-        return this.cache.get(path);
-      }
-
-      // Set up real-time listener if not already exists
-      if (!this.listeners.has(path)) {
-        console.log(`[Student Dashboard] Setting up real-time listener for ${path}`);
-        const listener = database.ref(path).on('value', (snapshot) => {
-          const data = snapshot.val() || {};
-          this.cache.set(path, data);
-          this.lastUpdated.set(path, Date.now());
-          console.log(`[Student Dashboard] Data updated for ${path}:`, Object.keys(data).length, 'items');
-          if (callback) callback(data);
-        });
-        this.listeners.set(path, listener);
-      }
-
-      // Return cached data if available, otherwise return empty object
-      return this.cache.get(path) || {};
-    }
-
-    // Clean up listeners when not needed
-    cleanup() {
-      this.listeners.forEach((listener, path) => {
-        database.ref(path).off('value', listener);
+    set(key, value) {
+      this.cache.set(key, {
+        data: value,
+        timestamp: Date.now()
       });
-      this.listeners.clear();
+    }
+
+    get(key) {
+      const cached = this.cache.get(key);
+      if (!cached) return null;
+      
+      // Check if cache is still valid
+      if (Date.now() - cached.timestamp > this.cacheExpiry) {
+        this.cache.delete(key);
+        return null;
+      }
+      
+      return cached.data;
+    }
+
+    clear() {
       this.cache.clear();
-      this.lastUpdated.clear();
     }
   }
 
-  // Initialize cache instance
-  const dataCache = new DataCache();
+  // Initialize simple cache instance
+  const simpleCache = new SimpleCache();
 
   // Debounce function to prevent rapid successive updates
   function debounce(func, wait) {
@@ -882,7 +861,7 @@ label {
 
   const emailKey = currentEmail.replace(/\./g, '_');
 
-  // Enhanced user authentication with caching
+  // User authentication with one-time query
   async function checkAuthentication() {
     console.log("[Student Dashboard] Checking authentication for:", currentEmail);
     
@@ -891,79 +870,65 @@ label {
       return false;
     }
 
-    // Wait for user data to be loaded from cache/Firebase
-    const userData = await new Promise((resolve) => {
-      dataCache.getData(`users/${emailKey}`, (data) => {
-        console.log("[Student Dashboard] User data loaded:", data);
-        resolve(data);
-      });
-    });
-    
-    if (!userData || Object.keys(userData).length === 0) {
-      console.log("[Student Dashboard] No user data found, redirecting to login");
+    try {
+      // One-time query instead of real-time listener
+      const snapshot = await database.ref(`users/${emailKey}`).once('value');
+      const userData = snapshot.val();
+      
+      if (!userData) {
+        console.log("[Student Dashboard] No user data found, redirecting to login");
+        window.location.href = "login.html";
+        return false;
+      }
+
+      const usernameElement = document.getElementById("username");
+      if (usernameElement && userData.username) {
+        const displayName = userData.username.split(" ").slice(0, 2).join(" ");
+        console.log("[Student Dashboard] Setting username to:", displayName);
+        usernameElement.textContent = displayName;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("[Student Dashboard] Error checking authentication:", error);
       window.location.href = "login.html";
       return false;
     }
-
-    const usernameElement = document.getElementById("username");
-    if (usernameElement && userData.username) {
-      const displayName = userData.username.split(" ").slice(0, 2).join(" ");
-      console.log("[Student Dashboard] Setting username to:", displayName);
-      usernameElement.textContent = displayName;
-    }
-
-    return true;
   }
 
-  // 🔔 Load latest notifications
+  // Initialize dashboard with one-time queries and polling
   document.addEventListener('DOMContentLoaded', async function() {
     const overlay = document.getElementById('loadingOverlay');
     try {
       if (overlay) overlay.classList.remove('hidden');
 
-      console.log("[Student Dashboard] Initializing dashboard...");
+      console.log("[Student Dashboard] Initializing dashboard with optimized queries...");
+      
       // Check authentication first
       const isAuthenticated = await checkAuthentication();
       if (!isAuthenticated) {
         return; // Exit if not authenticated (redirect handled elsewhere)
       }
 
-      console.log("[Student Dashboard] User authenticated, setting up real-time updates...");
-      // Setup real-time notifications listener
-      loadLatestNotifications();
-
-      // Calculate and display initial progress
+      console.log("[Student Dashboard] User authenticated, loading initial data...");
+      
+      // Load initial data with one-time queries
+      await loadLatestNotifications();
       await updateProgressDisplay();
 
-      // Real-time listener for alerts (auto-update notifications)
-      dataCache.getData('alerts', () => {
-        console.log("[Student Dashboard] Alerts updated, refreshing notifications...");
-        if (typeof debouncedLoadNotifications === 'function') {
-          debouncedLoadNotifications();
-        } else {
-          loadLatestNotifications();
-        }
-      });
+      // Setup periodic polling instead of real-time listeners (every 60 seconds)
+      setInterval(async () => {
+        console.log("[Student Dashboard] Periodic data refresh...");
+        
+        // Clear cache to force fresh data
+        simpleCache.clear();
+        
+        // Refresh notifications and progress
+        await loadLatestNotifications();
+        await updateProgressDisplay();
+      }, 60 * 1000); // Poll every 60 seconds
 
-  // Real-time listener for attendance data (update progress)
-      dataCache.getData('attendance', () => {
-        console.log("[Student Dashboard] Attendance data updated, recalculating progress...");
-        if (typeof debouncedUpdateProgress === 'function') {
-          debouncedUpdateProgress();
-        } else if (typeof updateProgressDisplay === 'function') {
-          updateProgressDisplay();
-        }
-      });
-
-      console.log("[Student Dashboard] Dashboard setup complete with smart caching and progress tracking");
-
-      // Periodic progress updates every 5 minutes
-      setInterval(() => {
-        console.log("[Student Dashboard] Periodic progress update");
-        if (typeof updateProgressDisplay === 'function') {
-          updateProgressDisplay();
-        }
-      }, 5 * 60 * 1000);
+      console.log("[Student Dashboard] Dashboard setup complete with optimized one-time queries");
     } catch (e) {
       console.error("[Student Dashboard] Error during initialization:", e);
     } finally {
@@ -971,12 +936,15 @@ label {
     }
   });
 
-  // 🔔 Enhanced notifications with smart caching
-  function loadLatestNotifications() {
-    console.log("[Student Dashboard] Loading notifications from cache...");
+  // 🔔 Load latest notifications with one-time query
+  async function loadLatestNotifications() {
+    console.log("[Student Dashboard] Loading latest notifications...");
     
-    // Use cached data with real-time listener
-    dataCache.getData('alerts', (alertsData) => {
+    try {
+      // One-time query - only fetch last 3 alerts
+      const snapshot = await database.ref('alerts').limitToLast(3).once('value');
+      const alertsData = snapshot.val();
+      
       const notificationsContainer = document.getElementById('latestNotifications');
       
       if (!alertsData || Object.keys(alertsData).length === 0) {
@@ -988,13 +956,12 @@ label {
         return;
       }
 
-      // Convert to array and sort by timestamp or order
-      const alerts = Object.values(alertsData);
-      const latestAlerts = alerts.slice(-3).reverse(); // Get last 3 alerts
+      // Convert to array and reverse to show newest first
+      const alerts = Object.values(alertsData).reverse();
       
-      console.log("[Student Dashboard] Displaying", latestAlerts.length, "notifications");
+      console.log("[Student Dashboard] Displaying", alerts.length, "notifications");
       
-      notificationsContainer.innerHTML = latestAlerts.map(alert => `
+      notificationsContainer.innerHTML = alerts.map(alert => `
         <div class="notification-item">
           <div class="notification-title">${alert.title || 'تنبيه'}</div>
           <div class="notification-message">${alert.message || ''}</div>
@@ -1002,15 +969,23 @@ label {
         </div>
       `).join('');
 
-      // Add subtle animation to show data refresh
-      notificationsContainer.style.opacity = '0.7';
-      setTimeout(() => {
-        notificationsContainer.style.opacity = '1';
-      }, 100);
-    });
+      // Cache the result
+      simpleCache.set('latestNotifications', alerts);
+      
+    } catch (error) {
+      console.error("[Student Dashboard] Error loading notifications:", error);
+      const notificationsContainer = document.getElementById('latestNotifications');
+      if (notificationsContainer) {
+        notificationsContainer.innerHTML = `
+          <div class="empty-notifications">
+            <p>حدث خطأ في تحميل التنبيهات</p>
+          </div>
+        `;
+      }
+    }
   }
 
-  // 📊 Calculate student progress based on attendance (period-aware)
+  // 📊 Calculate student progress based on attendance (period-aware) - OPTIMIZED
   async function calculateStudentProgress() {
     console.log("[Student Dashboard] Calculating student progress...");
     
@@ -1028,6 +1003,13 @@ label {
 
     try {
       const emailKey = currentEmail.replace(/\./g, '_');
+      
+      // Check cache first
+      const cachedProgress = simpleCache.get('studentProgress');
+      if (cachedProgress) {
+        console.log("[Student Dashboard] Using cached progress data");
+        return cachedProgress;
+      }
       
       // Get user data to get student name for attendance lookup
       const userSnapshot = await database.ref(`users/${emailKey}`).once('value');
@@ -1049,8 +1031,8 @@ label {
   const firstNameToken = studentName ? studentName.split(' ')[0] : '';
       console.log("[Student Dashboard] Calculating progress for student:", studentName);
 
-      // Get attendance data
-      const attendanceSnapshot = await database.ref('attendance').once('value');
+      // OPTIMIZED: Only fetch last 60 days of attendance instead of all
+      const attendanceSnapshot = await database.ref('attendance').orderByKey().limitToLast(60).once('value');
       const attendanceData = attendanceSnapshot.val() || {};
 
       const periodStats = {
@@ -1138,15 +1120,20 @@ label {
         }
       };
 
+      const result = {
+        percentage: progressPercentage,
+        attendance: attendanceSummary
+      };
+
       console.log("[Student Dashboard] Progress calculation:", {
         studentName,
         attendance: attendanceSummary
       });
 
-      return {
-        percentage: progressPercentage,
-        attendance: attendanceSummary
-      };
+      // Cache the result for 30 seconds
+      simpleCache.set('studentProgress', result);
+
+      return result;
 
     } catch (error) {
       console.error("[Student Dashboard] Error calculating progress:", error);
@@ -1161,7 +1148,7 @@ label {
     }
   }
 
-  // 📊 Update progress display
+  // 📊 Update progress display with manual refresh capability
   async function updateProgressDisplay() {
     console.log("[Student Dashboard] Updating progress display...");
     
@@ -1182,6 +1169,9 @@ label {
       refreshBtn.style.transform = 'rotate(180deg)';
       refreshBtn.disabled = true;
     }
+    
+    // Clear cache to force fresh calculation
+    simpleCache.set('studentProgress', null);
     
     try {
       const progressData = await calculateStudentProgress();
@@ -1267,10 +1257,6 @@ label {
     }
   }
 
-  // Debounced version to prevent rapid updates
-  const debouncedLoadNotifications = debounce(loadLatestNotifications, 200);
-  const debouncedUpdateProgress = debounce(updateProgressDisplay, 500);
-
   // Mobile menu toggle function
   function toggleMobileMenu() {
     const navMenu = document.getElementById('navMenu');
@@ -1296,15 +1282,9 @@ label {
     });
   });
 
-  // Clean up listeners when page is unloaded
-  window.addEventListener('beforeunload', function() {
-    console.log('[Student Dashboard] Cleaning up Firebase listeners...');
-    dataCache.cleanup();
-  });
-
   // Performance monitoring
   window.addEventListener('load', function() {
-    console.log('[Student Dashboard] Page loaded, cache system active');
+    console.log('[Student Dashboard] Page loaded with optimized one-time queries');
   });
 
 // cross background animation
