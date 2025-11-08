@@ -1046,29 +1046,68 @@ footer {
         document.getElementById('alertCount').textContent = (data.alerts || []).length;
         document.getElementById('studentCount').textContent = (data.students || []).length;
 
-        // Calculate attendance rate properly
+        // Calculate attendance rate properly (handles both period-based and legacy structure)
         const attendanceData = data.attendance || {};
         const totalStudents = (data.students || []).length;
         
         if (totalStudents > 0) {
           let totalAttendanceRecords = 0;
           let presentCount = 0;
-          let totalDates = 0;
+          let totalPeriods = 0;
+          let period1Count = 0;
+          let period2Count = 0;
+          let period1Present = 0;
+          let period2Present = 0;
           
           // Loop through all attendance dates
           Object.keys(attendanceData).forEach(date => {
-            const dateRecords = attendanceData[date];
-            if (typeof dateRecords === 'object' && dateRecords !== null) {
-              totalDates++;
-              // Each dateRecords contains student attendance for that date
-              Object.values(dateRecords).forEach(record => {
-                if (record && record.status) {
-                  totalAttendanceRecords++;
-                  if (record.status === 'حاضر' || record.status === 'present') {
-                    presentCount++;
-                  }
+            const dateData = attendanceData[date];
+            if (typeof dateData === 'object' && dateData !== null) {
+              
+              // Check if this date has period-based structure
+              const hasPeriods = dateData.period1 || dateData.period2;
+              
+              if (hasPeriods) {
+                // New structure with periods
+                if (dateData.period1) {
+                  totalPeriods++;
+                  Object.values(dateData.period1).forEach(record => {
+                    if (record && record.status) {
+                      totalAttendanceRecords++;
+                      period1Count++;
+                      if (record.status === 'حاضر' || record.status === 'present') {
+                        presentCount++;
+                        period1Present++;
+                      }
+                    }
+                  });
                 }
-              });
+                
+                if (dateData.period2) {
+                  totalPeriods++;
+                  Object.values(dateData.period2).forEach(record => {
+                    if (record && record.status) {
+                      totalAttendanceRecords++;
+                      period2Count++;
+                      if (record.status === 'حاضر' || record.status === 'present') {
+                        presentCount++;
+                        period2Present++;
+                      }
+                    }
+                  });
+                }
+              } else {
+                // Legacy structure without periods
+                totalPeriods++;
+                Object.values(dateData).forEach(record => {
+                  if (record && record.status) {
+                    totalAttendanceRecords++;
+                    if (record.status === 'حاضر' || record.status === 'present') {
+                      presentCount++;
+                    }
+                  }
+                });
+              }
             }
           });
           
@@ -1077,15 +1116,31 @@ footer {
             const rate = Math.round((presentCount / totalAttendanceRecords) * 100);
             document.getElementById('attendanceRate').textContent = rate + '%';
             
-            // Update tooltip with calculation details
+            // Update tooltip with detailed breakdown
             const tooltip = document.getElementById('attendanceTooltip');
-            tooltip.innerHTML = `
-              <div>إجمالي أيام الحضور: <strong>${totalDates}</strong></div>
-              <div>إجمالي عدد الطلاب: <strong>${totalAttendanceRecords}</strong></div>
+            let tooltipHTML = `
+              <div>إجمالي الفترات: <strong>${totalPeriods}</strong></div>
+              <div>إجمالي السجلات: <strong>${totalAttendanceRecords}</strong></div>
               <div>عدد الحاضرين: <strong>${presentCount}</strong></div>
               <div>عدد الغائبين: <strong>${totalAttendanceRecords - presentCount}</strong></div>
-              <div>المعدل: ${presentCount}/${totalAttendanceRecords} × 100 = <strong>${rate}%</strong></div>
             `;
+            
+            // Add period breakdown if periods exist
+            if (period1Count > 0 || period2Count > 0) {
+              tooltipHTML += `<div>`;
+              if (period1Count > 0) {
+                const p1Rate = Math.round((period1Present / period1Count) * 100);
+                tooltipHTML += `الفترة الأولى: ${period1Present}/${period1Count} (${p1Rate}%)<br>`;
+              }
+              if (period2Count > 0) {
+                const p2Rate = Math.round((period2Present / period2Count) * 100);
+                tooltipHTML += `الفترة الثانية: ${period2Present}/${period2Count} (${p2Rate}%)`;
+              }
+              tooltipHTML += `</div>`;
+            }
+            
+            tooltipHTML += `<div>المعدل الكلي: <strong>${rate}%</strong></div>`;
+            tooltip.innerHTML = tooltipHTML;
           } else {
             document.getElementById('attendanceRate').textContent = '0%';
             document.getElementById('attendanceTooltip').textContent = 'لا توجد سجلات حضور متاحة';
