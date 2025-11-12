@@ -364,7 +364,7 @@
       <tr>
         <th>المادة</th>
         <th>الدرجة</th>
-        <th>الحالة</th>
+        <!-- <th>الحالة</th> -->
       </tr>
     </thead>
  <tbody id="gradesBody">
@@ -541,7 +541,7 @@ for (let i = 0; i < crossCount; i++) {
             row.innerHTML = `
               <td>البحث</td>
                 <td>${totalGrade}</td>
-                <td class="${statusClass}">${statusText}</td>
+                <!-- <td class="${statusClass}">${statusText}</td> -->
             `;
             tableBody.appendChild(row);
           }
@@ -594,7 +594,7 @@ for (let i = 0; i < crossCount; i++) {
           row.innerHTML = `
             <td>${entry["اسم الماده"] || "-"}</td>
             <td>${grade}</td>
-            <td class="${statusClass}">${status}</td>
+            <!-- <td class="${statusClass}">${status}</td> -->
           `;
           tableBody.appendChild(row);
         }
@@ -612,7 +612,7 @@ for (let i = 0; i < crossCount; i++) {
       if (!foundGrades) {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td colspan="3" style="text-align: center; color: #666; font-style: italic;">
+          <td colspan="2" style="text-align: center; color: #666; font-style: italic;">
             لا توجد درجات متاحة حالياً
           </td>
         `;
@@ -625,7 +625,7 @@ for (let i = 0; i < crossCount; i++) {
       const tableBody = document.querySelector("#gradesTable tbody");
       tableBody.innerHTML = `
         <tr>
-          <td colspan="3" style="text-align: center; color: #d32f2f;">
+          <td colspan="2" style="text-align: center; color: #d32f2f;">
             حدث خطأ أثناء تحميل البيانات
           </td>
         </tr>
