@@ -634,44 +634,97 @@
     }
   }
 
-  // Calculate student progress
+  // Calculate student progress - PERIOD-AWARE VERSION
   async function calculateStudentProgress(studentData, attendanceData, researchData) {
     const studentName = studentData.username || studentData.name || studentData.fullName || studentData.firstName;
     const studentEmail = studentData.email;
+    const emailKey = studentEmail ? studentEmail.replace(/\./g, '_') : '';
+    const firstNameToken = studentName ? studentName.split(' ')[0] : '';
 
-    // Calculate attendance
-    let totalAttendanceDays = 0;
-    let presentDays = 0;
+    // Period-aware attendance calculation
+    const periodStats = {
+      period1: { present: 0, total: 0 },
+      period2: { present: 0, total: 0 }
+    };
 
-    Object.values(attendanceData || {}).forEach(dateData => {
-      Object.values(dateData).forEach(record => {
-        if (record.studentName === studentName || 
-            record.studentName?.includes(studentName?.split(' ')[0]) ||
-            studentName?.includes(record.studentName?.split(' ')[0])) {
-          totalAttendanceDays++;
-          if (record.status === 'present') {
-            presentDays++;
-          }
+    // Helper function to match student records
+    const matchesStudent = (record = {}) => {
+      if (!record) return false;
+      const recordId = record.studentId || record.id;
+      const recordEmail = record.studentEmail || record.email;
+      const recordName = record.studentName || record.name || '';
+      const recordFirstToken = recordName ? recordName.split(' ')[0] : '';
+
+      return recordId === emailKey ||
+             recordEmail === studentEmail ||
+             (recordName && studentName && (
+               recordName === studentName ||
+               (firstNameToken && recordName.includes(firstNameToken)) ||
+               (recordFirstToken && studentName.includes(recordFirstToken))
+             ));
+    };
+
+    // Helper function to collect stats for a specific period
+    const collectStatsForPeriod = (periodKey, periodPayload) => {
+      if (!periodPayload || typeof periodPayload !== 'object') {
+        return;
+      }
+
+      // Try direct lookup first
+      const directRecord = periodPayload[emailKey];
+      let studentRecord = directRecord;
+
+      // If not found, search through all records
+      if (!studentRecord) {
+        studentRecord = Object.values(periodPayload).find(matchesStudent);
+      }
+
+      if (studentRecord) {
+        periodStats[periodKey].total += 1;
+        if (studentRecord.status === 'present') {
+          periodStats[periodKey].present += 1;
         }
-      });
+      }
+    };
+
+    // Process attendance data with period awareness
+    Object.values(attendanceData || {}).forEach(dateData => {
+      if (!dateData || typeof dateData !== 'object') {
+        return;
+      }
+
+      const hasPeriods = dateData.period1 || dateData.period2;
+
+      if (hasPeriods) {
+        // New structure with periods
+        collectStatsForPeriod('period1', dateData.period1);
+        collectStatsForPeriod('period2', dateData.period2);
+      } else {
+        // Legacy structure without periods - treat as period1
+        collectStatsForPeriod('period1', dateData);
+      }
     });
+
+    // Calculate combined attendance
+    const combinedPresent = periodStats.period1.present + periodStats.period2.present;
+    const combinedTotal = periodStats.period1.total + periodStats.period2.total;
 
     // Calculate research submissions (for display purposes only)
     let submittedResearches = 0;
     Object.values(researchData || {}).forEach(research => {
       if (research.studentEmail === studentEmail || 
           research.studentName === studentName ||
-          research.studentName?.includes(studentName?.split(' ')[0]) ||
+          research.studentName?.includes(firstNameToken) ||
           studentName?.includes(research.studentName?.split(' ')[0])) {
         submittedResearches++;
       }
     });
 
-    // Calculate progress percentages - NOW BASED ONLY ON ATTENDANCE
-    const attendancePercentage = totalAttendanceDays > 0 ? (presentDays / totalAttendanceDays) * 100 : 0;
+    // Calculate progress percentages - BASED ONLY ON ATTENDANCE
+    const attendancePercentage = combinedTotal > 0 ? (combinedPresent / combinedTotal) * 100 : 0;
     const researchPercentage = Math.min(submittedResearches, 1) * 100; // For display only
 
-    // Overall progress = 100% attendance (no longer includes research)
+    // Overall progress = 100% attendance
     const overallProgress = attendancePercentage;
 
     return {
@@ -682,8 +735,22 @@
       researchPercentage: Math.round(researchPercentage),
       overallProgress: Math.round(overallProgress),
       attendanceDetails: {
-        present: presentDays,
-        total: totalAttendanceDays
+        present: combinedPresent,
+        total: combinedTotal,
+        period1: {
+          present: periodStats.period1.present,
+          total: periodStats.period1.total,
+          percentage: periodStats.period1.total > 0 
+            ? Math.round((periodStats.period1.present / periodStats.period1.total) * 100) 
+            : 0
+        },
+        period2: {
+          present: periodStats.period2.present,
+          total: periodStats.period2.total,
+          percentage: periodStats.period2.total > 0 
+            ? Math.round((periodStats.period2.present / periodStats.period2.total) * 100) 
+            : 0
+        }
       },
       researchSubmitted: submittedResearches > 0
     };
@@ -781,9 +848,9 @@
             </td>
             <td>
               <div class="attendance-info">
-                ${student.attendanceDetails.present}/${student.attendanceDetails.total}
+                ${student.attendanceDetails.period1.present}/${student.attendanceDetails.period1.total} الفترة الأولى
                 <br>
-                <small>(${student.attendancePercentage}%)</small>
+                ${student.attendanceDetails.period2.present}/${student.attendanceDetails.period2.total} الفترة الثانية
               </div>
             </td>
             <td>
