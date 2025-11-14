@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="logoCircle1.png">
+  <title>ترحيل المستخدمين المتبقيين - Firebase Auth</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      direction: rtl;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    h1 {
+      color: #233B6E;
+      margin-bottom: 10px;
+      font-size: 2em;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+
+    .info-box {
+      background: #d1ecf1;
+      border: 2px solid #0c5460;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+      color: #0c5460;
+    }
+
+    .info-box h3 {
+      margin-bottom: 10px;
+      color: #0c5460;
+    }
+
+    .password-input {
+      margin-bottom: 20px;
+    }
+
+    .password-input label {
+      display: block;
+      margin-bottom: 10px;
+      color: #233B6E;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .password-input input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1.1em;
+      transition: border-color 0.3s;
+    }
+
+    .password-input input:focus {
+      outline: none;
+      border-color: #233B6E;
+    }
+
+    .password-hint {
+      margin-top: 8px;
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: white;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #233B6E, #314d9f);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(35, 59, 110, 0.4);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+
+    #progress {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    #progress.show {
+      display: block;
+    }
+
+    #progress h2 {
+      color: #233B6E;
+      margin-bottom: 15px;
+      position: sticky;
+      top: 0;
+      background: #f8f9fa;
+      padding: 10px 0;
+    }
+
+    .progress-item {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      font-size: 0.95em;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border-right: 4px solid #28a745;
+    }
+
+    .warning-item {
+      background: #fff3cd;
+      color: #856404;
+      border-right: 4px solid #ffc107;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border-right: 4px solid #dc3545;
+    }
+
+    .info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border-right: 4px solid #17a2b8;
+    }
+
+    .summary {
+      background: white;
+      border: 3px solid #233B6E;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .summary h2 {
+      color: #233B6E;
+      margin-bottom: 15px;
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .stat-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .stat-warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .stat-error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .stat-total {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #233B6E;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 ترحيل المستخدمين المتبقيين (110 مستخدم)</h1>
+    <p class="subtitle">استكمال ترحيل المستخدمين بعد أول 100</p>
+
+    <div class="info-box">
+      <h3>📋 ما تفعله هذه الأداة:</h3>
+      <ul style="margin-right: 20px; line-height: 1.8;">
+        <li>تخطي أول 100 مستخدم (تم ترحيلهم مسبقاً)</li>
+        <li>ترحيل الـ 110 مستخدم المتبقيين</li>
+        <li>تخطي أي مستخدم تم ترحيله بالفعل تلقائياً</li>
+        <li>عرض تقرير مفصل عن النتائج</li>
+      </ul>
+    </div>
+
+    <div class="password-input">
+      <label for="tempPassword">كلمة المرور المؤقتة (نفس كلمة المرور السابقة):</label>
+      <input 
+        type="text" 
+        id="tempPassword" 
+        placeholder="Khedmty2025!"
+        value="Khedmty2025!"
+      >
+      <p class="password-hint">
+        💡 استخدم نفس كلمة المرور التي استخدمتها في الترحيل السابق
+      </p>
+    </div>
+
+    <div class="password-input">
+      <label for="skipCount">تخطي أول كم مستخدم:</label>
+      <input 
+        type="number" 
+        id="skipCount" 
+        value="100"
+        min="0"
+        max="250"
+      >
+      <p class="password-hint">
+        💡 القيمة الافتراضية 100 (لتخطي المستخدمين المُرحّلين)
+      </p>
+    </div>
+
+    <div class="password-input">
+      <label for="delayTime">الفترة الزمنية بين كل مستخدم (بالثانية):</label>
+      <input 
+        type="number" 
+        id="delayTime" 
+        value="2"
+        min="1"
+        max="10"
+        step="0.5"
+      >
+      <p class="password-hint">
+        💡 زيادة الوقت تقلل من احتمالية الحظر المؤقت (الافتراضي: 2 ثانية)
+      </p>
+    </div>
+
+    <div class="password-input">
+      <label for="batchSize">عدد المستخدمين في كل دفعة:</label>
+      <input 
+        type="number" 
+        id="batchSize" 
+        value="20"
+        min="5"
+        max="50"
+      >
+      <p class="password-hint">
+        💡 معالجة المستخدمين على دفعات صغيرة لتجنب الحظر (الافتراضي: 20 مستخدم)
+      </p>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-primary" id="startBtn" onclick="startMigration()">
+        🚀 بدء ترحيل الباقي (110 مستخدم)
+      </button>
+      <button class="btn-secondary" onclick="window.location.href='teacherDashboard.html'">
+        🏠 العودة للوحة التحكم
+      </button>
+    </div>
+
+    <div id="progress">
+      <h2>📊 سجل العملية</h2>
+      <div id="progressContent"></div>
+    </div>
+
+    <a href="index.html" class="back-link">← العودة للصفحة الرئيسية</a>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwcSo_bhqO5svMl3kAL8N1c91nvEZ_sac",
+      authDomain: "edad-5odam.firebaseapp.com",
+      databaseURL: "https://edad-5odam-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "edad-5odam",
+      storageBucket: "edad-5odam.appspot.com",
+      messagingSenderId: "679576633778",
+      appId: "1:679576633778:web:566e6aaef9b72f71a824ab"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const auth = firebase.auth();
+
+    let migrationInProgress = false;
+
+    function addProgressItem(message, type = 'info') {
+      const progressContent = document.getElementById('progressContent');
+      const item = document.createElement('div');
+      item.className = `progress-item ${type}`;
+      item.innerHTML = message;
+      progressContent.appendChild(item);
+      
+      // Auto-scroll to bottom
+      progressContent.scrollTop = progressContent.scrollHeight;
+    }
+
+    async function startMigration() {
+      if (migrationInProgress) {
+        alert('العملية جارية بالفعل، الرجاء الانتظار...');
+        return;
+      }
+
+      const tempPassword = document.getElementById('tempPassword').value.trim();
+      const skipCount = parseInt(document.getElementById('skipCount').value) || 0;
+      const delayTime = parseFloat(document.getElementById('delayTime').value) || 2;
+      const batchSize = parseInt(document.getElementById('batchSize').value) || 20;
+      
+      if (!tempPassword || tempPassword.length < 6) {
+        alert('⚠️ كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+        return;
+      }
+
+      if (!confirm(`هل أنت متأكد من بدء عملية الترحيل؟\n\nالإعدادات:\n• تخطي أول ${skipCount} مستخدم\n• التأخير بين كل مستخدم: ${delayTime} ثانية\n• حجم الدفعة: ${batchSize} مستخدم\n• كلمة المرور: "${tempPassword}"`)) {
+        return;
+      }
+
+      migrationInProgress = true;
+      const startBtn = document.getElementById('startBtn');
+      const progressDiv = document.getElementById('progress');
+      const progressContent = document.getElementById('progressContent');
+      
+      startBtn.disabled = true;
+      startBtn.textContent = '⏳ جاري الترحيل...';
+      progressDiv.classList.add('show');
+      progressContent.innerHTML = '';
+
+      addProgressItem('🔄 بدء عملية ترحيل المستخدمين المتبقيين...', 'info');
+      addProgressItem('📥 جاري تحميل قائمة المستخدمين...', 'info');
+
+      try {
+        // Get all users from database
+        const usersSnapshot = await database.ref('users').once('value');
+        const usersData = usersSnapshot.val() || {};
+        
+        const users = Object.entries(usersData);
+        let successCount = 0;
+        let errorCount = 0;
+        let skippedDuplicate = 0;
+        let skippedManually = 0;
+
+        addProgressItem(`✅ تم العثور على ${users.length} مستخدم في قاعدة البيانات`, 'success');
+        addProgressItem(`⏭️ سيتم تخطي أول ${skipCount} مستخدم (تم ترحيلهم سابقاً)`, 'warning-item');
+        addProgressItem(`⏱️ التأخير بين كل مستخدم: ${delayTime} ثانية`, 'info');
+        addProgressItem(`📦 حجم الدفعة: ${batchSize} مستخدم`, 'info');
+        addProgressItem('', 'info'); // Spacer
+        addProgressItem(`🔐 كلمة المرور المؤقتة: <strong>${tempPassword}</strong>`, 'info');
+        addProgressItem('', 'info'); // Spacer
+
+        let currentBatch = 0;
+        const totalBatches = Math.ceil((users.length - skipCount) / batchSize);
+
+        for (let i = 0; i < users.length; i++) {
+          const [emailKey, userData] = users[i];
+          
+          // Convert email key back to normal email
+          const email = emailKey.replace(/_/g, '.');
+          const userName = userData.username || userData.name || 'غير معروف';
+          const userRole = userData.role || 'student';
+          
+          // Skip first N users
+          if (i < skipCount) {
+            skippedManually++;
+            if (i % 10 === 0 || i === skipCount - 1) {
+              addProgressItem(
+                `⏭️ تخطي المستخدمين ${i - 9 >= 0 ? i - 9 + 1 : 1} إلى ${i + 1} - تم مسبقاً`,
+                'info'
+              );
+            }
+            continue;
+          }
+
+          // Check if we need to pause between batches
+          const positionInBatch = (i - skipCount) % batchSize;
+          const batchNumber = Math.floor((i - skipCount) / batchSize) + 1;
+          
+          if (positionInBatch === 0 && batchNumber > currentBatch) {
+            currentBatch = batchNumber;
+            addProgressItem(`📦 بدء الدفعة ${batchNumber}/${totalBatches}`, 'info');
+            
+            // Pause for 5 seconds between batches (except first batch)
+            if (batchNumber > 1) {
+              addProgressItem(`⏸️ إيقاف مؤقت لمدة 5 ثواني بين الدفعات...`, 'warning-item');
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+          }
+          
+          try {
+            // Create Firebase Auth account
+            await auth.createUserWithEmailAndPassword(email, tempPassword);
+            
+            successCount++;
+            addProgressItem(
+              `✅ ${i + 1}/${users.length}: تم ترحيل <strong>${userName}</strong> (${email}) - ${userRole}`,
+              'success'
+            );
+            
+          } catch (error) {
+            if (error.code === 'auth/email-already-exists') {
+              skippedDuplicate++;
+              addProgressItem(
+                `⚠️ ${i + 1}/${users.length}: <strong>${userName}</strong> (${email}) - موجود بالفعل`,
+                'warning-item'
+              );
+            } else if (error.code === 'auth/too-many-requests') {
+              errorCount++;
+              addProgressItem(
+                `🛑 ${i + 1}/${users.length}: <strong>${userName}</strong> - تم حظر الطلبات مؤقتاً!`,
+                'error'
+              );
+              addProgressItem(
+                `⚠️ Firebase حظر الجهاز مؤقتاً. انتظر 15 دقيقة ثم أعد المحاولة بدءاً من المستخدم ${i + 1}`,
+                'error'
+              );
+              addProgressItem(
+                `💡 نصيحة: استخدم "تخطي أول ${i} مستخدم" عند إعادة المحاولة`,
+                'warning-item'
+              );
+              // Stop the migration
+              throw new Error('تم الحظر المؤقت - يرجى الانتظار 15 دقيقة');
+            } else if (error.code === 'auth/invalid-email') {
+              errorCount++;
+              addProgressItem(
+                `❌ ${i + 1}/${users.length}: <strong>${userName}</strong> (${email}) - بريد غير صالح`,
+                'error'
+              );
+            } else if (error.code === 'auth/weak-password') {
+              errorCount++;
+              addProgressItem(
+                `❌ ${i + 1}/${users.length}: <strong>${userName}</strong> - كلمة المرور ضعيفة`,
+                'error'
+              );
+            } else {
+              errorCount++;
+              addProgressItem(
+                `❌ ${i + 1}/${users.length}: <strong>${userName}</strong> - ${error.message}`,
+                'error'
+              );
+            }
+          }
+
+          // Add delay between each user (converted to milliseconds)
+          await new Promise(resolve => setTimeout(resolve, delayTime * 1000));
+        }
+
+        // Show final summary
+        const totalProcessed = users.length - skippedManually;
+        progressContent.innerHTML += `
+          <div class="summary">
+            <h2>📊 ملخص عملية الترحيل</h2>
+            <div class="summary-stats">
+              <div class="stat-box stat-success">
+                <div style="font-size: 2em;">✅</div>
+                <div>نجح</div>
+                <div style="font-size: 1.5em;">${successCount}</div>
+              </div>
+              <div class="stat-box stat-warning">
+                <div style="font-size: 2em;">⚠️</div>
+                <div>موجود مسبقاً</div>
+                <div style="font-size: 1.5em;">${skippedDuplicate}</div>
+              </div>
+              <div class="stat-box stat-error">
+                <div style="font-size: 2em;">❌</div>
+                <div>فشل</div>
+                <div style="font-size: 1.5em;">${errorCount}</div>
+              </div>
+              <div class="stat-box stat-total">
+                <div style="font-size: 2em;">📁</div>
+                <div>تمت معالجته</div>
+                <div style="font-size: 1.5em;">${totalProcessed}</div>
+              </div>
+            </div>
+            ${skippedManually > 0 ? `
+            <div style="margin-top: 15px; padding: 10px; background: #d1ecf1; border-radius: 8px; color: #0c5460; text-align: center;">
+              <strong>⏭️ تم تخطي ${skippedManually} مستخدم يدوياً (تم ترحيلهم في الجلسة السابقة)</strong>
+            </div>` : ''}
+            <div style="margin-top: 20px; padding: 15px; background: #d4edda; border-radius: 8px; color: #155724;">
+              <strong>✅ إجمالي المستخدمين المُرحّلين بنجاح في هذه الجلسة: ${successCount}</strong><br>
+              <strong>📊 إجمالي المستخدمين في النظام الآن: ${successCount + skippedManually + skippedDuplicate}</strong>
+            </div>
+            <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; color: #856404;">
+              <strong>📌 خطوات مهمة بعد الترحيل:</strong>
+              <ol style="margin: 10px 0 0 20px; line-height: 1.8;">
+                <li>تأكد من إخبار المستخدمين الـ ${successCount} الجدد بكلمة المرور المؤقتة: <strong style="font-family: monospace;">${tempPassword}</strong></li>
+                <li>قم بتحديث قواعد Firebase لتفعيل الأمان (إذا لم يتم بعد)</li>
+                <li>جميع المستخدمين الـ 210 أصبحوا الآن في النظام!</li>
+              </ol>
+            </div>
+          </div>
+        `;
+
+        startBtn.textContent = '✅ اكتملت العملية بنجاح';
+        startBtn.style.background = '#28a745';
+
+      } catch (error) {
+        addProgressItem(`❌ خطأ خطير: ${error.message}`, 'error');
+        startBtn.disabled = false;
+        startBtn.textContent = '🚀 بدء ترحيل الباقي (110 مستخدم)';
+      } finally {
+        migrationInProgress = false;
+      }
+    }
+  </script>
+</body>
+</html>
