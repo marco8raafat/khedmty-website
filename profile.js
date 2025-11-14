@@ -149,62 +149,154 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Verify session and get current user email
-const currentEmail = requireAuthentication();
+// Wait for DOM and QRCode library to be ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Verify session and get current user email
+  const currentEmail = requireAuthentication();
 
-// Show loading overlay
-const loadingOverlay = document.getElementById('loadingOverlay');
-if (loadingOverlay) loadingOverlay.classList.remove('hidden');
-
-const emailKey = currentEmail.replace(/\./g, '_');
-
-// Fetch user data from Firebase
-database.ref("users/" + emailKey).once("value").then((snapshot) => {
-  if (!snapshot.exists()) {
-    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+  if (!currentEmail) {
+    console.error("[Profile] No authenticated user found");
     window.location.href = "login.html";
     return;
   }
 
-  const userData = snapshot.val();
-  document.getElementById("username").textContent = userData.username;
-  document.getElementById("email").textContent = "📧 البريد الإلكتروني: " + userData.email;
-  document.getElementById("phone").textContent = "📞 رقم التليفون: " + userData.phone;
-  document.getElementById("group").textContent = "👥 اسم المجموعة: " + userData.group;
-  document.getElementById("role").textContent = "🎓 الدور: " + (userData.role === "student" ? "طالب" : "خادم");
+  // Show loading overlay
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+
+  const emailKey = currentEmail.replace(/\./g, '_');
+
+  // Fetch user data from Firebase
+  database.ref("users/" + emailKey).once("value").then((snapshot) => {
+    if (!snapshot.exists()) {
+      console.error("[Profile] User data not found in database");
+      if (loadingOverlay) loadingOverlay.classList.add('hidden');
+      window.location.href = "login.html";
+      return;
+    }
+
+    const userData = snapshot.val();
+    console.log("[Profile] User data loaded successfully:", userData.username);
+    console.log("[Profile] User role:", userData.role);
+    
+    document.getElementById("username").textContent = userData.username;
+    document.getElementById("email").textContent = "📧 البريد الإلكتروني: " + userData.email;
+    document.getElementById("phone").textContent = "📞 رقم التليفون: " + userData.phone;
+    document.getElementById("group").textContent = "👥 اسم المجموعة: " + userData.group;
+    document.getElementById("role").textContent = "🎓 الدور: " + (userData.role === "student" ? "طالب" : "خادم");
+    
+    // Generate QR Code for students only - with delay to ensure library is loaded
+    const userRole = userData.role ? userData.role.toLowerCase().trim() : '';
+    console.log("[Profile] Checking if should generate QR. Role:", userRole);
+    
+    if (userRole === "student" || userRole === "طالب") {
+      console.log("[Profile] User is a student, attempting to generate QR code");
+      if (typeof QRCode !== 'undefined') {
+        console.log("[Profile] QRCode library is loaded, generating now");
+        generateUserQRCode(emailKey, userData.username);
+      } else {
+        console.warn("[Profile] QRCode library not loaded yet, retrying in 500ms...");
+        setTimeout(() => {
+          if (typeof QRCode !== 'undefined') {
+            console.log("[Profile] QRCode library loaded after delay, generating now");
+            generateUserQRCode(emailKey, userData.username);
+          } else {
+            console.error("[Profile] QRCode library failed to load after delay");
+          }
+        }, 500);
+      }
+    } else {
+      console.log("[Profile] User is not a student (role: " + userRole + "), skipping QR code");
+    }
+    
+    // Set up dashboard link based on user role
+    const dashboardLink = document.getElementById("dashboardLink");
+    if (userData.role === "student") {
+      dashboardLink.href = "studentDashboard.html";
+    } else if (userData.role === "teacher" || userData.role === "servant") {
+      dashboardLink.href = "teacherDashboard.html";
+    } else {
+      // Default to student dashboard if role is unclear
+      dashboardLink.href = "studentDashboard.html";
+    }
+
+    // Hide loading overlay on success
+    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+    
+  }).catch((error) => {
+    console.error("[Profile] Firebase error:", error);
+    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+    alert("حدث خطأ في تحميل البيانات. يرجى المحاولة مرة أخرى.");
+    window.location.href = "login.html";
+  });
+
+  // Add event listeners for edit and logout buttons
+  const editBtn = document.getElementById("editBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
   
-  // Set up dashboard link based on user role
-  const dashboardLink = document.getElementById("dashboardLink");
-  if (userData.role === "student") {
-    dashboardLink.href = "studentDashboard.html";
-  } else if (userData.role === "teacher" || userData.role === "servant") {
-    dashboardLink.href = "teacherDashboard.html";
-  } else {
-    // Default to student dashboard if role is unclear
-    dashboardLink.href = "studentDashboard.html";
+  if (editBtn) {
+    editBtn.addEventListener("click", function() {
+      window.location.href = "editprofile.html";
+    });
   }
 
-  // Hide loading overlay on success
-  if (loadingOverlay) loadingOverlay.classList.add('hidden');
-  
-}).catch((error) => {
-  console.error("Firebase error:", error);
-  if (loadingOverlay) loadingOverlay.classList.add('hidden');
-  window.location.href = "login.html";
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function() {
+      // Clear all session data
+      clearSession();
+      
+      // Show confirmation message
+      alert("تم تسجيل الخروج بنجاح!");
+      
+      // Redirect to login page
+      window.location.href = "login.html";
+    });
+  }
 });
 
-// Add event listeners for edit and logout buttons
-document.getElementById("editBtn").addEventListener("click", function() {
-  window.location.href = "editprofile.html";
-});
-
-document.getElementById("logoutBtn").addEventListener("click", function() {
-  // Clear all session data
-  clearSession();
-  
-  // Show confirmation message
-  alert("تم تسجيل الخروج بنجاح!");
-  
-  // Redirect to login page
-  window.location.href = "login.html";
-});
+// Generate QR code for user attendance
+function generateUserQRCode(userId, userName) {
+  try {
+    const qrCodeSection = document.getElementById('qrCodeSection');
+    const qrcodeContainer = document.getElementById('qrcode');
+    
+    if (!qrCodeSection || !qrcodeContainer) {
+      console.error("[Profile] QR code containers not found in DOM");
+      return;
+    }
+    
+    // Check if QRCode library is available
+    if (typeof QRCode === 'undefined') {
+      console.error("[Profile] QRCode library is not loaded");
+      return;
+    }
+    
+    // Clear existing QR code
+    qrcodeContainer.innerHTML = '';
+    
+    // Create simplified QR code data - just userId to keep it short
+    // Full name will be looked up from database when scanned
+    const qrData = `ATT:${userId}`;
+    
+    console.log('[Profile] Generating QR Code for user:', userName);
+    console.log('[Profile] QR Data length:', qrData.length, 'characters');
+    
+    // Generate QR code with lower error correction for more data capacity
+    new QRCode(qrcodeContainer, {
+      text: qrData,
+      width: 200,
+      height: 200,
+      colorDark: "#233B6E",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.L  // Changed from H to L for more capacity
+    });
+    
+    // Show QR code section
+    qrCodeSection.style.display = 'block';
+    
+    console.log('[Profile] QR Code generated successfully for user:', userName);
+  } catch (error) {
+    console.error('[Profile] Error generating QR code:', error);
+    // Don't redirect, just log the error - profile should still work without QR
+  }
+}

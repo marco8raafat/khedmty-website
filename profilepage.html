@@ -34,16 +34,35 @@
     <div class="info-line" id="phone"></div>
     <div class="info-line" id="group"></div>
     <div class="info-line" id="role"></div>
+    
+    <!-- QR Code Section -->
+    <div class="qr-code-section" id="qrCodeSection" style="display: none;">
+      <h3>كود الحضور الخاص بك</h3>
+      <div id="qrcode"></div>
+      <p class="qr-instruction">اعرض هذا الكود للخادم او الخادمة لتسجيل حضورك</p>
+    </div>
+    
     <div class="profile-buttons">
       <button id="editBtn">تعديل البيانات</button>
       <button id="logoutBtn">تسجيل الخروج</button>
     </div>
   </div>
 
+  <!-- Load QRCode library first -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
+  <!-- Firebase scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  
+  <!-- Session and profile scripts -->
   <script src="sessionUtils.js"></script>
   <script src="profile.js"></script>
+  
+  <!-- Verify QRCode loaded -->
+  <script>
+    console.log('[Profile Page] QRCode library loaded:', typeof QRCode !== 'undefined');
+  </script>
 </body>
 </html>
