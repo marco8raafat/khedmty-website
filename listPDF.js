@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-        // Convert Firebase data to array format
+        // Convert Firebase data to array format with enhanced metadata
         Object.entries(pdfData).forEach(([pdfKey, pdf]) => {
           allPdfs.push({
             ...pdf,
@@ -179,7 +179,29 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         });
         
-        console.log('[PDF System] Loaded PDFs from cache/Firebase:', allPdfs.length);
+        // Sort by multiple criteria (newest first)
+        allPdfs.sort((a, b) => {
+          // Try timestamp first
+          if (a.timestamp && b.timestamp) {
+            return b.timestamp - a.timestamp;
+          }
+          
+          // Try uploadedAt (ISO string)
+          if (a.uploadedAt && b.uploadedAt) {
+            return new Date(b.uploadedAt) - new Date(a.uploadedAt);
+          }
+          
+          // Try id (Date.now() based)
+          if (a.id && b.id) {
+            return b.id - a.id;
+          }
+          
+          // Fallback: Use Firebase push key (time-based)
+          // Firebase push keys are lexicographically sortable by time
+          return b.firebaseKey.localeCompare(a.firebaseKey);
+        });
+        
+        console.log('[PDF System] Loaded and sorted PDFs (newest first):', allPdfs.length);
         debouncedPopulateSubjectFilter();
         debouncedRenderPDFs('all');
       });
