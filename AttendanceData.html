@@ -195,7 +195,7 @@
     <div class="nav-right" id="navMenu">
       <a href="index.html" class="nav-link">الصفحة الرئيسية</a>
       <a href="teacherDashboard.html" class="nav-link">لوحة التحكم</a>
-      <a href="qr-scanner.html" class="nav-link">📱 ماسح QR</a>
+      <a href="qr-scanner.html" class="nav-link">ماسح QR</a>
       <a href="AttendanceRegistration.html" class="nav-link">سجل الحضور</a>
       <a href="profilepage.html" class="nav-link">الملف الشخصي</a>
       <a href="javascript:void(0)" onclick="logout()" class="nav-link">تسجيل الخروج</a>
@@ -612,30 +612,38 @@ async function loadExistingAttendance() {
                   }
               }
 
-              const attendanceRef = database.ref('attendance/' + selectedDate + '/' + selectedPeriod);
               const promises = [];
 
               // Save only the students with marked attendance
-              Object.keys(attendanceData).forEach(studentId => {
+              for (const studentId of Object.keys(attendanceData)) {
                   const student = students.find(s => s.id === studentId);
                   if (!student) {
                       console.warn('Student not found:', studentId);
-                      return;
+                      continue;
                   }
                   
                   const periodText = selectedPeriod === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
+                  
+                  // Create reference for individual student
+                  const studentAttendanceRef = database.ref('attendance/' + selectedDate + '/' + selectedPeriod + '/' + studentId);
+                  
+                  // Check if student already has attendance record (to preserve timestamp and other fields)
+                  const existingSnapshot = await studentAttendanceRef.once('value');
+                  const existingRecord = existingSnapshot.val();
+                  
                   const attendanceRecord = {
                       studentId: studentId,
                       studentName: student.name,
                       team: student.team,
                       status: attendanceData[studentId],
                       period: periodText,
-                      timestamp: firebase.database.ServerValue.TIMESTAMP
+                      // Preserve existing timestamp if it exists, otherwise create new one
+                      timestamp: existingRecord && existingRecord.timestamp ? existingRecord.timestamp : firebase.database.ServerValue.TIMESTAMP
                   };
                   
-                  // Use set() to overwrite existing record or create new one
-                  promises.push(attendanceRef.child(studentId).set(attendanceRecord));
-              });
+                  // Use set() on individual student path - this won't affect other students
+                  promises.push(studentAttendanceRef.set(attendanceRecord));
+              }
 
               await Promise.all(promises);
               

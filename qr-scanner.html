@@ -738,15 +738,15 @@
         // Save attendance to Firebase using selected date
         const attendanceRef = database.ref(`attendance/${attendanceDate}/${selectedPeriod}/${userId}`);
         
+        const periodText = selectedPeriod === 'period1' ? 'الفترة الأولى' : 'الفترة الثانية';
+        
         await attendanceRef.set({
           studentId: userId,
           studentName: userName,
-          studentGroup: userGroup,
+          team: userGroup,
           status: 'present',
-          timestamp: Date.now(),
-          markedBy: currentUser,
-          method: 'qr-scan',
-          period: selectedPeriod
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          period: periodText
         });
 
         // Add to today's list with period-specific key
@@ -900,7 +900,7 @@
                 const periodKey = `${userId}_${period}`;
                 if (record.status === 'present' && !todayAttendance[periodKey]) {
                   // Fetch group from user data if not in attendance record
-                  let studentGroup = record.studentGroup;
+                  let studentGroup = record.team;
                   
                   if (!studentGroup || studentGroup === 'undefined') {
                     try {
