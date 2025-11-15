@@ -771,12 +771,14 @@ async function loadExistingAttendance() {
           
           // Add event listeners for date and period changes
           document.getElementById('attendanceDate').addEventListener('change', function() {
-              console.log('Date changed, reloading students and attendance...');
+              console.log('Date changed, reloading students');
+              attendanceData = {}; // Clear attendance data when date changes
               loadStudents();
           });
           
           document.getElementById('periodSelect').addEventListener('change', function() {
-              console.log('Period changed, reloading students and attendance...');
+              console.log('Period changed, reloading students');
+              attendanceData = {}; // Clear attendance data when period changes
               loadStudents();
           });
       };
