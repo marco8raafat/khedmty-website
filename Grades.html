@@ -569,14 +569,12 @@ for (let i = 0; i < crossCount; i++) {
 
       // Add regular grades from Google Sheets
       sheetsData.forEach(entry => {
-        // More flexible name matching
-        const entryName = entry["الاسم"]?.trim();
-        const entryEmail = entry["الإيميل"]?.trim();
+        // Strict email matching to prevent showing wrong grades
+        const entryEmail = entry["الإيميل"]?.trim().toLowerCase();
+        const normalizedStudentEmail = studentEmail?.trim().toLowerCase();
         
-        if ((entryEmail === studentEmail) || 
-            (entryName === studentName) ||
-            (entryName && studentName && entryName.includes(studentName.split(' ')[0])) ||
-            (entryName && studentName && studentName.includes(entryName.split(' ')[0]))) {
+        // Only match if emails are exactly the same
+        if (entryEmail === normalizedStudentEmail) {
           
           foundGrades = true;
           const row = document.createElement("tr");
